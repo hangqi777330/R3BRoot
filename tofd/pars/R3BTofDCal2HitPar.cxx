@@ -70,7 +70,8 @@ R3BTofDCal2HitPar::R3BTofDCal2HitPar(const char* name, Int_t iVerbose)
     , fHitPar(NULL)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fMaxQ(1500)
+    , fMaxQ(2000)
+	//, fMaxQ(1500)
     , fNbZPeaks(1)
     , fZfitType("pol1")
     , fTofdTotLow(0.)
@@ -409,6 +410,9 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     // fill control histograms
                     // fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
+	            /*if (sqrt(top_tot * bot_tot) > 170.) {
+			    fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT,sqrt(top_tot * bot_tot));
+		    }*/
 
                     // Time differences of one paddle
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
@@ -498,9 +502,11 @@ void R3BTofDCal2HitPar::Exec(Option_t* option)
                     // Fill control histograms and Q vs Pos without multihits
                     if (multihits[iPlane - 1][iBar - 1] < 2 && (qb > 0.))
                     {
-                        // std::cout<< " h: " << posToT << " , " << qb << std::endl;
-                        fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT, qb);
-                    }
+			    //if (TMath::Sqrt(top_tot * bot_tot) > 170.) {
+                        	// std::	cout<< " h: " << posToT << " , " << qb << std::endl;
+                        	fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT, qb);
+			    //}
+			}		
                 }
 
                 ++top_i;
@@ -573,8 +579,9 @@ void R3BTofDCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 2000, -100, 100, max_charge / 2, 0., max_charge);
-        fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
+        //fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 2000, -100, 100, max_charge / 2, 0., max_charge);
+        fhQvsPos[iPlane - 1] [iBar - 1] = new TH2F(strName,"",500,-100,100, max_charge / 2, 0., max_charge); 
+	fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
 
