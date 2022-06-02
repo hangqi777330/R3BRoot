@@ -33,6 +33,7 @@ class R3BCalifaMappingPar;
 class TH1F;
 class TH1I;
 class TH2F;
+class TVector3;
 class R3BEventHeader;
 
 /**
@@ -172,6 +173,7 @@ class R3BCalifaOnlineSpectra : public FairTask
 
   private:
     void SetParameter();
+    bool isFootDetect(TVector3 hit);
 
     Int_t fMapHistos_max;
     Int_t fMapHistos_bins;

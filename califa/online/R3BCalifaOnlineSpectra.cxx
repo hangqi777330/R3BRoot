@@ -139,6 +139,25 @@ void R3BCalifaOnlineSpectra::SetParContainers()
     }
 }
 
+bool R3BCalifaOnlineSpectra::isFootDetect(TVector3 hit)
+{
+    double theta = hit.Theta() * TMath::RadToDeg();
+    double phi = hit.Phi() * TMath::RadToDeg();
+    
+    bool cond_theta = ((theta>20.0) && (theta<80.0));
+    
+    double h = 8.0265; // cm, perp dist from target
+    double beta = 1.10915; // 63.55 degrees
+    double foot_half_height = 5.0; // cm, foot half height
+    double d = h / TMath::Cos(hit.Theta()-beta);
+    double phiR_lim = 180.0 - TMath::ATan(foot_half_height / d) * TMath::RadToDeg();
+    double phiL_lim = TMath::ATan(foot_half_height / d) * TMath::RadToDeg();
+    
+    bool cond_phi = ((TMath::Abs(phi)<phiL_lim) || (TMath::Abs(phi)>phiR_lim));
+
+    return (cond_theta && cond_phi);
+}
+
 void R3BCalifaOnlineSpectra::SetParameter()
 {
     R3BLOG_IF(ERROR, !fMap_Par, "CalifaMappingPar container not found");
@@ -1457,7 +1476,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                 continue;
 
             Int_t cryId = hit->GetCrystalId();
-
+	    
             fh2_Califa_cryId_energy_cal->Fill(cryId, hit->GetEnergy());
 
             fh2_Califa_NsNf->Fill(hit->GetNf(), hit->GetNs());
@@ -1516,8 +1535,12 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         }
         if (maxEL > fMinProtonE && maxER > fMinProtonE)
         {
-            fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
-        }
+	    if (isFootDetect(master[0]) && isFootDetect(master[1])) {
+		//std::cout << "right: " << master[0].Theta()*57.3 << " " << master[0].Phi()*57.3 << endl;
+		//std::cout << "left: " << master[1].Theta()*57.3 << " " << master[1].Phi()*57.3 << endl;
+	    	fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+            }
+	}	
 
         // Comparison of hits to get energy, theta and phi correlations between them
         for (Int_t i1 = 0; i1 < nHits; i1++)
