@@ -257,6 +257,14 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             for (int idx; idx < 3; idx++)
                 cal[idx] = NAN;
 
+        /*if (0<crystalId && crystalId <= fNumCrystals) 
+	{
+	    std::cout << "raw energy: " << raw[0] << " Nf: " << raw[1] << " Ns: " << raw[2] << std::endl;
+	    std::cout << "fit intercept: " << fCalParams->GetAt(fNumParams*(crystalId-1))
+		    << " slope: " << fCalParams->GetAt(fNumParams*(crystalId-1)+1) << std::endl;
+	    std::cout << "calibrated energy: " << cal[0] << " Nf: " << cal[1] << " Ns: " << cal[2] << std::endl;
+	}*/
+
         double TotCal = Tot;
         if (fCalTotParams)
         {

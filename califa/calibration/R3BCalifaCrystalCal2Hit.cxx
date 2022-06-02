@@ -251,6 +251,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
             crystalId2Pos[aCalData.GetCrystalId()] = &aCalData;
 
         R3BLOG(DEBUG, "crystalId2Pos.size()=" << crystalId2Pos.size());
+	//std::cout << "crystalId2Pos.size()=" << crystalId2Pos.size() << endl;
 
         for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
             if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
@@ -276,6 +277,8 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         auto highest = unusedCrystalHits.front();
         LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): starting cluster at "
                    << "crystal " << highest->GetCrystalId() << ", E=" << highest->GetEnergy();
+	//std::cout << "starting cluster at crystal " << highest->GetCrystalId() 
+		//<< ", E=" << highest->GetEnergy() << endl;
 
         // Note: we do not remove highest, but process it like any others
         uint64_t time = highest->GetTime();
@@ -315,6 +318,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
             {
                 LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): adding  "
                            << "crystal " << (*i)->GetCrystalId() << ", E=" << (*i)->GetEnergy();
+	        //std::cout << "adding crystal" << (*i)->GetCrystalId() << ", E=" << (*i)->GetEnergy() << endl;
 
                 *clusterHit += **i;
                 i = unusedCrystalHits.erase(i);
