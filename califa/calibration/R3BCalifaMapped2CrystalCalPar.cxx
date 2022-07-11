@@ -209,7 +209,7 @@ void R3BCalifaMapped2CrystalCalPar::FinishTask()
 {
     // Look for the peaks in each spectrum
     SearchPeaks();
-    // fCal_Par->printParams();
+    //fCal_Par->printParams();
     if (fDebugMode)
         for (Int_t i = 0; i < fNumCrystals; i++)
             if (fMap_Par->GetInUse(i + 1) == 1 && fh_Map_energy_crystal[i]->GetEntries() > fMinStadistics)
@@ -247,6 +247,8 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 LOG(DEBUG) << "CrystalId=" << i + 1 << " " << nfound << " " << fThreshold;
                 fChannelPeaks = (Double_t*)ss->GetPositionX();
 
+		std::cout << "nfound: " << nfound << std::endl;
+
                 Int_t idx[nfound];
                 TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
 
@@ -254,10 +256,13 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 Double_t X[nfound + 1];
                 Double_t Y[nfound + 1];
 
+		std::cout << "crystal Id: " << i+1 << std::endl;
+
                 for (Int_t j = 0; j < nfound; j++)
                 {
                     X[j] = fChannelPeaks[idx[nfound - j - 1]];
                     Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
+		    std::cout << "the " << j << "th entry: channel: " << X[j] << " energy: " << Y[j] << std::endl;
                     LOG(DEBUG) << "CrystalId=" << i + 1 << " " << j + 1 << " " << X[j + 1];
                 }
                 X[nfound] = 0.;
@@ -314,10 +319,13 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
 
                 TGraph* graph = new TGraph(fNumPeaks + 1, X, Y);
                 graph->Fit("f1", "Q"); // Quiet mode (minimum printing)
+		graph->Draw("");
 
+		std::cout << "crystalId: " << i+1 << std::endl;
                 for (Int_t h = 0; h < numPars; h++)
                 {
                     fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h);
+		    std::cout<<"the "<<h<<"th parameter: "<<f1->GetParameter(h)<<std::endl;
                 }
             }
             else

@@ -200,6 +200,20 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
+    outfile = new TFile("califa_cal.root","RECREATE");
+    outfile->cd();
+    outtree = new TTree("genTbuffer","General Tree");
+
+    outtree->Branch("tpat",&tpat);
+    outtree->Branch("wr0",&wr0);
+    outtree->Branch("wr1",&wr1);
+    outtree->Branch("wrm",&wrmaster);
+    outtree->Branch("crystalId",&crystalId);
+    outtree->Branch("energy",&energy);
+    outtree->Branch("Ns",&Ns);
+    outtree->Branch("Nf",&Nf);
+    outtree->Branch("time",&time);
+
     // get access to Mapped data
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
@@ -291,6 +305,21 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     gPad->SetLogz();
     fh2_Califa_cryId_energy->Draw("COLZ");
 
+    // energy spectrum for each crystal
+    //TCanvas cCalifa_cry_energy_spectrum = new TCanvas("energy spectrum, mapped", "Califa Map energy spectrum", 10, 10, 500, 500);
+    for (Int_t i = 0; i<4864; i++) 
+    {
+	TString buf = "crystal_mapped_"+std::to_string(i);
+        fh1_Califa_CrystalEnergy[i] =
+		new TH1F(buf,buf,fBinsChannelFebex,0.0,fMaxBinChannelFebex);
+	fh1_Califa_CrystalEnergy[i]->GetXaxis()->SetTitle("Energy [Channels]");
+	fh1_Califa_CrystalEnergy[i]->GetYaxis()->SetTitle("Counts");
+	fh1_Califa_CrystalEnergy[i]->GetYaxis()->SetTitleOffset(1.4);
+	fh1_Califa_CrystalEnergy[i]->GetXaxis()->CenterTitle(true);
+	fh1_Califa_CrystalEnergy[i]->GetYaxis()->CenterTitle(true);
+	fh1_Califa_CrystalEnergy[i]->Draw();
+    }
+
     // CANVAS Crystal_ID vs energy
     cCalifa_cry_energy_cal = new TCanvas("Califa_Cal_cryID_energy", "Califa_Cal energy vs cryID", 10, 10, 500, 500);
     fh2_Califa_cryId_energy_cal = new TH2F("fh2_Califa_Cal_cryID_energy",
@@ -319,6 +348,44 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_NsNf->GetYaxis()->CenterTitle(true);
     gPad->SetLogz();
     fh2_Califa_NsNf->Draw("COLZ");
+
+    //TCanvas cCalifa_energy_spectrum_cal = new TCanvas("cal energy spectrum", "cal energy spectrum", 10, 10, 500, 500);
+    for (Int_t i = 0; i<4864; i++)
+    {
+        TString buf = "crystal_cal_"+std::to_string(i);
+	fh1_Califa_CrystalEnergy_cal[i] =
+		new TH1F(buf,buf,bins,minE,maxE);
+	fh1_Califa_CrystalEnergy_cal[i]->GetXaxis()->SetTitle("Energy [keV]");
+	fh1_Califa_CrystalEnergy_cal[i]->GetYaxis()->SetTitle("Counts");
+	fh1_Califa_CrystalEnergy_cal[i]->GetYaxis()->SetTitleOffset(1.4);
+	fh1_Califa_CrystalEnergy_cal[i]->GetXaxis()->CenterTitle(true);
+	fh1_Califa_CrystalEnergy_cal[i]->GetYaxis()->CenterTitle(true);
+	fh1_Califa_CrystalEnergy_cal[i]->Draw();
+    }
+
+    fh1_Califa_cryHits = new TH1F("fh1_Califa_cryHits","Hits v. Crystal Id",4865,0,4865);
+    fh1_Califa_cryHits->GetXaxis()->SetTitle("Crystal Id");
+    fh1_Califa_cryHits->GetYaxis()->SetTitle("Hits");
+    fh1_Califa_cryHits->GetYaxis()->SetTitleOffset(1.4);
+    fh1_Califa_cryHits->GetXaxis()->CenterTitle(true);
+    fh1_Califa_cryHits->GetYaxis()->CenterTitle(true);
+    fh1_Califa_cryHits->Draw();
+
+    fh2_Califa_Ns_crystalId = new TH2F("fh2_Califa_Ns_crystalId","Ns v. Crystal Id",4865,0,4865,bins,minE,maxE);
+    fh2_Califa_Ns_crystalId->GetXaxis()->SetTitle("Crystal Id");
+    fh2_Califa_Ns_crystalId->GetYaxis()->SetTitle("Ns Energy [keV]");
+    fh2_Califa_Ns_crystalId->GetYaxis()->SetTitleOffset(1.2);
+    fh2_Califa_Ns_crystalId->GetXaxis()->CenterTitle(true);
+    fh2_Califa_Ns_crystalId->GetYaxis()->CenterTitle(true);
+    fh2_Califa_Ns_crystalId->Draw("COLZ");
+
+    fh2_Califa_Nf_crystalId = new TH2F("fh2_Califa_Nf_crystalId","Nf v. Crystal Id",4865,0,4865,bins,minE,maxE);
+    fh2_Califa_Nf_crystalId->GetXaxis()->SetTitle("Crystal Id");
+    fh2_Califa_Nf_crystalId->GetYaxis()->SetTitle("Nf Energy [keV]");
+    fh2_Califa_Nf_crystalId->GetYaxis()->SetTitleOffset(1.2);
+    fh2_Califa_Nf_crystalId->GetXaxis()->CenterTitle(true);
+    fh2_Califa_Nf_crystalId->GetYaxis()->CenterTitle(true);
+    fh2_Califa_Nf_crystalId->Draw("COLZ");	   
 
     // Map data
     for (Int_t i = 0; i < fNumRings; i++)
@@ -968,6 +1035,12 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
         // for (Int_t s = 0; s < 3; s++)
         //   fh1_Califa_sync[s]->Reset();
         fh2_Califa_cryId_energy->Reset();
+
+	for (Int_t i = 0; i<4864; i++)
+	{
+	    fh1_Califa_CrystalEnergy[i]->Reset();
+	}
+
         for (Int_t i = 0; i < fNumRings; i++)
         {
             fh2_Preamp_vs_ch_R[i]->Reset();
@@ -995,6 +1068,16 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     {
         fh2_Califa_cryId_energy_cal->Reset();
         fh2_Califa_NsNf->Reset();
+	fh1_Califa_cryHits->Reset();
+
+	fh2_Califa_Ns_crystalId->Reset();
+	fh2_Califa_Nf_crystalId->Reset();
+
+	for (Int_t i = 0; i<4864; i++)
+	{
+	    fh1_Califa_CrystalEnergy_cal[i]->Reset();
+	}
+
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1328,22 +1411,37 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 
 void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 {
+    tpat = 0;
+    wr0 = 0;
+    wr1 = 0;
+    wrmaster = 0;
+    crystalId.clear();
+    energy.clear();
+    Ns.clear();
+    Nf.clear();
+    time.clear();
+
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
     // fTpat = 1-16; fTpat_bit = 0-15
     Int_t fTpat_bit1 = fTpat1 - 1;
     Int_t fTpat_bit2 = fTpat2 - 1;
     Int_t tpatbin;
+    //std::cout << "fTpat_bit1: " << fTpat_bit1 << std::endl;
+    //std::cout << "fTpat_bit2: " << fTpat_bit2 << std::endl;
     if (header && fTpat1 >= 0 && fTpat2 >= 0)
     {
+	//std::cout << "tpat: " << header->GetTpat() << std::endl;
         for (int i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
+	    //std::cout << "tpatbin: " << tpatbin << std::endl;
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
                 return;
             }
         }
+	//std::cout << "tpat passed: " << header->GetTpat() << std::endl;
     }
 
     int64_t wr[2];
@@ -1378,6 +1476,11 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             }
         }
     }
+
+    tpat = header->GetTpat();
+    wr0 = wr[0];
+    wr1 = wr[1];
+    wrmaster = wrm;
 
     // Mapped trigger data
     if (fTrigMappedItemsCalifa && fTrigMappedItemsCalifa->GetEntriesFast() > 0)
@@ -1434,6 +1537,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
             fh2_Califa_cryId_energy->Fill(cryId, hit->GetEnergy());
 
+	    fh1_Califa_CrystalEnergy[cryId-1]->Fill(hit->GetEnergy());
+
             if (fMap_Par->GetHalf(cryId) == 2)
                 fh2_Preamp_vs_ch_L[fMap_Par->GetRing(cryId) - 1]->Fill(fMap_Par->GetPreamp(cryId),
                                                                        fMap_Par->GetChannel(cryId));
@@ -1469,17 +1574,32 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     {
         Int_t nHits = fCalItemsCalifa->GetEntriesFast();
 
+	/*crystalId.clear();
+	energy.clear();
+	Ns.clear();
+	Nf.clear();
+	time.clear();*/
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
             if (!hit)
                 continue;
 
+	    crystalId.push_back(hit->GetCrystalId());
+	    energy.push_back(hit->GetEnergy());
+	    Ns.push_back(hit->GetNs());
+	    Nf.push_back(hit->GetNf());
+	    time.push_back(hit->GetTime());
+
             Int_t cryId = hit->GetCrystalId();
 	    
             fh2_Califa_cryId_energy_cal->Fill(cryId, hit->GetEnergy());
-
             fh2_Califa_NsNf->Fill(hit->GetNf(), hit->GetNs());
+	    fh2_Califa_Ns_crystalId->Fill(cryId, hit->GetNs());
+	    fh2_Califa_Nf_crystalId->Fill(cryId, hit->GetNf());
+	    fh1_Califa_cryHits->Fill(cryId);
+	    fh1_Califa_CrystalEnergy_cal[cryId-1]->Fill(hit->GetEnergy());
 
             if (fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2)
                 fh1_crystals_cal[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
@@ -1563,6 +1683,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         }
     }
 
+    outtree->Fill();
     fNEvents += 1;
 }
 
@@ -1624,6 +1745,11 @@ void R3BCalifaOnlineSpectra::FinishTask()
         cCalifaMult->Write();
         cCalifa_cry_energy->Write();
 
+	//for (Int_t i = 0; i<4864; i++) 
+	//{
+	  //  fh1_Califa_CrystalEnergy[i]->Write();
+	//}
+
         for (Int_t i = 0; i < fNumRings; i++)
         {
             cMap_RingR[i]->Write();
@@ -1645,6 +1771,14 @@ void R3BCalifaOnlineSpectra::FinishTask()
     {
         cCalifa_cry_energy_cal->Write();
         cCalifa_NsNf->Write();
+	fh2_Califa_Ns_crystalId->Write();
+	fh2_Califa_Nf_crystalId->Write();
+
+	//for (Int_t i=0; i<4864; i++) 
+	//{
+	  //  fh1_Califa_CrystalEnergy_cal[i]->Write();
+	//}
+
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1667,6 +1801,10 @@ void R3BCalifaOnlineSpectra::FinishTask()
         cCalifa_hitenergy->Write();
         cCalifa_opening->Write();
     }
+
+    outtree->SetName("genT");
+    outfile->Write();
+    outfile->Close();
 }
 
 ClassImp(R3BCalifaOnlineSpectra);
