@@ -269,6 +269,24 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_EtrigCor[4];
     TH1F* fh1_Califa_Etrig[2];
 
+    // added
+    TH1F* fh1_Califa_CrystalEnergy[4864];
+    TH1F* fh1_Califa_CrystalEnergy_cal[4864];
+    TH1F* fh1_Califa_cryHits;
+    TH2F* fh2_Califa_Ns_crystalId;
+    TH2F* fh2_Califa_Nf_crystalId;
+
+    TFile *outfile;
+    TTree *outtree;
+
+    std::vector<Double_t> crystalId;
+    std::vector<Double_t> energy;
+    std::vector<Double_t> Ns;
+    std::vector<Double_t> Nf;
+    std::vector<uint64_t> time;
+    Int_t tpat;
+    int64_t wr0, wr1, wrmaster;
+
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)
 };

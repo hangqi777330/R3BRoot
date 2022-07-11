@@ -21,10 +21,12 @@
 
 #include "FairTask.h"
 #include "TCanvas.h"
+#include "TLorentzVector.h"
 
 class TClonesArray;
 class TH2F;
 class R3BEventHeader;
+class TVector3;
 
 class R3BCalifavsTofDOnlineSpectra : public FairTask
 {
@@ -104,8 +106,11 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     void SetZCharge(Float_t z) { fZselection = z; }
 
   private:
+    bool isFootDetect(TVector3 hit);
+
     TClonesArray* fHitItemsCalifa;
     TClonesArray* fHitItemsTofd;
+    TClonesArray* fItemsFrs;
 
     R3BEventHeader* header;
     Int_t fNEvents;
@@ -113,10 +118,51 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     Float_t fZselection;
     Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
 
+<<<<<<< HEAD
     TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with TofD
     TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_coinTheta;
     TCanvas* cCalifa_angles;
+=======
+    TH2F* fh2_Califa_theta_phi[3]; // 0: all, 1: with TofD
+    TH2F* fh2_Califa_NsNf[4];
+    TH1F* fh2_Califa_total_energy[3];
+    TH1F* fh2_Califa_CrystalHits[3];
+    TH1F* fh2_Califa_ClusterId[3];
+    TH2F* fh2_Califa_theta_energy[3];
+
+    TH1F* fh2_openangle[3];
+    TH2F* fh2_coinTheta[3];
+    TH2F* fh2_coinPhi[3];
+    TH2F* fh2_coinE[3];
+    TH2F* fh2_leftE_openangle[3];
+    TH2F* fh2_rightE_openangle[3];
+
+    TH2F* fh2_Q_tof;
+
+    //TCanvas* cCalifa_angles;
+
+    TFile *outfile;
+    TTree *outtree;
+
+    // event variables
+    Int_t tpatval;
+    //Int_t trigger;
+
+    // califa variables
+    std::vector<Double_t> thetaList;
+    std::vector<Double_t> phiList;
+    std::vector<Double_t> energyList;
+    std::vector<Double_t> NfList;
+    std::vector<Double_t> NsList;
+    std::vector<Double_t> crystalHitsList;
+    std::vector<Double_t> clusterIdList; 
+
+    // tofd variables
+    std::vector<Double_t> charge;
+    std::vector<Double_t> tof;
+    std::vector<Int_t> detectorId;
+>>>>>>> changes
 
   public:
     ClassDef(R3BCalifavsTofDOnlineSpectra, 1)
