@@ -133,16 +133,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     // Create histograms for detectors
 
     // CANVAS Theta vs Phi
-<<<<<<< HEAD
     cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
     cCalifa_angles->Divide(2, 2);
-    for (int i = 0; i < 2; i++)
-    {
-        cCalifa_angles->cd(i + 1);
-        char buf[512];
-        snprintf(buf, 512, "%s%s", "fh2_CalifaTofd_theta_vs_phi", (i == 0) ? "" : "_withTofD");
-        fh2_Califa_theta_phi[i] = new TH2F(buf, buf, 50, 0, 90, 180, -180, 180);
-=======
     //cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
     //cCalifa_angles->Divide(2, 1);
 
@@ -159,7 +151,6 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 	if (i == 1) buf1 = "fh2_theta_phi_withTofD";
 	if (i == 2) buf1 = "fh2_theta_phi_withTofDFoot";
         fh2_Califa_theta_phi[i] = new TH2F(buf1, buf1, 50, 0, 90, 180, -180, 180);
->>>>>>> changes
         fh2_Califa_theta_phi[i]->GetXaxis()->SetTitle("Theta [degrees]");
         fh2_Califa_theta_phi[i]->GetYaxis()->SetTitle("Phi [degrees]");
         fh2_Califa_theta_phi[i]->GetYaxis()->SetTitleOffset(1.2);
@@ -324,27 +315,6 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 	fh2_rightE_openangle[i]->Draw("COLZ");
     }
 
-<<<<<<< HEAD
-    cCalifa_angles->cd(3);
-    fh2_Califa_coinTheta =
-        new TH2F("fh2_CalifaTofd_theta_correlations", "Califa theta correlations", 500, 0, 100, 500, 0, 100);
-    fh2_Califa_coinTheta->GetXaxis()->SetTitle("Theta [degrees]");
-    fh2_Califa_coinTheta->GetYaxis()->SetTitle("Theta [degrees]");
-    fh2_Califa_coinTheta->GetYaxis()->SetTitleOffset(1.2);
-    fh2_Califa_coinTheta->GetXaxis()->CenterTitle(true);
-    fh2_Califa_coinTheta->GetYaxis()->CenterTitle(true);
-    fh2_Califa_coinTheta->Draw("COLZ");
-
-    cCalifa_angles->cd(4);
-    fh2_Califa_coinPhi =
-        new TH2F("fh2_CalifaTofd_phi_correlations", "Califa phi correlations", 600, -190, 190, 600, -190, 190);
-    fh2_Califa_coinPhi->GetXaxis()->SetTitle("Phi [degrees]");
-    fh2_Califa_coinPhi->GetYaxis()->SetTitle("Phi [degrees]");
-    fh2_Califa_coinPhi->GetYaxis()->SetTitleOffset(1.2);
-    fh2_Califa_coinPhi->GetXaxis()->CenterTitle(true);
-    fh2_Califa_coinPhi->GetYaxis()->CenterTitle(true);
-    fh2_Califa_coinPhi->Draw("COLZ");
-=======
     TString buf = "fh2_NsNf_withTofDFoot_openangle";
     fh2_Califa_NsNf[3] =
 	    new TH2F(buf, buf, bins, minE, maxE, bins, minE, maxE);
@@ -364,7 +334,6 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     fh2_Q_tof->GetXaxis()->CenterTitle(true);
     fh2_Q_tof->GetYaxis()->CenterTitle(true);
     fh2_Q_tof->Draw("COLZ");
->>>>>>> changes
 
     // MAIN FOLDER-Califa
     TFolder* mainfolCalifa = new TFolder("CALIFAvsTofD", "CALIFA vs TofD info");
@@ -406,14 +375,9 @@ void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 	fh2_coinPhi[i]->Reset();
 	fh2_coinE[i]->Reset();
     }
-<<<<<<< HEAD
-    fh2_Califa_coinPhi->Reset();
-    fh2_Califa_coinTheta->Reset();
-=======
 
     fh2_Califa_NsNf[3]->Reset();
     fh2_Q_tof->Reset();
->>>>>>> changes
 }
 
 void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
@@ -543,15 +507,11 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	}
     }
 
-<<<<<<< HEAD
     // Hit data
     if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
 
         Double_t theta = 0., phi = 0.;
-        Double_t califa_theta[nHits];
-        Double_t califa_phi[nHits];
-        Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
@@ -564,82 +524,49 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
             califa_e[ihit] = hit->GetEnergy();
         }
 
-        TVector3 master[2];
-        Double_t maxEL = 0., maxER = 0.;
-        for (Int_t i1 = 0; i1 < nHits; i1++)
-        {
+    	TVector3 master[2];
+    	Double_t maxEL = 0., maxER = 0.;
+   	Double_t NsL=0., NfL=0., NsR=0., NfR=0.;
+    	for (Int_t i1 = 0; i1 < nHits; i1++)
+    	{
+      		if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 150.) // wixhausen
+      		{
+			master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
+  			maxER = califa_e[i1];
+			NsR = califa_Ns[i1];
+			NfR = califa_Nf[i1];
+      		}
+      		if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 60.)
+      		{ // messel
+        		master[1].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
+       			maxEL = califa_e[i1];
+			NsL = califa_Ns[i1];
+			NfL = califa_Nf[i1];
+      		}
+	}
 
-            if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 90.) // wixhausen
-            {
-                master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
-                maxER = califa_e[i1];
-            }
-            if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 90.)
-            { // messel
-                master[1].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
-                maxEL = califa_e[i1];
-            }
-        }
-        if (maxEL > fMinProtonE && maxER > fMinProtonE &&
-            TMath::Abs(master[0].Phi() * TMath::RadToDeg() - master[1].Phi() * TMath::RadToDeg()) > 150.0)
-        {
-            if (gRandom->Uniform(0., 1.0) < 0.5)
-            {
-                fh2_Califa_coinTheta->Fill(master[0].Theta() * TMath::RadToDeg(),
-                                           master[1].Theta() * TMath::RadToDeg());
-                fh2_Califa_coinPhi->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
-            }
-            else
-            {
-                fh2_Califa_coinTheta->Fill(master[1].Theta() * TMath::RadToDeg(),
-                                           master[0].Theta() * TMath::RadToDeg());
-                fh2_Califa_coinPhi->Fill(master[1].Phi() * TMath::RadToDeg(), master[0].Phi() * TMath::RadToDeg());
-            }
-        }
-=======
-    TVector3 master[2];
-    Double_t maxEL = 0., maxER = 0.;
-    Double_t NsL=0., NfL=0., NsR=0., NfR=0.;
-    for (Int_t i1 = 0; i1 < nHits; i1++)
-    {
-      if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 150.) // wixhausen
-      {
-        master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
-  	maxER = califa_e[i1];
-	NsR = califa_Ns[i1];
-	NfR = califa_Nf[i1];
-      }
-      if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 60.)
-      { // messel
-        master[1].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
-        maxEL = califa_e[i1];
-	NsL = califa_Ns[i1];
-	NfL = califa_Nf[i1];
-      }
-    }
+    	if (maxEL > fMinProtonE && maxER > fMinProtonE)
+    	{	
+      		fh2_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+      		fh2_coinTheta[0]->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
+      		fh2_coinPhi[0]->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
+      		fh2_coinE[0]->Fill(maxER,maxEL);
+      		fh2_leftE_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxEL);
+      		fh2_rightE_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxER);
 
-    if (maxEL > fMinProtonE && maxER > fMinProtonE)
-    {
-      fh2_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
-      fh2_coinTheta[0]->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
-      fh2_coinPhi[0]->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
-      fh2_coinE[0]->Fill(maxER,maxEL);
-      fh2_leftE_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxEL);
-      fh2_rightE_openangle[0]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxER);
+      		// temp mod
+      		fh2_Califa_total_energy[0]->Fill(maxEL);
+     		 fh2_Califa_total_energy[0]->Fill(maxER);
 
-      // temp mod
-      fh2_Califa_total_energy[0]->Fill(maxEL);
-      fh2_Califa_total_energy[0]->Fill(maxER);
+      		if (fZminus1) {
+        		fh2_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+        		fh2_coinTheta[1]->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
+			fh2_coinPhi[1]->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
+			fh2_coinE[1]->Fill(maxER,maxEL);
+			fh2_leftE_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxEL);
+			fh2_rightE_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxER);
 
-      if (fZminus1) {
-        fh2_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
-        fh2_coinTheta[1]->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
-	fh2_coinPhi[1]->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
-	fh2_coinE[1]->Fill(maxER,maxEL);
-	fh2_leftE_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxEL);
-	fh2_rightE_openangle[1]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg(),maxER);
-
-	if (isFootDetect(master[0]) && isFootDetect(master[1])) {
+		if (isFootDetect(master[0]) && isFootDetect(master[1])) {
 	  fh2_openangle[2]->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
 	  fh2_coinTheta[2]->Fill(master[0].Theta() * TMath::RadToDeg(), master[1].Theta() * TMath::RadToDeg());
 	  fh2_coinPhi[2]->Fill(master[0].Phi() * TMath::RadToDeg(), master[1].Phi() * TMath::RadToDeg());
@@ -659,7 +586,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	  }
 	}
       }
->>>>>>> changes
+    }
     }
 
     fNEvents += 1;
@@ -703,11 +630,6 @@ void R3BCalifavsTofDOnlineSpectra::FinishTask()
 	    fh2_Q_tof->Write();
 
             fh2_Califa_theta_phi[1]->Write();
-<<<<<<< HEAD
-
-        fh2_Califa_coinPhi->Reset();
-        fh2_Califa_coinTheta->Reset();
-=======
 	    fh2_Califa_theta_phi[2]->Write();
 	    fh2_Califa_NsNf[1]->Write();
 	    fh2_Califa_NsNf[2]->Write();
@@ -734,7 +656,6 @@ void R3BCalifavsTofDOnlineSpectra::FinishTask()
 	    fh2_rightE_openangle[2]->Write();
 	    fh2_Califa_NsNf[3]->Write();
 	}
->>>>>>> changes
     }
 
     outtree->SetName("genT");

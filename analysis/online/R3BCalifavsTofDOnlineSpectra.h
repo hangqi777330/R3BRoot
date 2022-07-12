@@ -118,12 +118,10 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     Float_t fZselection;
     Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
 
-<<<<<<< HEAD
-    TH2F* fh2_Califa_theta_phi[2]; // 0: all, 1: with TofD
     TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_coinTheta;
     TCanvas* cCalifa_angles;
-=======
+
     TH2F* fh2_Califa_theta_phi[3]; // 0: all, 1: with TofD
     TH2F* fh2_Califa_NsNf[4];
     TH1F* fh2_Califa_total_energy[3];
@@ -162,7 +160,6 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     std::vector<Double_t> charge;
     std::vector<Double_t> tof;
     std::vector<Int_t> detectorId;
->>>>>>> changes
 
   public:
     ClassDef(R3BCalifavsTofDOnlineSpectra, 1)
