@@ -224,9 +224,9 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 
   std::list<R3BCalifaCrystalCalData*> unusedCrystalHits;
   auto addHit = [&](R3BCalifaCrystalCalData* aCalData) {
-    if (aCalData->GetEnergy() > fThreshold)
-      unusedCrystalHits.push_back(aCalData);
-    else
+    if (aCalData->GetEnergy() > fThreshold) {
+	unusedCrystalHits.push_back(aCalData);
+    } else
       LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): rejected hit in " << aCalData->GetCrystalId()
 		 << " because of low energy (E=" << aCalData->GetEnergy() << "<=" << fThreshold << "=E_threshold";
   };

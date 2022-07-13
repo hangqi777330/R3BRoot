@@ -110,7 +110,7 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
 
     TClonesArray* fHitItemsCalifa;
     TClonesArray* fHitItemsTofd;
-    TClonesArray* fItemsFrs;
+    //TClonesArray* fItemsFrs;
 
     R3BEventHeader* header;
     Int_t fNEvents;
@@ -118,7 +118,7 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     Float_t fZselection;
     Float_t fMinProtonE; /* Min proton energy (in keV) to calculate the opening angle */
 
-    TH2F* fh2_Califa_coinPhi;
+    /*TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_coinTheta;
     TCanvas* cCalifa_angles;
 
@@ -136,7 +136,7 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     TH2F* fh2_leftE_openangle[3];
     TH2F* fh2_rightE_openangle[3];
 
-    TH2F* fh2_Q_tof;
+    TH2F* fh2_Q_tof;*/
 
     //TCanvas* cCalifa_angles;
 
