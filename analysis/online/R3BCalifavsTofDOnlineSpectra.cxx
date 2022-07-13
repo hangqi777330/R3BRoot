@@ -88,6 +88,8 @@ bool R3BCalifavsTofDOnlineSpectra::isFootDetect(TVector3 hit)
 
 InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 {
+    std::cout << "CalifavsTofDOnlineSpectra  Init begin" << std::endl;
+
     R3BLOG(INFO, "");
     FairRootManager* mgr = FairRootManager::Instance();
 
@@ -99,7 +101,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to Hit data
-    fItemsFrs = (TClonesArray*)mgr->GetObject("FrsData");
+    //fItemsFrs = (TClonesArray*)mgr->GetObject("FrsData");
 
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
     R3BLOG_IF(FATAL, !fHitItemsCalifa, "CalifaHitData not found");
@@ -108,7 +110,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     R3BLOG_IF(WARNING, !fHitItemsTofd, "TofdHit not found");
 
     // create Root File
-    outfile = new TFile("protons_main0126.root","RECREATE");
+    /*outfile = new TFile("protons.root","RECREATE");
     outfile->cd();
     outtree = new TTree("genTbuffer","General Tree");
 
@@ -128,12 +130,14 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     // tofd vars
     outtree->Branch("detectorId",&detectorId);
     outtree->Branch("charge",&charge);
-    outtree->Branch("tof",&tof);
+    outtree->Branch("tof",&tof);*/
+
+    std::cout << "CalifavsTofDOnlineSpectra Init middle" << std::endl;
 
     // Create histograms for detectors
 
     // CANVAS Theta vs Phi
-    cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
+    /*cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
     cCalifa_angles->Divide(2, 2);
     //cCalifa_angles = new TCanvas("Califa_Theta_vs_Phi_andTofD", "Theta vs Phi", 10, 10, 500, 500);
     //cCalifa_angles->Divide(2, 1);
@@ -342,17 +346,19 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     {
         //mainfolCalifa->Add(cCalifa_angles);
     }
-    run->AddObject(mainfolCalifa);
+    run->AddObject(mainfolCalifa);*/
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_CalifavsTofD", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    //run->GetHttpServer()->RegisterCommand("Reset_CalifavsTofD", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
+    std::cout << "CalifavsTofDOnlineSpectra end" << std::endl;
     return kSUCCESS;
 }
 
 // -----   Public method ReInit   ----------------------------------------------
 InitStatus R3BCalifavsTofDOnlineSpectra::ReInit()
 {
+    std::cout << "CalifavsTofDOnlineSpectra ReInit" << std::endl;
     SetParContainers();
     // SetParameter();
     return kSUCCESS;
@@ -361,7 +367,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::ReInit()
 void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 {
     R3BLOG(INFO, "");
-    for (int i = 0; i < 2; i++)
+    std::cout << "CalifavsTofDOnlineSpectra Reset" << std::endl;
+    /*for (int i = 0; i < 2; i++)
     {
         fh2_Califa_theta_phi[i]->Reset();
 	fh2_Califa_NsNf[i]->Reset();
@@ -377,28 +384,14 @@ void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
     }
 
     fh2_Califa_NsNf[3]->Reset();
-    fh2_Q_tof->Reset();
+    fh2_Q_tof->Reset();*/
 }
 
 void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 {
+    std::cout << "CalifavsTofDOnlineSpectra Exec" << std::endl;
     //if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
         //return;
-	
-    //std::cout << "tpat: " << header->GetTpat() << std::endl;
-
-    //bool tpatpass = false;
-    //int tpat = header->GetTpat();
-    //if (tpat&(1<<1) || tpat&(1<<2))
-    //{
-//	    tpatpass = true;
-    //}
-    /*if ((tpat&2) == 2)
-    {
-	    tpatpass = true;
-    }
-    if (!tpatpass) 
-	    return;*/
 
     tpatval = header->GetTpat();
     //trigger = header->GetTrigger();
@@ -416,9 +409,9 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 
     int tofdHits = fHitItemsTofd->GetEntriesFast();
     int califaHits = fHitItemsCalifa->GetEntriesFast();
-    int frsHits = fItemsFrs->GetEntriesFast();
+    //int frsHits = fItemsFrs->GetEntriesFast();
 
-    std::cout << "frs hits: " << frsHits << std::endl;
+    //std::cout << "frs hits: " << frsHits << std::endl;
 
     if ((tofdHits==0) && (califaHits==0))
     {
@@ -436,7 +429,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	charge.push_back(hit->GetEloss());
 	tof.push_back(hit->GetTof());
 	
-	if (hit->GetDetId() == 1) 
+	/*if (hit->GetDetId() == 1) 
 	{
 	    fh2_Q_tof->Fill(hit->GetTof(),hit->GetEloss());
 	}
@@ -444,7 +437,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	if (hit->GetDetId() == 1 && hit->GetEloss() > (fZselection - 0.5) && hit->GetEloss() < (fZselection + 0.5)) 
 	{
             fZminus1 = true;
-	}
+	}*/
     }
 
     Int_t nHits = fHitItemsCalifa->GetEntriesFast();
@@ -478,14 +471,14 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	crystalHitsList.push_back(hit->GetNbOfCrystalHits());
 	clusterIdList.push_back(hit->GetClusterId());
 
-        fh2_Califa_theta_phi[0]->Fill(theta, phi); // always
+        /*fh2_Califa_theta_phi[0]->Fill(theta, phi); // always
 	fh2_Califa_NsNf[0]->Fill(hit->GetNs(), hit->GetNf());
 	//fh2_Califa_total_energy[0]->Fill(hit->GetEnergy());
 	fh2_Califa_CrystalHits[0]->Fill(hit->GetNbOfCrystalHits());
 	fh2_Califa_ClusterId[0]->Fill(hit->GetClusterId());
-	fh2_Califa_theta_energy[0]->Fill(theta, hit->GetEnergy());
+	fh2_Califa_theta_energy[0]->Fill(theta, hit->GetEnergy());*/
 	
-        if (fZminus1) {
+        /*if (fZminus1) {
             fh2_Califa_theta_phi[1]->Fill(theta, phi); // only with TofD
 	    fh2_Califa_NsNf[1]->Fill(hit->GetNs(), hit->GetNf());
 	    fh2_Califa_total_energy[1]->Fill(hit->GetEnergy());
@@ -504,11 +497,11 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 		fh2_Califa_ClusterId[2]->Fill(hit->GetClusterId());
 		fh2_Califa_theta_energy[2]->Fill(theta, hit->GetEnergy());
 	    }
-	}
+	}*/
     }
 
     // Hit data
-    if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
+    /*if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
 
         Double_t theta = 0., phi = 0.;
@@ -587,11 +580,11 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	}
       }
     }
-    }
+    }*/
 
     fNEvents += 1;
 
-    outtree->Fill();
+    //outtree->Fill();
 }
 
 void R3BCalifavsTofDOnlineSpectra::FinishEvent()
@@ -609,7 +602,7 @@ void R3BCalifavsTofDOnlineSpectra::FinishEvent()
 void R3BCalifavsTofDOnlineSpectra::FinishTask()
 {
     // Write canvas for Hit data
-    if (fHitItemsCalifa)
+    /*if (fHitItemsCalifa)
     {
         fh2_Califa_theta_phi[0]->Write();
 	fh2_Califa_NsNf[0]->Write();
@@ -656,13 +649,11 @@ void R3BCalifavsTofDOnlineSpectra::FinishTask()
 	    fh2_rightE_openangle[2]->Write();
 	    fh2_Califa_NsNf[3]->Write();
 	}
-    }
+    }*/
 
-    outtree->SetName("genT");
-    //outtree->Write();	
-    //outfile->Delete("genTbuffer;*");
-    outfile->Write();
-    outfile->Close();
+    //outtree->SetName("genT");
+    //outfile->Write();
+    //outfile->Close();
 }
 
 ClassImp(R3BCalifavsTofDOnlineSpectra);
