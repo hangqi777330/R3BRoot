@@ -144,8 +144,15 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
         LOG(DEBUG) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
                    << "" << pz << "\t" << vx << "\t" << vy << "" << vz;
-        primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
-
+        // put a loop of 1000 events
+	//std::cout << "pdg: " << pdg << " px: " << px << " py: " << py << " pz: " pz << " vx: " << vx << " vy: " << vy << " vz: " << vz << std::endl;
+	//int evtidx = 0;
+	//while (evtidx<1000) 
+	//{
+	primGen->AddTrack(2212,px,py,pz,vx,vy,vz);
+		//primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
+		//evtidx++;
+	//}
     } //! tracks
 
     return true;

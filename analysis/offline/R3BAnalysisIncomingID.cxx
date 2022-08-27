@@ -133,6 +133,13 @@ InitStatus R3BAnalysisIncomingID::Init()
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
+    fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
+    if (fFrsDataCA == NULL)
+    {
+        fFrsDataCA = new TClonesArray("R3BFrsData");
+	mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
+    }
+
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
     R3BLOG_IF(WARNING, !fHitItemsMus, "MusicHitData not found");
@@ -145,12 +152,12 @@ InitStatus R3BAnalysisIncomingID::Init()
     R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
 
     // Output data
-    fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
+    /*fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
     if (fFrsDataCA == NULL)
     {
         fFrsDataCA = new TClonesArray("R3BFrsData");
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
-    }
+    }*/
 
     SetParameter();
 

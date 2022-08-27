@@ -19,9 +19,16 @@
 #ifndef R3BCalifavsTofDOnlineSpectra_H
 #define R3BCalifavsTofDOnlineSpectra_H 1
 
+#include "R3BFrsData.h"
 #include "FairTask.h"
 #include "TCanvas.h"
 #include "TLorentzVector.h"
+#include "TMath.h"
+#include <array>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 class TClonesArray;
 class TH2F;
@@ -108,9 +115,14 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
   private:
     bool isFootDetect(TVector3 hit);
 
+    TClonesArray* fWRItemsCalifa;
+    TClonesArray* fWRItemsMaster;
+    TClonesArray* fMapItemsCalifa;
+    TClonesArray* fCalItemsCalifa;
     TClonesArray* fHitItemsCalifa;
     TClonesArray* fHitItemsTofd;
-    //TClonesArray* fItemsFrs;
+    TClonesArray* fHitItemsLos;
+    TClonesArray* fHitItemsFrs;
 
     R3BEventHeader* header;
     Int_t fNEvents;
@@ -145,21 +157,46 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
 
     // event variables
     Int_t tpatval;
+    Int_t frshits;
+    Int_t loshits;
     //Int_t trigger;
 
-    // califa variables
+    // califa mapped variables
+    std::vector<UShort_t> map_crystalId;
+    std::vector<int16_t> map_energy;
+    std::vector<int16_t> map_Ns;
+    std::vector<int16_t> map_Nf;
+    std::vector<int16_t> map_febexTime;
+    std::vector<int16_t> map_wrts;
+    std::vector<int16_t> map_overflow;
+    std::vector<int16_t> map_pileup;
+    std::vector<int16_t> map_discard;
+    
+    // califa cal variables
+    std::vector<Int_t> cal_crystalId;
+    std::vector<Double_t> cal_energy;
+    std::vector<Double_t> cal_Ns;
+    std::vector<Double_t> cal_Nf;
+    std::vector<uint64_t> cal_time; 
+
+    // califa hit variables
     std::vector<Double_t> thetaList;
     std::vector<Double_t> phiList;
     std::vector<Double_t> energyList;
     std::vector<Double_t> NfList;
     std::vector<Double_t> NsList;
     std::vector<Double_t> crystalHitsList;
-    std::vector<Double_t> clusterIdList; 
+    std::vector<Double_t> clusterIdList;
+    std::vector<ULong64_t> timeList;
 
     // tofd variables
     std::vector<Double_t> charge;
     std::vector<Double_t> tof;
     std::vector<Int_t> detectorId;
+
+    // WR items
+    std::vector<int64_t> wr;
+    int64_t wrm;
 
   public:
     ClassDef(R3BCalifavsTofDOnlineSpectra, 1)

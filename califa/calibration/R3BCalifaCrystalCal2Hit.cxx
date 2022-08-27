@@ -116,8 +116,12 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
 
 
     }
+  }
 
-
+  for (int j=0; j<5000; j++)
+  {
+    TVector3 v3hit = this->GetAnglesVector(j);
+    std::cout << j << " " << v3hit.Theta()*TMath::RadToDeg() << " " << v3hit.Phi()*TMath::RadToDeg() << std::endl;
   }
   return kSUCCESS;
 }
@@ -226,6 +230,13 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
   auto addHit = [&](R3BCalifaCrystalCalData* aCalData) {
     if (aCalData->GetEnergy() > fThreshold) {
 	unusedCrystalHits.push_back(aCalData);
+	    // select proton arm
+	/*double alpha = -0.99;
+        double Nf_rotate = TMath::Cos(alpha)*aCalData->GetNf() - TMath::Sin(alpha)*aCalData->GetNs();
+	double Ns_rotate = TMath::Sin(alpha)*aCalData->GetNf() + TMath::Cos(alpha)*aCalData->GetNs();
+	if (Nf_rotate>0. && Ns_rotate>-4000. && Ns_rotate<4000.) {	
+		unusedCrystalHits.push_back(aCalData);
+	}*/
     } else
       LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec(): rejected hit in " << aCalData->GetCrystalId()
 		 << " because of low energy (E=" << aCalData->GetEnergy() << "<=" << fThreshold << "=E_threshold";
