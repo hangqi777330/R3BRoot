@@ -118,11 +118,11 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
     }
   }
 
-  for (int j=0; j<5000; j++)
+  /*for (int j=0; j<5000; j++)
   {
     TVector3 v3hit = this->GetAnglesVector(j);
     std::cout << j << " " << v3hit.Theta()*TMath::RadToDeg() << " " << v3hit.Phi()*TMath::RadToDeg() << std::endl;
-  }
+  }*/
   return kSUCCESS;
 }
 

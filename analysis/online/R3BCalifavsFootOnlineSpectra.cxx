@@ -187,6 +187,15 @@ void R3BCalifavsFootOnlineSpectra::Exec(Option_t* option)
             ffoot = true;
     }
 
+    /*for (Int_t ihit=0; ihit< fHitItemsFoot->GetEntriesFast(); ihit++)
+    {
+	auto hit = (R3BFootHitData*) fHitItemsFoot->At(ihit);
+	if (!ihit)
+	    continue;
+
+	std::cout << hit->GetTheta() << std::endl;
+    }*/
+
     Int_t nHits = fHitItemsCalifa->GetEntriesFast();
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)

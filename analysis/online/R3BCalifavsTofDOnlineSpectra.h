@@ -24,6 +24,7 @@
 #include "TCanvas.h"
 #include "TLorentzVector.h"
 #include "TMath.h"
+#include "TVector3.h"
 #include <array>
 #include <cstdlib>
 #include <fstream>
@@ -123,6 +124,8 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     TClonesArray* fHitItemsTofd;
     TClonesArray* fHitItemsLos;
     TClonesArray* fHitItemsFrs;
+    TClonesArray* fHitItemsFoot;
+    TClonesArray* fCalItemsFoot;
 
     R3BEventHeader* header;
     Int_t fNEvents;
@@ -193,6 +196,16 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     std::vector<Double_t> charge;
     std::vector<Double_t> tof;
     std::vector<Int_t> detectorId;
+
+    // foot variables
+    std::vector<Int_t> foot_detectorId;
+    std::vector<Int_t> foot_nbHits;
+    std::vector<Int_t> foot_mulStrip;
+    std::vector<Double_t> foot_pos;
+    std::vector<TVector3> foot_poslab;
+    std::vector<Double_t> foot_theta;
+    std::vector<Double_t> foot_phi;
+    std::vector<Double_t> foot_energy; 
 
     // WR items
     std::vector<int64_t> wr;

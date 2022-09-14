@@ -21,6 +21,7 @@
 #include "R3BFrsData.h"
 #include "R3BLosHitData.h"
 #include "R3BWRData.h"
+#include "R3BFootHitData.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -68,6 +69,20 @@ R3BCalifavsTofDOnlineSpectra::~R3BCalifavsTofDOnlineSpectra()
         delete fHitItemsCalifa;
     if (fHitItemsTofd)
         delete fHitItemsTofd;
+    if (fWRItemsCalifa)
+	delete fWRItemsCalifa;
+    if (fWRItemsMaster)
+	delete fWRItemsMaster;
+    if (fMapItemsCalifa)
+	delete fMapItemsCalifa;
+    if (fCalItemsCalifa)
+	delete fCalItemsCalifa;
+    if (fHitItemsLos)
+	delete fHitItemsLos;
+    if (fHitItemsFrs)
+	delete fHitItemsFrs;
+    if (fHitItemsFoot)
+	delete fHitItemsFoot;
 }
 
 void R3BCalifavsTofDOnlineSpectra::SetParContainers()
@@ -117,6 +132,13 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     fHitItemsFrs = (TClonesArray*)mgr->GetObject("FrsData");
     fMapItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
+    fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
+    if (!fHitItemsFoot)
+	    std::cout << "FootHitData not found" << std::endl;
+
+    fCalItemsFoot = (TClonesArray*) mgr->GetObject("FootCalData");
+    if (!fCalItemsFoot)
+	    std::cout << "FootCalData not found" << std::endl;
 
     fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
     R3BLOG_IF(FATAL, !fHitItemsCalifa, "CalifaHitData not found");
@@ -173,7 +195,17 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     outtree->Branch("wr",&wr);
     outtree->Branch("wrm",&wrm,"wrm/L");
 
-    std::cout << "CalifavsTofDOnlineSpectra Init middle" << std::endl;
+    // foot vars
+    outtree->Branch("foot_detectorId",&foot_detectorId);
+    outtree->Branch("foot_nbHits",&foot_nbHits);
+    outtree->Branch("foot_mulStrip",&foot_mulStrip);
+    outtree->Branch("foot_pos",&foot_pos);
+    outtree->Branch("foot_poslab",&foot_poslab);
+    outtree->Branch("foot_theta",&foot_theta);
+    outtree->Branch("foot_phi",&foot_phi);
+    outtree->Branch("foot_energy",&foot_energy);
+
+    //std::cout << "CalifavsTofDOnlineSpectra Init middle" << std::endl;
 
     // Create histograms for detectors
 
@@ -436,7 +468,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 
     tpatval = header->GetTpat();
     wrm = header->GetTimeStamp();
-    std::cout << "wrm: " << wrm << std::endl;
+    //std::cout << "wrm: " << wrm << std::endl;
     //trigger = header->GetTrigger();
 
     map_crystalId.clear();
@@ -467,6 +499,15 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     tof.clear();
     detectorId.clear();
 
+    foot_detectorId.clear();
+    foot_nbHits.clear();
+    foot_mulStrip.clear();
+    foot_pos.clear();
+    foot_poslab.clear();
+    foot_theta.clear();
+    foot_phi.clear();
+    foot_energy.clear();
+
     wr.clear();
 
     //int tofdHits = 0;
@@ -491,6 +532,24 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 		wr.push_back(hit->GetTimeStamp());
     	}
     }
+
+    /*if (fHitItemsFoot && fHitItemsFoot->GetEntriesFast()>0) {
+	for (Int_t ihit=0; ihit<fHitItemsFoot->GetEntriesFast(); ihit++)
+	{
+	    R3BFootHitData* hit = (R3BFootHitData*) fHitItemsFoot->At(ihit);
+	    if (!hit) continue;
+
+	    std::cout << "foot theta: " << hit->GetTheta() << std::endl;
+	    foot_detectorId.push_back(hit->GetDetId());
+	    foot_nbHits.push_back(hit->GetNbHit());
+	    foot_mulStrip.push_back(hit->GetMulStrip());
+	    foot_pos.push_back(hit->GetPos());
+	    foot_poslab.push_back(hit->GetPosLab());
+	    foot_theta.push_back(hit->GetTheta());
+	    foot_phi.push_back(hit->GetPhi());
+	    foot_energy.push_back(hit->GetEnergy());
+	}
+    }*/
 
     /*if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
     {
@@ -701,6 +760,34 @@ void R3BCalifavsTofDOnlineSpectra::FinishEvent()
     if (fHitItemsTofd)
     {
         fHitItemsTofd->Clear();
+    }
+    if (fWRItemsCalifa)
+    {
+	fWRItemsCalifa->Clear();
+    }
+    if (fWRItemsMaster)
+    {
+	fWRItemsMaster->Clear();
+    }
+    if (fMapItemsCalifa)
+    {
+	fMapItemsCalifa->Clear();
+    }
+    if (fCalItemsCalifa)
+    {
+	fCalItemsCalifa->Clear();
+    }
+    if (fHitItemsLos)
+    {
+	fHitItemsLos->Clear();
+    }
+    if (fHitItemsFrs)
+    {
+	fHitItemsFrs->Clear();
+    }
+    if (fHitItemsFoot)
+    {
+	fHitItemsFoot->Clear();
     }
 }
 
