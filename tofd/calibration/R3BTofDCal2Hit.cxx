@@ -583,7 +583,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 // if (parz[1] > 0)
                 // {
                 event.push_back(
-                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof-par->GetTofSyncOffset() });
                 // }
 
                 /* if (parz[0] > 0 && parz[2] > 0)

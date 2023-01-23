@@ -16,6 +16,8 @@
 
 #include "FairTask.h"
 #include "TH1F.h"
+#include "TH2F.h"
+#include "TF1.h"
 
 class TClonesArray;
 class R3BCalifaMappingPar;
@@ -56,6 +58,9 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     /** Virtual method Search peaks and calibrate **/
     virtual void SearchPeaks();
 
+    /** Virtual method Fit peaks **/
+    virtual void FitPeaks();
+
     /** Virtual method SetParContainers **/
     virtual void SetParContainers();
 
@@ -69,6 +74,7 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     const Double_t GetThreshold() { return fThreshold; }
     const Int_t GetNumParameterFit() { return fNumParam; }
     const Int_t GetMinStadistics() { return fMinStadistics; }
+    const TString GetSourceName() { return fSourceName; }
 
     TArrayF* GetEnergyPeaks() { return fEnergyPeaks; }
 
@@ -84,6 +90,7 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     void SetThreshold(Double_t threshold) { fThreshold = threshold; }
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
     void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
+    void SetSourceName(TString sourceName) { fSourceName = sourceName; }
 
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
@@ -111,6 +118,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     Double_t fSigma;
     Double_t fThreshold;
 
+    TString fSourceName;
+
     TArrayF* fEnergyPeaks;
     Double_t* fChannelPeaks;
 
@@ -118,7 +127,25 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     R3BCalifaCrystalCalPar* fCal_Par;  /**< Container for Cal parameters. >*/
     TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped-input data. >*/
 
+    //FILE *outfile;
+    TFile *outrootfile;
+    TTree *outroottree;
+
     TH1F** fh_Map_energy_crystal;
+    TH2F* fh2_Map_crystal_gamma;
+    TH2F* fh2_Map_crystal_proton;
+    TH2F* fh_peak_crystal_gamma;
+    TH2F* fh_peak_crystal_proton;
+    TH2F* fh_sigma_crystal_gamma;
+    TH2F* fh_sigma_crystal_proton;
+    TH2F** fh2_peak_cal;
+    TH2F* fh2_slope_crystalID;
+    // significance
+    TH2F** fh2_sig_crystal;
+    TH2F* fh2_chi2_crystal;
+    TH1F* fh_numPeak;
+    TH1F** fh_Map_nobkg;
+    TF1* f1 = nullptr;
 
   public:
     ClassDef(R3BCalifaMapped2CrystalCalPar, 2);

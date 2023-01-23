@@ -293,6 +293,9 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 
 
 
+	// hangqi: add crystal name list
+	std::vector<int> crystalIDs;
+	crystalIDs.push_back(highest->GetCrystalId());
 	           clusterHit =
 		     TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time ,TMath::DegToRad()*fRandTheta,TMath::DegToRad()*fRandPhi,clusterId);
 
@@ -300,6 +303,8 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 
       else{
 
+	      std::vector<int> crystalIDs;
+	      crystalIDs.push_back(highest->GetCrystalId());
 	          clusterHit =
 		    TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
 
