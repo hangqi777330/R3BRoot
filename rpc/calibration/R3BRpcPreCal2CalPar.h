@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -15,13 +15,12 @@
 #define R3BRPCPRECAL2CALPAR_H
 
 #include "FairTask.h"
-#include "TH1F.h"
 #include "R3BRpcTotCalPar.h"
+#include "TH1F.h"
 
 class TClonesArray;
 class R3BRpcTotCalPar;
 class R3BEventHeader;
-
 
 class R3BRpcPreCal2CalPar : public FairTask
 {
@@ -53,7 +52,7 @@ class R3BRpcPreCal2CalPar : public FairTask
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
-    
+
     /** Accessor functions **/
     const Int_t GetNumChannels() { return fNumChannels; }
 
@@ -67,7 +66,7 @@ class R3BRpcPreCal2CalPar : public FairTask
 
     R3BRpcTotCalPar* fTotCalPar;
 
-    TH1F* fhTot[N_NUM]; 
+    TH1F* fhTot[N_NUM];
 
     TClonesArray* fPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 

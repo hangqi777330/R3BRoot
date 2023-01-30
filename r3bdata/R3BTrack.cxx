@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -39,8 +39,8 @@ R3BTrack::R3BTrack(Double_t x,
                    Double_t px,
                    Double_t py,
                    Double_t pz,
-                   Int_t q,
-                   Int_t AoZ,
+                   Double_t q,
+                   Double_t AoZ,
                    Double_t chix,
                    Double_t chiy,
                    Int_t quality)

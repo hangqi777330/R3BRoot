@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,7 +38,7 @@ Bool_t R3BFiberMAPMTReader::Init()
                 auto const& ch = fMHL[side_i][edge_i][prec_i];
                 if (fFiberNum != ch._MI_len)
                 {
-                    R3BLOG(FATAL,
+                    R3BLOG(fatal,
                            "Multi-hit array sizes mismatch (fFiberNum=" << fFiberNum << " != MI-len=" << ch._MI_len
                                                                         << ").");
                     return kFALSE;
@@ -52,7 +52,7 @@ Bool_t R3BFiberMAPMTReader::Init()
 
 Bool_t R3BFiberMAPMTReader::Read()
 {
-    R3BLOG(DEBUG, "Read BEGIN for fib " << fShortName);
+    R3BLOG(debug, "Read BEGIN for fib " << fShortName);
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
         for (size_t edge_i = 0; edge_i < 2; ++edge_i)
@@ -67,17 +67,17 @@ Bool_t R3BFiberMAPMTReader::Read()
 
             if (c_M != f_M || c_ != f_)
             {
-                LOG(WARNING) << "Coarse and fine multi-hit list counts mismatch "
-                                "(edge="
-                             << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).";
+                LOG(warn) << "Coarse and fine multi-hit list counts mismatch "
+                             "(edge="
+                          << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c=" << c_ << ",f=" << f_ << "}).";
                 return kFALSE;
             }
             if (c_M > e[0]._MI_len || c_M > e[0]._ME_len || c_ > e[0]._v_len)
             {
-                LOG(WARNING) << "Multi-hit indexing out of range "
-                                "(edge="
-                             << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
-                             << ");(_=" << c_ << ")>=(v=" << e[0]._v_len << ")).";
+                LOG(warn) << "Multi-hit indexing out of range "
+                             "(edge="
+                          << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len << ",ME=" << e[0]._ME_len
+                          << ");(_=" << c_ << ")>=(v=" << e[0]._v_len << ")).";
                 return kFALSE;
             }
 
@@ -92,14 +92,14 @@ Bool_t R3BFiberMAPMTReader::Read()
                 uint32_t c_ME = e[0]._ME[i];
                 uint32_t f_ME = e[1]._ME[i];
 
-                //    LOG(WARNING)<<"Start: "<<side_i<<"; "<<edge_i<<", "<<c_MI<<", "<<f_MI<<", "<<c_ME<<", "<<f_ME;
+                //    LOG(warn)<<"Start: "<<side_i<<"; "<<edge_i<<", "<<c_MI<<", "<<f_MI<<", "<<c_ME<<", "<<f_ME;
 
                 if (c_MI != f_MI || c_ME != f_ME)
                 {
-                    LOG(WARNING) << "Coarse and fine multi-hit data mismatch "
-                                    "(edge="
-                                 << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
-                                 << "}).";
+                    LOG(warn) << "Coarse and fine multi-hit data mismatch "
+                                 "(edge="
+                              << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI << "};ME{c=" << c_ME << ",f=" << f_ME
+                              << "}).";
                     return kFALSE;
                 }
                 for (; cur_entry < c_ME; cur_entry++)
@@ -123,9 +123,9 @@ Bool_t R3BFiberMAPMTReader::Read()
 
         if (c_ != f_)
         {
-            LOG(WARNING) << "Coarse and fine single-hit list counts mismatch "
-                            "(_{c="
-                         << c_ << ",f=" << f_ << "}).";
+            LOG(warn) << "Coarse and fine single-hit list counts mismatch "
+                         "(_{c="
+                      << c_ << ",f=" << f_ << "}).";
             return kFALSE;
         }
 
@@ -149,7 +149,7 @@ Bool_t R3BFiberMAPMTReader::Read()
             cur_entry = c_ME;
         }
     }
-    // LOG(ERROR) << "R3BFiberMAPMTReader::Read END";
+    // LOG(error) << "R3BFiberMAPMTReader::Read END";
     return kTRUE;
 }
 

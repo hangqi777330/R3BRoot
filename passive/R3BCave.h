@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -35,7 +35,7 @@ class R3BCave : public FairModule
     R3BCave(const R3BCave&);
     R3BCave& operator=(const R3BCave&);
 
-    ClassDef(R3BCave, 1);
+    ClassDef(R3BCave, 2);
 };
 
 #endif // R3BCave_H

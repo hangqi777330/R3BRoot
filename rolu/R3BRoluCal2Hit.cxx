@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -25,6 +25,7 @@
 #include "R3BRoluMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -108,15 +109,15 @@ InitStatus R3BRoluCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BRoluCal2Hit::Init() FairRootManager not found";
+        LOG(fatal) << "R3BRoluCal2Hit::Init() FairRootManager not found";
 
     fCalItems = (TClonesArray*)mgr->GetObject("RoluCal");
     if (NULL == fCalItems)
-        LOG(FATAL) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
+        LOG(fatal) << "R3BRoluCal2Hit::Init() Branch RoluCal not found";
 
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("RoluTriggerCal");
     if (NULL == fCalTriggerItems)
-        LOG(WARNING) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
+        LOG(warn) << "R3BRoluCal2Hit::Init() Branch RoluTriggerCal not found";
 
     // request storage of Hit data in output tree
     mgr->Register("RoluHit", "RoluHitData", fHitItems, !fOnline);

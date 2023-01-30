@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -64,8 +64,8 @@ void R3BTwim::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BTwim: initialisation";
-    LOG(DEBUG) << "R3BTwim: Vol (McId) def" << gMC->VolId("TwinLog");
+    LOG(info) << "R3BTwim: initialisation";
+    LOG(debug) << "R3BTwim: Vol (McId) def" << gMC->VolId("TwinLog");
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -171,7 +171,7 @@ TClonesArray* R3BTwim::GetCollection(Int_t iColl) const
 void R3BTwim::Print(Option_t* option) const
 {
     Int_t nHits = fSofTWIMCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTwim: " << nHits << " points registered in this event";
+    LOG(info) << "R3BTwim: " << nHits << " points registered in this event";
 }
 
 // -----   Public method Reset   ----------------------------------------------
@@ -185,7 +185,7 @@ void R3BTwim::Reset()
 void R3BTwim::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTwim: " << nEntries << " entries to add";
+    LOG(info) << "R3BTwim: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BTwimPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -196,7 +196,7 @@ void R3BTwim::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTwimPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTwim: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BTwim: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -216,7 +216,7 @@ R3BTwimPoint* R3BTwim::AddPoint(Int_t trackID,
     TClonesArray& clref = *fSofTWIMCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BTwim: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BTwim: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size])
         R3BTwimPoint(trackID, detID, volid, Z, A, posIn, posOut, momIn, momOut, time, length, eLoss);
@@ -227,7 +227,7 @@ Bool_t R3BTwim::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("TwinLog"))
     {
-        LOG(DEBUG) << "Found TWIN MUSIC geometry from ROOT file: " << name;
+        LOG(debug) << "Found TWIN MUSIC geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

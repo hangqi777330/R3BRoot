@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -63,6 +63,11 @@ class R3BFootMapped2StripCal : public FairTask
      */
     void SetThresholdSigma(Double_t th) { fTimesSigma = th; }
 
+    /**
+     * Method for setting the N of strip hit per foot: fNStrip
+     */
+    void SetNStrip(Double_t nstrip) { fNStrip = nstrip; }
+
   private:
     void SetParameter();
 
@@ -70,6 +75,7 @@ class R3BFootMapped2StripCal : public FairTask
     Int_t NumStrips;
     Int_t NumParams;
     Int_t MaxSigma;
+    Double_t fNStrip;
     Double_t fTimesSigma;
     TArrayF* CalParams;
 

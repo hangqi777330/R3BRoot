@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -49,21 +49,17 @@ R3BWhiterabbitFootReader::~R3BWhiterabbitFootReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-    {
-        delete fEventHeader;
-    }
 }
 
 Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_WRFOOT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRFOOT, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -72,12 +68,12 @@ Bool_t R3BWhiterabbitFootReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
     {
-        R3BLOG(INFO, "R3BEventHeader found");
+        R3BLOG(info, "R3BEventHeader found");
     }
 
     // Register output array in tree
@@ -96,7 +92,7 @@ Bool_t R3BWhiterabbitFootReader::Read()
             char strMessage[1000];
             snprintf(strMessage,
                      sizeof strMessage,
-                     "Event %u: Whiterabbit ID mismatch for det=%u: expected 0x%x, got 0x%x.\n",
+                     "Event %lu: Whiterabbit ID mismatch for det=%u: expected 0x%x, got 0x%x.\n",
                      fEventHeader->GetEventno(),
                      d,
                      fWhiterabbitId[d],

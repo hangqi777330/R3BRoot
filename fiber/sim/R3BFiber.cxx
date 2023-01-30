@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -74,11 +74,11 @@ void R3BFiber::Initialize()
 {
     FairDetector::Initialize();
 
-    R3BLOG(INFO, "for fiber " << fName);
-    R3BLOG(DEBUG, "Vol (McId) def " << gMC->VolId("Fiber"));
+    R3BLOG(info, "for fiber " << fName);
+    R3BLOG(debug, "Vol (McId) def " << gMC->VolId("Fiber"));
 }
 
-void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(INFO, ""); }
+void R3BFiber::SetSpecialPhysicsCuts() { R3BLOG(info, ""); }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BFiber::ProcessHits(FairVolume* vol)
@@ -188,7 +188,7 @@ void R3BFiber::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BFiber::Register()
 {
-    R3BLOG(DEBUG, "");
+    R3BLOG(debug, "");
     FairRootManager::Instance()->Register(fName + "Point", GetName(), fFiCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -207,7 +207,7 @@ TClonesArray* R3BFiber::GetCollection(Int_t iColl) const
 void R3BFiber::Print(Option_t* option) const
 {
     Int_t nHits = fFiCollection->GetEntriesFast();
-    LOG(INFO) << "R3B" << fName << ": " << nHits << " points registered in this event";
+    LOG(info) << "R3B" << fName << ": " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -223,7 +223,7 @@ void R3BFiber::Reset()
 void R3BFiber::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    R3BLOG(INFO, nEntries << " entries to add");
+    R3BLOG(info, nEntries << " entries to add");
     TClonesArray& clref = *cl2;
     R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -234,7 +234,7 @@ void R3BFiber::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
-    R3BLOG(INFO, cl2->GetEntriesFast() << " merged entries");
+    R3BLOG(info, cl2->GetEntriesFast() << " merged entries");
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -253,7 +253,7 @@ R3BFibPoint* R3BFiber::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        R3BLOG(INFO,
+        R3BLOG(info,
                "Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID
                                    << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV");
     }
@@ -264,7 +264,7 @@ Bool_t R3BFiber::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains(fName))
     {
-        LOG(DEBUG) << "Found" << fName << " geometry from ROOT file: " << name;
+        LOG(debug) << "Found" << fName << " geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

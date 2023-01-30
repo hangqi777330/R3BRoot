@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -117,8 +117,8 @@ void R3BDchDigitizer::SetParContainers()
 
     if (fDchDigiPar)
     {
-        LOG(INFO) << "R3BDchDigitizer::SetParContainers() ";
-        LOG(INFO) << "Container R3BDchDigiPar  loaded ";
+        LOG(info) << "R3BDchDigitizer::SetParContainers() ";
+        LOG(info) << "Container R3BDchDigiPar  loaded ";
     }
 }
 
@@ -209,7 +209,7 @@ void R3BDchDigitizer::Exec(Option_t* opt)
     eventNoDch += 1;
 
     Int_t nentriesDch = fDchPoints->GetEntries();
-    LOG(INFO) << nentriesDch;
+    LOG(info) << nentriesDch;
 
     Int_t TrackId = 0;
 

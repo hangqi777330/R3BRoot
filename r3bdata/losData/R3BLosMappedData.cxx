@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -45,8 +45,8 @@ R3BLosMappedData::R3BLosMappedData(UInt_t detector, UInt_t channel, UInt_t type,
     //<<timeCoarse<<endl;
     /* Everything fine here!
 
-     if(timeFine <= 0 || IS_NAN(timeFine) ) LOG(INFO)<<"LosMappedData FineTime wrong value for channel: "<<channel<<"
-     type: "<<type<<" value: "<<timeFine; if(timeCoarse < 0 || IS_NAN(timeCoarse)) LOG(INFO)<<"LosMappedData CoarseTime
+     if(timeFine <= 0 || IS_NAN(timeFine) ) LOG(info)<<"LosMappedData FineTime wrong value for channel: "<<channel<<"
+     type: "<<type<<" value: "<<timeFine; if(timeCoarse < 0 || IS_NAN(timeCoarse)) LOG(info)<<"LosMappedData CoarseTime
      wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeCoarse;
 
     */

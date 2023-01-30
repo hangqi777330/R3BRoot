@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #include "R3BCalifavsTofDOnlineSpectra.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BTofdHitData.h"
@@ -64,7 +64,7 @@ R3BCalifavsTofDOnlineSpectra::R3BCalifavsTofDOnlineSpectra(const TString& name, 
 
 R3BCalifavsTofDOnlineSpectra::~R3BCalifavsTofDOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fHitItemsCalifa)
         delete fHitItemsCalifa;
     if (fHitItemsTofd)
@@ -90,7 +90,7 @@ void R3BCalifavsTofDOnlineSpectra::SetParContainers()
     // Parameter Container
     // Reading amsStripCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 }
 
 bool R3BCalifavsTofDOnlineSpectra::isFootDetect(TVector3 hit)
@@ -113,11 +113,10 @@ bool R3BCalifavsTofDOnlineSpectra::isFootDetect(TVector3 hit)
 
 InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 {
-
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
 
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
@@ -125,25 +124,11 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     run->GetHttpServer()->Register("", this);
 
     // get access to Hit data
-    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
-    fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
-    fHitItemsFrs = (TClonesArray*)mgr->GetObject("FrsData");
-    fMapItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
-    fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
-    fHitItemsFoot = (TClonesArray*)mgr->GetObject("FootHitData");
-    if (!fHitItemsFoot)
-	    std::cout << "FootHitData not found" << std::endl;
-
-    fCalItemsFoot = (TClonesArray*) mgr->GetObject("FootCalData");
-    if (!fCalItemsFoot)
-	    std::cout << "FootCalData not found" << std::endl;
-
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(FATAL, !fHitItemsCalifa, "CalifaHitData not found");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    R3BLOG_IF(fatal, !fHitItemsCalifa, "CalifaClusterData not found");
 
     fHitItemsTofd = (TClonesArray*)mgr->GetObject("TofdHit");
-    R3BLOG_IF(WARNING, !fHitItemsTofd, "TofdHit not found");
+    R3BLOG_IF(warn, !fHitItemsTofd, "TofdHit not found");
 
     //gROOT->ProcessLine("#include <vector>");
 
@@ -438,9 +423,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::ReInit()
 
 void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
-    std::cout << "CalifavsTofDOnlineSpectra Reset" << std::endl;
-    /*for (int i = 0; i < 2; i++)
+    R3BLOG(info, "");
+    for (int i = 0; i < 2; i++)
     {
         fh2_Califa_theta_phi[i]->Reset();
 	fh2_Califa_NsNf[i]->Reset();
@@ -456,7 +440,7 @@ void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
     }
 
     fh2_Califa_NsNf[3]->Reset();
-    fh2_Q_tof->Reset();*/
+    fh2_Q_tof->Reset();
 }
 
 void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
@@ -613,16 +597,8 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < califaHits; ihit++)
     {
-        auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
-	double theta = hit->GetTheta() * TMath::RadToDeg();
-	double phi = hit->GetPhi() * TMath::RadToDeg();
-	double E = hit->GetEnergy();
-	califa_theta[ihit] = theta;
-	califa_phi[ihit] = phi;
-	califa_e[ihit] = E;
-	califa_Ns[ihit] = hit->GetNs();
-	califa_Nf[ihit] = hit->GetNf();
-        if (E < fMinProtonE)
+        auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
+        if (hit->GetEnergy() < fMinProtonE)
             continue;
 
 	thetaList.push_back(theta);
@@ -671,7 +647,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -105,19 +105,19 @@ R3BNeulandMCMon::R3BNeulandMCMon(const Option_t* option)
     , fNeulandPoints("NeulandPoints")
     , nEvents(0)
 {
-    LOG(INFO) << "Using R3B NeuLAND Neuland Monte Carlo Monitor";
+    LOG(info) << "Using R3B NeuLAND Neuland Monte Carlo Monitor";
 
     TString opt = option;
     opt.ToUpper();
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization";
+        LOG(info) << "... with 3D track visualization";
     }
     if (opt.Contains("FULLSIMANA"))
     {
         fIsFullSimAnaEnabled = true;
-        LOG(INFO) << "... with full simulation neutron reaction product analysis";
+        LOG(info) << "... with full simulation neutron reaction product analysis";
     }
 }
 
@@ -506,7 +506,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 // std::vector<int> filteredPdgCodes{ 22, -211, 211, 111 };
                 std::vector<int> filteredPdgCodes{ 22, 111 };
                 const TString reaction = std::accumulate(
-                    tracks.begin(), tracks.end(), TString(), [&](TString& s, const R3BMCTrack* b) -> TString& {
+                    tracks.begin(), tracks.end(), TString(), [&](TString s, const R3BMCTrack* b) -> TString {
                         if (std::find(filteredPdgCodes.begin(), filteredPdgCodes.end(), b->GetPdgCode()) !=
                             filteredPdgCodes.end())
                         {

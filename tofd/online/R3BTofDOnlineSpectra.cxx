@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,6 +38,7 @@
 // R3B headers
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTimeStitch.h"
 #include "R3BTofDMappingPar.h"
@@ -45,7 +46,6 @@
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
 #include "R3BTofdMappedData.h"
-#include "R3BLosCalData.h"
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
@@ -85,7 +85,7 @@ R3BTofDOnlineSpectra::R3BTofDOnlineSpectra(const TString& name, Int_t iVerbose)
 // Virtual R3BTofDOnlineSpectra::Destructor
 R3BTofDOnlineSpectra::~R3BTofDOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMappedItems)
         delete fMappedItems;
     if (fCalItems)
@@ -97,13 +97,13 @@ R3BTofDOnlineSpectra::~R3BTofDOnlineSpectra()
 void R3BTofDOnlineSpectra::SetParContainers()
 {
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
     return;
 }
 
 void R3BTofDOnlineSpectra::SetParameter()
 {
-    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(info, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
     if (fMapPar)
     {
         fNofPlanes = fMapPar->GetNbPlanes();
@@ -115,33 +115,33 @@ void R3BTofDOnlineSpectra::SetParameter()
 
 InitStatus R3BTofDOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fCalTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerCal");
-    R3BLOG_IF(WARNING, NULL == fCalTriggerItems, "TofdTriggerCal not found");
+    R3BLOG_IF(warn, NULL == fCalTriggerItems, "TofdTriggerCal not found");
 
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
-    R3BLOG_IF(FATAL, NULL == fMappedItems, "TofdMapped not found");
+    R3BLOG_IF(fatal, NULL == fMappedItems, "TofdMapped not found");
 
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
-    R3BLOG_IF(WARNING, NULL == fCalItems, "TofdCal not found");
+    R3BLOG_IF(warn, NULL == fCalItems, "TofdCal not found");
 
     fHitItems = (TClonesArray*)mgr->GetObject("TofdHit");
-    R3BLOG_IF(WARNING, NULL == fHitItems, "TofdHit not found");
+    R3BLOG_IF(warn, NULL == fHitItems, "TofdHit not found");
 
     SetParameter();
 
@@ -560,36 +560,35 @@ InitStatus R3BTofDOnlineSpectra::Init()
         maintofd->Add(cToFd_los_h2);
     }
 
-
     TCanvas* cToFd_los[N_PLANE_MAX];
-    TCanvas* cToFd_los_h2 = new TCanvas("ToFD time - Los time","ToFD time - Los time", 20,20,1120,1020);
-    cToFd_los_h2->Divide(2,2);
-    for (Int_t i=0;i<4;i++)
+    TCanvas* cToFd_los_h2 = new TCanvas("ToFD time - Los time", "ToFD time - Los time", 20, 20, 1120, 1020);
+    cToFd_los_h2->Divide(2, 2);
+    for (Int_t i = 0; i < 4; i++)
     {
-      char strNameLos_c[255];
-      sprintf(strNameLos_c,"tofd-los_timediff_plane_%d",i+1);
-      fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c,strNameLos_c,45,0,45,5000,-50000,10000);
-      fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
-      fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF");
-      cToFd_los_h2->cd(i+1);
-      fh_tofd_time_los_h2[i]->Draw("colz");
+        char strNameLos_c[255];
+        sprintf(strNameLos_c, "tofd-los_timediff_plane_%d", i + 1);
+        fh_tofd_time_los_h2[i] = new TH2F(strNameLos_c, strNameLos_c, 45, 0, 45, 5000, -50000, 10000);
+        fh_tofd_time_los_h2[i]->GetXaxis()->SetTitle("Bar");
+        fh_tofd_time_los_h2[i]->GetYaxis()->SetTitle("ToF");
+        cToFd_los_h2->cd(i + 1);
+        fh_tofd_time_los_h2[i]->Draw("colz");
 
-      cToFd_los[i] = new TCanvas(strNameLos_c, strNameLos_c, 20, 20, 1120, 1020);
-      cToFd_los[i]->Divide(5,9);
-      for (Int_t j = 0; j < 44; j++)
-      {
-        char strNameLos[255];
-        sprintf(strNameLos,"tofd-los_timediff_bar_%d_plane_%d",j+1,i+1);
-        char strNameLos2[255];
-        sprintf(strNameLos2,"Tofd_time - Los_time bar %d plane %d",j+1,i+1);
-        fh_tofd_time_los[i][j] = new TH1F(strNameLos, strNameLos2,50,0,1000);
-        fh_tofd_time_los[i][j]->GetXaxis()->SetTitle("Time");
-        fh_tofd_time_los[i][j]->GetYaxis()->SetTitle("counts");
-        cToFd_los[i]->cd(j+1);
-        fh_tofd_time_los[i][j]->Draw("");
-      }
-      // Adding this canvases to the main folder
-      maintofd->Add(cToFd_los[i]);
+        cToFd_los[i] = new TCanvas(strNameLos_c, strNameLos_c, 20, 20, 1120, 1020);
+        cToFd_los[i]->Divide(5, 9);
+        for (Int_t j = 0; j < 44; j++)
+        {
+            char strNameLos[255];
+            sprintf(strNameLos, "tofd-los_timediff_bar_%d_plane_%d", j + 1, i + 1);
+            char strNameLos2[255];
+            sprintf(strNameLos2, "Tofd_time - Los_time bar %d plane %d", j + 1, i + 1);
+            fh_tofd_time_los[i][j] = new TH1F(strNameLos, strNameLos2, 50, 0, 1000);
+            fh_tofd_time_los[i][j]->GetXaxis()->SetTitle("Time");
+            fh_tofd_time_los[i][j]->GetYaxis()->SetTitle("counts");
+            cToFd_los[i]->cd(j + 1);
+            fh_tofd_time_los[i][j]->Draw("");
+        }
+        // Adding this canvases to the main folder
+        maintofd->Add(cToFd_los[i]);
     }
     maintofd->Add(cToFd_los_h2);
 
@@ -605,7 +604,7 @@ InitStatus R3BTofDOnlineSpectra::Init()
 
 void R3BTofDOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     for (int i = 0; i < fNofPlanes; i++)
     {
         fh_tofd_channels[i]->Reset();
@@ -739,7 +738,6 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
        "<<losChannelTrigger<<std::endl; losTriggerTime = losTriggerHit->GetTimeL_ns(0);}
     */
 
-
     if (fCalItems)
     {
         UInt_t vmultihits[fNofPlanes + 1][fPaddlesPerPlane];
@@ -824,7 +822,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -833,12 +831,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -866,7 +864,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missing)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missing = true;
                     }
                 }
@@ -881,12 +879,12 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 Int_t iBar = bot->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    R3BLOG(ERROR, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
+                    R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    R3BLOG(ERROR, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
+                    R3BLOG(error, "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                     continue;
                 }
 
@@ -945,7 +943,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                 {
                     if (!s_was_trig_missingc)
                     {
-                        R3BLOG(ERROR, "Missing trigger information!");
+                        R3BLOG(error, "Missing trigger information!");
                         s_was_trig_missingc = true;
                     }
                     ++n2;
@@ -976,13 +974,13 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
                     Int_t iBar = topc->GetBarId();        // 1..n
                     if (iPlane > fNofPlanes)              // this also errors for iDetector==0
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                         continue;
                     }
                     if (iBar > fPaddlesPerPlane) // same here
                     {
-                        R3BLOG(ERROR,
+                        R3BLOG(error,
                                "More bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane);
                         continue;
                     }
@@ -1108,7 +1106,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
 
 void R3BTofDOnlineSpectra::FinishEvent()
 {
-    R3BLOG(DEBUG1, "Cleaning data structures");
+    R3BLOG(debug1, "Cleaning data structures");
     if (fMappedItems)
     {
         fMappedItems->Clear();

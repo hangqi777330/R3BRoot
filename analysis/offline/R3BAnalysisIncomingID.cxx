@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ----------------------------------------------------------------
-// -----         R3BAnalysisIncomingID source file            -----
+// -----       R3BAnalysisIncomingID source file              -----
 // -----     Created 01/11/21 by M. Feijoo Fontan             -----
 // ----------------------------------------------------------------
 
@@ -28,6 +28,7 @@
 
 #include "R3BAnalysisIncomingID.h"
 #include "R3BEventHeader.h"
+#include "R3BFrsData.h"
 #include "R3BIncomingIDPar.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
@@ -36,6 +37,7 @@
 #include "R3BMusicHitData.h"
 #include "R3BMusicHitPar.h"
 #include "R3BMusliHitData.h"
+#include "R3BPspxHitData.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -50,6 +52,9 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fHeader(NULL)
     , fHitItemsMus(NULL)
     , fHitItemsMusli(NULL)
+    , fHitLos(NULL)
+    , fHitPspx1_x(NULL)
+    , fHitPspx1_y(NULL)
     , fFrsDataCA(NULL)
     , fPos_p0(-11)
     , fPos_p1(54.7)
@@ -61,7 +66,8 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fOnline(kFALSE)
     , fIncomingID_Par(NULL)
     , fNumDet(1)
-    , fUseLOS(kTRUE)
+    , fUseLOS(kFALSE)
+    , fUsePspx1(kTRUE)
     , fCutS2(NULL)
     , fCutCave(NULL)
 {
@@ -76,21 +82,21 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
 
 R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFrsDataCA)
         delete fFrsDataCA;
 }
 
 void R3BAnalysisIncomingID::SetParContainers()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
-    R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
-    R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
+    R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
 
     return;
 }
@@ -120,16 +126,16 @@ void R3BAnalysisIncomingID::SetParameter()
         fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
         fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
     }
-    R3BLOG(INFO, "Brho:" << fBrho0_S2toCC->GetAt(0));
+    R3BLOG(info, "Brho:" << fBrho0_S2toCC->GetAt(0));
     return;
 }
 
 InitStatus R3BAnalysisIncomingID::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
@@ -142,14 +148,20 @@ InitStatus R3BAnalysisIncomingID::Init()
 
     // Get access to hit data of the MUSIC
     fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
-    R3BLOG_IF(WARNING, !fHitItemsMus, "MusicHitData not found");
+    R3BLOG_IF(warn, !fHitItemsMus, "MusicHitData not found");
 
     fHitItemsMusli = (TClonesArray*)mgr->GetObject("MusliHitData");
-    R3BLOG_IF(WARNING, !fHitItemsMusli, "MusliHitData not found");
+    R3BLOG_IF(warn, !fHitItemsMusli, "MusliHitData not found");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
+    R3BLOG_IF(warn, !fHitLos, "LosHit not found");
+
+    // Get access to hit data of PSPX1
+    fHitPspx1_x = (TClonesArray*)mgr->GetObject("Pspx1_xHit");
+    R3BLOG_IF(warn, !fHitPspx1_x, "Pspx1_xHit not found");
+    fHitPspx1_y = (TClonesArray*)mgr->GetObject("Pspx1_yHit");
+    R3BLOG_IF(warn, !fHitPspx1_y, "Pspx1_yHit not found");
 
     // Output data
     fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
@@ -160,7 +172,6 @@ InitStatus R3BAnalysisIncomingID::Init()
     }
 
     SetParameter();
-
     return kSUCCESS;
 }
 
@@ -209,6 +220,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
     Double_t Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
     Double_t AoQ_m1_corr = 0.;
     Int_t multLos[fNumDet];
+    Double_t en_pspx = 0., en_pspy = 0., ZPsp = 0.;
 
     for (Int_t i = 0; i < fNumDet; i++)
     {
@@ -235,6 +247,27 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
         } // --- end of loop over hit data --- //
     }
 
+    // --- read hit from PSP data --- //
+
+    if (fHitPspx1_x || fHitPspx1_y)
+    {
+        // For now only multiplicity = 1 events are taken. Proper
+        // treatment of multihit events needs to be implemented.
+        if (fHitPspx1_x && fHitPspx1_x->GetEntriesFast() == 1)
+        {
+            auto pspx1hitx = (R3BPspxHitData*)fHitPspx1_x->At(0);
+            en_pspx = pspx1hitx->GetEnergy();
+        }
+
+        if (fHitPspx1_y && fHitPspx1_y->GetEntriesFast() == 1)
+        {
+            auto pspx1hity = (R3BPspxHitData*)fHitPspx1_y->At(0);
+            en_pspy = pspx1hity->GetEnergy();
+        }
+
+        ZPsp = en_pspx;
+    }
+
     for (int i = 0; i < fNumDet; i++)
     {
         // --- secondary beam identification ---
@@ -252,7 +285,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             if (fFrsDataCA && fFrsDataCA->GetEntriesFast() > 0)
             {
                 nHits = fFrsDataCA->GetEntriesFast();
-                R3BLOG_IF(ERROR, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
+                R3BLOG_IF(error, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
                 for (Int_t ihit = 0; ihit < nHits; ihit++)
                 {
                     hitfrs = (R3BFrsData*)fFrsDataCA->At(ihit);
@@ -272,7 +305,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 
                 if (fCutS2 && fCutS2->IsInside(PosXS2, AoQ_m1_corr))
                 {
-                    if (Zmusic > 0. && !fUseLOS)
+                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                     {
                         // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
                         // double zcor = sqrt(Emus * Beta_m1) * 0.277;
@@ -290,7 +323,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         }
                     }
 
-                    if (Zlos[i] > 0. && fUseLOS)
+                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
                     {
                         if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
                         {
@@ -304,11 +337,18 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
+                    }
+
+                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                    {
+                        hitfrs->SetZ(ZPsp);
+                        hitfrs->SetAq(AoQ_m1_corr);
+                        hitfrs->SetBrho(Brho_m1);
                     }
                 }
                 else if (!fCutS2)
                 {
-                    if (Zmusic > 0. && !fUseLOS)
+                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                     {
                         // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
                         // double zcor = sqrt(Emus * Beta_m1) * 0.277;
@@ -326,7 +366,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                         }
                     }
 
-                    if (Zlos[i] > 0. && fUseLOS)
+                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
                     {
                         if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
                         {
@@ -340,6 +380,13 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
+                    }
+
+                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                    {
+                        hitfrs->SetZ(ZPsp);
+                        hitfrs->SetAq(AoQ_m1_corr);
+                        hitfrs->SetBrho(Brho_m1);
                     }
                 }
             }
@@ -350,13 +397,29 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
 void R3BAnalysisIncomingID::FinishEvent()
 {
     if (fHitLos)
+    {
         fHitLos->Clear();
+    }
     if (fHitItemsMus)
+    {
         fHitItemsMus->Clear();
+    }
     if (fHitItemsMusli)
+    {
         fHitItemsMusli->Clear();
+    }
+    if (fHitPspx1_x)
+    {
+        fHitPspx1_x->Clear();
+    }
+    if (fHitPspx1_y)
+    {
+        fHitPspx1_y->Clear();
+    }
     if (fFrsDataCA)
+    {
         fFrsDataCA->Clear();
+    }
 }
 
 ClassImp(R3BAnalysisIncomingID);

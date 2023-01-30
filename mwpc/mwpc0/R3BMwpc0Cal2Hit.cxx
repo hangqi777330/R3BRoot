@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -52,7 +52,7 @@ R3BMwpc0Cal2Hit::R3BMwpc0Cal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc0Cal2Hit: Destructor
 R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 {
-    LOG(INFO) << "R3BMwpc0Cal2Hit: Delete instance";
+    LOG(info) << "R3BMwpc0Cal2Hit: Delete instance";
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
 }
@@ -60,7 +60,7 @@ R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc0Cal2Hit::Init()
 {
-    LOG(INFO) << "R3BMwpc0Cal2Hit: Init";
+    LOG(info) << "R3BMwpc0Cal2Hit: Init";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -94,7 +94,7 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
 
     // Reading the Input -- Cal Data --
     Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
-    if (nHits==0)
+    if (nHits == 0)
         return;
 
     // Data from cal level
@@ -180,7 +180,7 @@ Double_t R3BMwpc0Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc0Cal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc0HitData Structure";
+    LOG(debug) << "Clearing Mwpc0HitData Structure";
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }

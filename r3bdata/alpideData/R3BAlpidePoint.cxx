@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,7 @@
 R3BAlpidePoint::R3BAlpidePoint()
     : FairMCPoint()
 {
+    fSensorID = 0;
     fX_out = fY_out = fZ_out = fEloss = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
     fPid = 0;
@@ -32,7 +33,7 @@ R3BAlpidePoint::R3BAlpidePoint()
 // -----   Standard constructor   ------------------------------------------
 R3BAlpidePoint::R3BAlpidePoint(Int_t trackID,
                                Int_t detID,
-                               Int_t detCopyID,
+                               Int_t sensorID,
                                TVector3 posIn,
                                TVector3 posOut,
                                TVector3 momIn,
@@ -43,7 +44,7 @@ R3BAlpidePoint::R3BAlpidePoint(Int_t trackID,
                                Int_t PId)
     : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss)
 {
-    fDetCopyID = detCopyID;
+    fSensorID = sensorID;
     fX_out = posOut.X();
     fY_out = posOut.Y();
     fZ_out = posOut.Z();

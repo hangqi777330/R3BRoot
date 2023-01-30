@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,6 +14,7 @@
 #ifndef R3BSFIBCAL2HIT
 #define R3BSFIBCAL2HIT
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 
 #include <R3BTCalEngine.h>

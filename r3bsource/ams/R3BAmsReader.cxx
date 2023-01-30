@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -44,7 +44,7 @@ R3BAmsReader::R3BAmsReader(EXT_STR_h101_AMS_onion* data, size_t offset)
 
 R3BAmsReader::~R3BAmsReader()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (fArray)
         delete fArray;
 }
@@ -52,12 +52,12 @@ R3BAmsReader::~R3BAmsReader()
 Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_AMS, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -71,7 +71,7 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BAmsReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     // Read AMS detectors
     for (int d = 0; d < 6; d++)
         if (fData->SST[d]._ == 1024)

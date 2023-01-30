@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -80,7 +80,7 @@ R3BStartrackMapped2CalPar::~R3BStartrackMapped2CalPar()
 InitStatus R3BStartrackMapped2CalPar::Init()
 {
 
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
@@ -96,7 +96,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
       fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
       if (!fCal_Par)
       {
-          LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
+          LOG(error) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
           return kFATAL;
 
       }
@@ -105,7 +105,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
 
       if (!fNofModules)
       {
-          LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
+          LOG(error) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
           return kFATAL;
       }
 
@@ -119,7 +119,7 @@ void R3BStartrackMapped2CalPar::Exec(Option_t* option)
 {
 
     if (++NEvents % 10000 == 0)
-        LOG(INFO) << NEvents;
+        LOG(info) << NEvents;
 
     Int_t nHits = fStartrackMappedDataCA->GetEntries();
     if (!nHits)
@@ -137,7 +137,7 @@ void R3BStartrackMapped2CalPar::Exec(Option_t* option)
 
         if (iLadder >= (fNofInLadder + fNofOutLadder)) // this also errors for iDetector==0
         {
-            LOG(ERROR) << "R3BStartrackMapped2CalPar::Exec() : more Ladders than expected! Det: " << iLadder
+            LOG(error) << "R3BStartrackMapped2CalPar::Exec() : more Ladders than expected! Det: " << iLadder
                        << " allowed are 1.." << fNofInLadder + fNofOutLadder;
             continue;
         }

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,9 +19,9 @@
 #include <TObjString.h>
 #include <TVector3.h>
 
-#include "TArrayF.h"
 #include "FairParGenericSet.h"
 #include "FairParamList.h"
+#include "TArrayF.h"
 
 class R3BRpcHitPar : public FairParGenericSet
 {
@@ -64,7 +64,7 @@ class R3BRpcHitPar : public FairParGenericSet
     TArrayF* fHitCalParams2; /*< Calibration Parameters of Pos 2>*/
     TArrayF* fHitCalParams3; /*< Calibration Parameters of Pos 3>*/
     TArrayF* fHitCalParams4; /*< Calibration Parameters of Pos 4>*/
-    Int_t fNumChannels;  /*< number of channels>*/
+    Int_t fNumChannels;      /*< number of channels>*/
 
     const R3BRpcHitPar& operator=(const R3BRpcHitPar&);
     R3BRpcHitPar(const R3BRpcHitPar&);

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -26,6 +26,7 @@
 #include "R3BTofdHitData.h"
 #include "R3BTofdHitModulePar.h"
 #include "R3BTofdHitPar.h"
+#include <FairRootManager.h>
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
@@ -195,14 +196,14 @@ InitStatus R3BTofdCal2Hit::Init()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofdHitPar";
+        LOG(error) << "There are no Hit parameters in container TofdHitPar";
         return kFATAL;
     }
     // get access to Cal data
@@ -213,7 +214,7 @@ InitStatus R3BTofdCal2Hit::Init()
     if (header == nullptr)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
@@ -222,10 +223,10 @@ InitStatus R3BTofdCal2Hit::Init()
     maxevent = mgr->CheckMaxEventNo();
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItemsLos)
-        LOG(WARNING) << "Branch LosCal not found";
+        LOG(warn) << "Branch LosCal not found";
     fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
     if (NULL == fHitItemsLos)
-        LOG(WARNING) << "Branch LosHit not found";
+        LOG(warn) << "Branch LosHit not found";
 
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Tofd hit data", fHitItems, kTRUE);
@@ -239,7 +240,7 @@ void R3BTofdCal2Hit::SetParContainers()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
+        LOG(error) << "Could not get access to TofdHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -313,11 +314,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             countloshit++;
-            LOG(WARNING) << "LOS Ihit  " << ihit << " " << nHits;
+            LOG(warn) << "LOS Ihit  " << ihit << " " << nHits;
             R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
             if (ihit == 0)
                 timeLos = hitData->fTime_ns;
-            LOG(WARNING) << "LOS Time " << timeLos;
+            LOG(warn) << "LOS Time " << timeLos;
             if (std::isnan(timeLos))
                 return; /// in s444 run2930 Event 22333208
             if (NULL == fh_los_pos)
@@ -347,11 +348,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             Int_t nHits = fCalItemsLos->GetEntriesFast();
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
+                LOG(warn) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
                 R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
                 timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;
                 LosTresM=(calData->fTimeV_r_ns+calData->fTimeV_l_ns)/2.-(calData->fTimeV_t_ns+calData->fTimeV_b_ns)/2.;
-                LOG(WARNING) << "LOS MCFD  "<< LosTresM<<" "<<timeLos<<FairLogger::endl;
+                LOG(warn) << "LOS MCFD  "<< LosTresM<<" "<<timeLos<<FairLogger::endl;
                 if (NULL == fh_los_pos)
                 {
                     char strName[255];
@@ -441,13 +442,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(error) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -468,14 +469,14 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(info) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     continue;
                 }
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(INFO) << "Walk correction not found!";
+                    LOG(info) << "Walk correction not found!";
                 auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                  par->GetPar1Walk(),
                                                  par->GetPar2Walk(),
@@ -493,11 +494,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
                 // calculate time-of-flight
                 if (timeLos == 0)
-                    LOG(WARNING) << "Los Time is zero! ";
+                    LOG(warn) << "Los Time is zero! ";
                 Double_t ToF = (bot_ns + top_ns) / 2. - timeLos - par->GetSync();
                 if (std::isnan(ToF))
                 {
-                    LOG(FATAL) << "ToFD ToF not found";
+                    LOG(fatal) << "ToFD ToF not found";
                 }
                 if (timeP0 == 0.)
                     timeP0 = ToF;
@@ -537,24 +538,24 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                 nHitsEvent = 0;
                             }
                         }
-                        LOG(WARNING) << "Found new first hit -> will reset";
+                        LOG(warn) << "Found new first hit -> will reset";
                         goto reset; /// TODO: how to do without goto?
                     }
                 }
 
                 if (timeLos != 0)
                 {
-                    LOG(DEBUG) << "Found LOS detector";
-                    LOG(DEBUG) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
+                    LOG(debug) << "Found LOS detector";
+                    LOG(debug) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
                     while (ToF < -c_range_ns / 2)
                     {
                         ToF += c_range_ns;
-                        LOG(DEBUG) << "Shift up\n";
+                        LOG(debug) << "Shift up\n";
                     }
                     while (ToF > c_range_ns / 2)
                     {
                         ToF -= c_range_ns;
-                        LOG(DEBUG) << "Shift down\n";
+                        LOG(debug) << "Shift down\n";
                     }
                 }
 
@@ -692,12 +693,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(WARNING) << "Not in bar coincidence increase top counter";
+                LOG(warn) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(WARNING) << "Not in bar coincidence increase bot counter";
+                LOG(warn) << "Not in bar coincidence increase bot counter";
             }
         }
     }
@@ -707,7 +708,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t hit_coinc = 5000000.; // coincidence window for hits in one event in ns. physics says max 250 ps
     Double_t maxChargeDiff = 1.;   // maximum charge difference between two planes for averaged hits
 
-    LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
+    LOG(debug) << "Hits in this event: " << nHitsEvent;
     if (nHitsEvent == 0)
         events_wo_tofd_hits++;
 
@@ -756,7 +757,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     Int_t p = 0;
                     if (tArrT[0] == -1.)
                     { // first entry
-                        LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
+                        LOG(debug) << "First entry plane/bar " << i << "/" << j;
                         tArrQ[0] = q[i][j].at(m);
                         tArrT[0] = tof[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
@@ -769,7 +770,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     {
                         if (tof[i][j].at(m) < tArrT[0])
                         { // new first entry with smaller time
-                            LOG(DEBUG) << "Insert new first " << i << " " << j;
+                            LOG(debug) << "Insert new first " << i << " " << j;
                             insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), 1);
@@ -784,13 +785,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             {
                                 p++; // find insert position
                                 if (p > 2 * nHitsEvent + 1)
-                                    LOG(FATAL) << "Insert position oor"; // should not happen
+                                    LOG(fatal) << "Insert position oor"; // should not happen
                             }
 
-                            LOG(DEBUG) << "Will insert at " << p;
+                            LOG(debug) << "Will insert at " << p;
                             if (p > 0 && tof[i][j].at(m) > tArrT[p - 1] && tof[i][j].at(m) != tArrT[p])
                             { // insert at right position
-                                LOG(DEBUG) << "Insert at " << p << " " << i << " " << j;
+                                LOG(debug) << "Insert at " << p << " " << i << " " << j;
                                 insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 1);
@@ -803,7 +804,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             {
                                 if (tof[i][j].at(m) == tArrT[p])
                                 { // handle virtual bars
-                                    LOG(DEBUG) << "Insert virtual bar " << i << " " << j;
+                                    LOG(debug) << "Insert virtual bar " << i << " " << j;
                                     insertX(2 * nHitsEvent, tArrQ, q[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 2);
@@ -869,8 +870,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t time0;
     for (Int_t ihit = 0; ihit < 2 * nHitsEvent;)
     { // loop over all hits in this event
-        LOG(WARNING) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
-                     << " " << tArrQ[ihit];
+        LOG(warn) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit] << " "
+                  << tArrQ[ihit];
         time0 = tArrT[ihit];            // time of first hit in coincidence window
         Double_t charge0 = tArrQ[ihit]; // charge of first hit in coincidence window
         Double_t plane0 = tArrP[ihit];  // plane of first hit in coincidence window
@@ -909,7 +910,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 }
             }
 
-            LOG(DEBUG) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
+            LOG(debug) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
                        << " " << tArrQ[ihit];
 
             // try to average plane 1&2
@@ -1022,9 +1023,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             tArrU[ihit] == false && tArrU[ihit - i] == false)
                         {
                             inaverage34++;
-                            LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
-                                         << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
-                                         << tArrB[ihit - i];
+                            LOG(warn) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
+                                      << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " " << tArrB[ihit - i];
 
                             nAverage34++; // number of averaged hits in this coincidence window
                             sumQ34 += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
@@ -1150,7 +1150,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     { // loop over not averaged hits
         if (tArrU[hit] == false)
         {
-            LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
+            LOG(debug) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = tArrU[hit + 1] = true;
             // store single hits only seen in planes
             singlehit++;
@@ -1183,11 +1183,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     {
         // std::cout << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL);
+            LOG(fatal);
     }
     // std::cout << "\n";
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
 
     fnEvents++;
 }

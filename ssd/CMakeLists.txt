@@ -1,7 +1,7 @@
 
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -93,3 +93,5 @@ set(DEPENDENCIES
     Spectrum R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(test)

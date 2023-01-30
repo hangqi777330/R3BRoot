@@ -2,6 +2,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "TPython.h"
+#include <TClonesArray.h>
 #include <iostream>
 #include <utility>
 
@@ -41,7 +42,7 @@ InitStatus R3BNeulandNeutronsKeras::Init()
     auto ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronsKeras: No FairRootManager";
+        LOG(fatal) << "R3BNeulandNeutronsKeras: No FairRootManager";
         return kFATAL;
     }
 

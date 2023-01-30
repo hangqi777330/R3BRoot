@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -65,20 +65,18 @@ class R3BRpcCal2HitPar : public FairTask
 
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
 
-    void SetNBCalib(){fRpcCalib = false;}
-
-
+    void SetNBCalib() { fRpcCalib = false; }
 
   private:
     void CalculateParsStrip();
     void CalculateParsPmt();
     void SetParameter();
     Bool_t fDebugMode;
-    Bool_t  fRpcCalib;
+    Bool_t fRpcCalib;
     Int_t fNumChannels;
 
-    TH1F* fhPos[N_STRIP_NB]; 
-    TH1F* fhTime[N_STRIP_NB]; 
+    TH1F* fhPos[N_STRIP_NB];
+    TH1F* fhTime[N_STRIP_NB];
 
     R3BRpcHitPar* fHitPar;    /**< Container for Hit parameters. >*/
     TClonesArray* fCalDataCA; /**< Array with Cal RPC Strip - input data. >*/

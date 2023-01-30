@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -97,6 +97,7 @@ Set(LINKDEF AnaLinkDef.h)
 
 Set(DEPENDENCIES
 GeoBase ParBase MbsAPI Base FairTools R3BPassive R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene R3BTracking
+R3BSsd R3BLos R3BCalifa
 )
 
 Set(LIBRARY_NAME R3BAnalysis)

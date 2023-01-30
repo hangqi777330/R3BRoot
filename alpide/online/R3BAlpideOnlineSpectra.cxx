@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -64,60 +64,56 @@ R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra(const TString& name, Int_t iVerbo
 }
 
 // Virtual R3BAlpideOnlineSpectra::Destructor
-R3BAlpideOnlineSpectra::~R3BAlpideOnlineSpectra()
-{
-    R3BLOG(DEBUG1, "Destructor");
-    if (fMappedItems)
-        delete fMappedItems;
-    if (fCalItems)
-        delete fCalItems;
-    if (fHitItems)
-        delete fHitItems;
-}
+R3BAlpideOnlineSpectra::~R3BAlpideOnlineSpectra() { R3BLOG(debug, ""); }
 
 void R3BAlpideOnlineSpectra::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
-    R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
+    R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 }
 
 void R3BAlpideOnlineSpectra::SetParameter()
 {
     //--- Parameter Container ---
-    fNbSensors = fMap_Par->GetNbSensors();
-    R3BLOG(INFO, "Nb of sensors: " << fNbSensors);
+    if (fMap_Par)
+    {
+        fNbSensors = fMap_Par->GetNbSensors();
+        R3BLOG(info, "Nb of sensors: " << fNbSensors);
+    }
 }
 
 InitStatus R3BAlpideOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+    {
+        R3BLOG(info, "EventHeader. found");
+    }
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     fMappedItems = (TClonesArray*)mgr->GetObject("AlpideMappedData");
-    R3BLOG_IF(FATAL, NULL == fMappedItems, "AlpideMappedData not found");
+    R3BLOG_IF(fatal, NULL == fMappedItems, "AlpideMappedData not found");
 
     fCalItems = (TClonesArray*)mgr->GetObject("AlpideCalData");
-    R3BLOG_IF(WARNING, NULL == fCalItems, "AlpideCalData not found");
+    R3BLOG_IF(warn, NULL == fCalItems, "AlpideCalData not found");
 
     fHitItems = (TClonesArray*)mgr->GetObject("AlpideHitData");
-    R3BLOG_IF(WARNING, NULL == fHitItems, "AlpideHitData not found");
+    R3BLOG_IF(warn, NULL == fHitItems, "AlpideHitData not found");
 
     // MAIN FOLDER-ALPIDE
     TFolder* mainfol = new TFolder("ALPIDE", "Alpide info");
@@ -131,7 +127,6 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     //
     // Create histograms
     //
-
     SetParameter();
 
     char Name1[255];
@@ -177,7 +172,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_mulcal_sensor_%d", s + 1);
             sprintf(Name2, "Cal_mult for sensor: %d", s + 1);
-            fh1_Calmult[s] = new TH1F(Name1, Name2, 100, 0, 100);
+            fh1_Calmult[s] = new TH1F(Name1, Name2, 1000, 0, 1000);
             fh1_Calmult[s]->GetXaxis()->SetTitle("Pixel multiplicity");
             fh1_Calmult[s]->GetYaxis()->SetTitle("Counts");
             fh1_Calmult[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -204,7 +199,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             cHit->Divide(2, 1);
             sprintf(Name1, "fh2_pos_hit_sensor_%d", s + 1);
             sprintf(Name2, "Hit-position for sensor: %d", s + 1);
-            fh2_PosHit[s] = new TH2F(Name1, Name2, 600, 0.0, 30.0, 300, 0.0, 15.0);
+            fh2_PosHit[s] = new TH2F(Name1, Name2, 600, -15.0, 15.0, 300, -7.5, 7.5);
             fh2_PosHit[s]->GetXaxis()->SetTitle("Posl [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitle("Post [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -215,7 +210,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_cluster_size_sensor_%d", s + 1);
             sprintf(Name2, "Cluster_size for sensor: %d", s + 1);
-            fh1_Clustersize[s] = new TH1F(Name1, Name2, 60, 0, 60);
+            fh1_Clustersize[s] = new TH1F(Name1, Name2, 160, 0, 160);
             fh1_Clustersize[s]->GetXaxis()->SetTitle("Cluster size [pixels]");
             fh1_Clustersize[s]->GetYaxis()->SetTitle("Counts");
             fh1_Clustersize[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -263,7 +258,7 @@ InitStatus R3BAlpideOnlineSpectra::ReInit()
 
 void R3BAlpideOnlineSpectra::Reset_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     if (fMappedItems)
     {
@@ -324,34 +319,37 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
             auto hit = (R3BAlpideMappedData*)fMappedItems->At(ihit);
             if (!hit)
                 continue;
-            fh2_ColVsRow[hit->GetSensorId() - 1]->Fill(hit->GetCol(), hit->GetAds());
+            fh2_ColVsRow[hit->GetSensorId() - 1]->Fill(hit->GetCol(), hit->GetRow());
         }
     }
 
     // Fill cal data
-    if (fCalItems && fCalItems->GetEntriesFast() > 0)
+    if (fCalItems)
     {
-        Int_t mult[fNbSensors];
-        for (Int_t s = 0; s < fNbSensors; s++)
-            mult[s] = 0;
-        auto nHits = fCalItems->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        if (fCalItems->GetEntriesFast() > 0)
         {
-            auto hit = (R3BAlpideCalData*)fCalItems->At(ihit);
-            if (!hit)
-                continue;
-            Int_t senid = hit->GetSensorId() - 1;
-            fh2_ColVsRowCal[senid]->Fill(hit->GetCol(), hit->GetRow());
-            mult[senid]++;
-        }
+            Int_t mult[fNbSensors];
+            for (Int_t s = 0; s < fNbSensors; s++)
+                mult[s] = 0;
+            auto nHits = fCalItems->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = (R3BAlpideCalData*)fCalItems->At(ihit);
+                if (!hit)
+                    continue;
+                Int_t senid = hit->GetSensorId() - 1;
+                fh2_ColVsRowCal[senid]->Fill(hit->GetCol(), hit->GetRow());
+                mult[senid]++;
+            }
 
-        for (Int_t s = 0; s < fNbSensors; s++)
-            fh1_Calmult[s]->Fill(mult[s]);
-    }
-    else
-    {
-        for (Int_t s = 0; s < fNbSensors; s++)
-            fh1_Calmult[s]->Fill(0);
+            for (Int_t s = 0; s < fNbSensors; s++)
+                fh1_Calmult[s]->Fill(mult[s]);
+        }
+        else
+        {
+            for (Int_t s = 0; s < fNbSensors; s++)
+                fh1_Calmult[s]->Fill(0);
+        }
     }
 
     // Fill hit data
@@ -376,11 +374,12 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* option)
     }
 
     fNEvents++;
+    return;
 }
 
 void R3BAlpideOnlineSpectra::FinishEvent()
 {
-    R3BLOG(DEBUG1, "Cleaning data structures");
+    R3BLOG(debug, "Cleaning data structures");
     if (fMappedItems)
     {
         fMappedItems->Clear();

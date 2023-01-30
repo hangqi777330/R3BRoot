@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,12 +20,13 @@
 #define R3BAlpideMappingPar_H 1
 
 #include "FairParGenericSet.h"
+
 #include <Rtypes.h>
 #include <stdint.h>
 #include <vector>
 
-#define AlpideRows 512
-#define AlpideCols 1024
+#define DAlpideRows 512
+#define DAlpideCols 1024
 
 class FairParamList;
 
@@ -50,26 +51,32 @@ class R3BAlpideMappingPar : public FairParGenericSet
     Bool_t getParams(FairParamList* list);
 
     /** Method to print values of parameters to the standard output **/
+    virtual void print();
     void printParams();
 
     /** Accessor functions **/
-    const UInt_t GetNbSensors() { return fNbSensors; }
+    const Int_t GetNbSensors() { return fNbSensors; }
+    const Int_t GetGeoVersion() { return fGeoVersion; }
     const Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) { return fIn_use[col - 1][row - 1][sensor - 1]; }
 
-    void SetNbSensors(UInt_t n);
+    void SetNbSensors(Int_t n);
+    void SetGeoVersion(Int_t v) { fGeoVersion = v; }
     void SetInUse(UInt_t sensor, UInt_t col, UInt_t row, Int_t val) { fIn_use[col - 1][row - 1][sensor - 1] = val; }
 
   private:
     Int_t fNbSensors;
-    std::vector<Int_t> fIn_use[AlpideCols][AlpideRows];
+    Int_t fGeoVersion;
+    Int_t fAlpideCols;
+    Int_t fAlpideRows;
+    std::vector<Int_t> fIn_use[DAlpideCols][DAlpideRows];
 
     /** Method to fill all parameters using FairRuntimeDB **/
     Bool_t fillParams(const Text_t* name, Int_t* values, FairParamList* list, const Int_t nValues = 1);
 
     const R3BAlpideMappingPar& operator=(const R3BAlpideMappingPar&); /*< an assignment operator>*/
+    R3BAlpideMappingPar(const R3BAlpideMappingPar&);                  /*< a copy constructor >*/
 
-    R3BAlpideMappingPar(const R3BAlpideMappingPar&); /*< a copy constructor >*/
-
+  public:
     ClassDef(R3BAlpideMappingPar, 1);
 };
 

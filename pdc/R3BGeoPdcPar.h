@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -25,8 +25,8 @@ class R3BGeoPdcPar : public FairParGenericSet
     TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
 
     R3BGeoPdcPar(const char* name = "R3BGeoPdcPar",
-                  const char* title = "Pdc Geometry Parameters",
-                  const char* context = "TestDefaultContext");
+                 const char* title = "Pdc Geometry Parameters",
+                 const char* context = "TestDefaultContext");
     ~R3BGeoPdcPar(void);
     void clear(void);
     void putParams(FairParamList*);

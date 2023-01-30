@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -127,7 +127,11 @@ class R3BFileSource : public FairSource
     void SetInputFileName(TString tstr) { fInputFileName = tstr; }
 
     /**Read one event from source to find out which RunId to use*/
+#ifdef ACTIVATEOVERRIDE
+    virtual Bool_t SpecifyRunId() override;
+#else
     virtual Bool_t SpecifyRunId();
+#endif
 
   private:
     // static pointer to this class

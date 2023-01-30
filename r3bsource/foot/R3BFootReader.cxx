@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -45,7 +45,7 @@ R3BFootReader::R3BFootReader(EXT_STR_h101_FOOT_onion* data, size_t offset)
 
 R3BFootReader::~R3BFootReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
         delete fArray;
 }
@@ -53,12 +53,12 @@ R3BFootReader::~R3BFootReader()
 Bool_t R3BFootReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_FOOT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FOOT, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information");
+        R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -73,7 +73,7 @@ Bool_t R3BFootReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BFootReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data");
+    R3BLOG(debug1, "Event data");
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
     {
@@ -91,7 +91,7 @@ Bool_t R3BFootReader::Read()
         {
             if (fNEvent > 0)
             {
-                R3BLOG(FATAL,
+                R3BLOG(fatal,
                        "\033[5m\033[31m Failed number of strips per detector " << fData->FOOT[d]._ << " \033[0m");
             }
         }

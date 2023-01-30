@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,11 @@
 #include <numeric>
 #include <string>
 
-void normalize_TArrayD(TArrayD& a){
+void normalize_TArrayD(TArrayD& a)
+{
     const auto s = a.GetSum();
     const auto l = a.GetSize();
-    if(s > 0.)
+    if (s > 0.)
     {
         for (int j = 0; j < l; j++)
         {
@@ -131,7 +132,7 @@ bool R3BNeulandMultiplicityBayesPar::CheckIfProperlyLoaded() const
 {
     if (std::accumulate(fHits.cbegin(), fHits.cend(), 0, [](int i, const TArrayD& a) { return i + a.GetSum(); }) < 0.1)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityBayesPar: Empty dataset -> Not properly loaded!";
+        LOG(fatal) << "R3BNeulandMultiplicityBayesPar: Empty dataset -> Not properly loaded!";
     }
     return true;
 }

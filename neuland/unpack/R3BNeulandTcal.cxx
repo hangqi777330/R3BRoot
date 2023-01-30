@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -73,7 +73,7 @@ R3BNeulandTcal::~R3BNeulandTcal()
 
 InitStatus R3BNeulandTcal::Init()
 {
-    LOG(INFO) << "R3BNeulandTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
+    LOG(info) << "R3BNeulandTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -161,7 +161,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             // Convert TDC to [ns]
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 
@@ -170,7 +170,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
             {
-                LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
+                LOG(debug) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide;
                 continue;
             }
 
@@ -185,7 +185,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             */
             if (timeLE < 0. || timeLE > fClockFreq || timeTE < 0. || timeTE > fClockFreq)
             {
-                LOG(ERROR) << "R3BNeulandTcal::Exec : error in time calibration: ch= " << channel << ", tdc= " << tdc
+                LOG(error) << "R3BNeulandTcal::Exec : error in time calibration: ch= " << channel << ", tdc= " << tdc
                            << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE;
                 continue;
             }
@@ -203,7 +203,7 @@ void R3BNeulandTcal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1))
     {
-        LOG(INFO) << "R3BNeulandTcal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
+        LOG(info) << "R3BNeulandTcal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

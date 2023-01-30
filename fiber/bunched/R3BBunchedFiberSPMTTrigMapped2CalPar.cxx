@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,6 +13,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include <FairRootManager.h>
 
 #include "R3BBunchedFiberSPMTTrigMapped2CalPar.h"
 #include "R3BFiberMappedData.h"
@@ -42,10 +43,10 @@ R3BBunchedFiberSPMTTrigMapped2CalPar::~R3BBunchedFiberSPMTTrigMapped2CalPar()
 InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
 {
     auto rm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject("BunchedFiberSPMTTrigMapped");
-    R3BLOG_IF(FATAL, !fMapped, "BunchedFiberSPMTTrigMapped not found");
+    R3BLOG_IF(fatal, !fMapped, "BunchedFiberSPMTTrigMapped not found");
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
@@ -53,7 +54,7 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        R3BLOG(ERROR, "Could not get " << name);
+        R3BLOG(error, "Could not get " << name);
         return kFATAL;
     }
     fEngine = new R3BTCalEngine(fTCalPar, fMinStats);
@@ -73,7 +74,7 @@ void R3BBunchedFiberSPMTTrigMapped2CalPar::Exec(Option_t* option)
 
 void R3BBunchedFiberSPMTTrigMapped2CalPar::FinishTask()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fEngine->CalculateParamVFTX();
     fTCalPar->printParams();
 }

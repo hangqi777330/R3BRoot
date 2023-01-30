@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -13,6 +13,7 @@
 
 set(INCLUDE_DIRECTORIES 
 ${INCLUDE_DIRECTORIES} 
+${R3BROOT_SOURCE_DIR}/neuland/calibration
 ${R3BROOT_SOURCE_DIR}/neuland/digitizing
 )
 include_directories(${INCLUDE_DIRECTORIES})
@@ -29,6 +30,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF NeulandDigitizingLinkDef.h)
 set(LIBRARY_NAME R3BNeulandDigitizing)
-set(DEPENDENCIES R3BNeulandShared R3BData)
+set(DEPENDENCIES R3BNeulandShared R3BData R3BNeulandCalibration)
 
 GENERATE_LIBRARY()

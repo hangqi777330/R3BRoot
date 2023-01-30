@@ -2,7 +2,7 @@
 
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -22,10 +22,10 @@
 #pragma link C++ class R3BModule+;
 #pragma link C++ class R3BDetector+;
 #pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BWhiterabbitPropagator+;
 #pragma link C++ class R3BDataPropagator+;
 #pragma link C++ class R3BFileSource+;
+#pragma link C++ class R3BEventHeaderPropagator+;
 #pragma link C++ class R3BLogger+;
 #pragma link C++ class R3BTcutPar+;
 #pragma link C++ class R3BTsplinePar+;

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,6 +18,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 
 R3BStrawtubesMapped2CalPar::R3BStrawtubesMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
@@ -70,7 +71,7 @@ void R3BStrawtubesMapped2CalPar::Exec(Option_t* option)
         auto mapped = (R3BStrawtubesMappedData*)fMapped->At(i);
         if (!mapped)
         {
-            LOG(ERROR) << "R3BStrawtubesMapped2CalPar::Exec(): What is this crap?";
+            LOG(error) << "R3BStrawtubesMapped2CalPar::Exec(): What is this crap?";
             continue;
         }
 

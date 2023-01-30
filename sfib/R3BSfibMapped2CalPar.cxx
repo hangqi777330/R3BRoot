@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,6 +18,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BSfibMapped2CalPar::R3BSfibMapped2CalPar(Int_t a_verbose,
@@ -57,7 +58,7 @@ InitStatus R3BSfibMapped2CalPar::Init()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get SfibTCalPar.";
+        LOG(error) << "Could not get SfibTCalPar.";
         return kFATAL;
     }
     fTCalPar->setChanged();

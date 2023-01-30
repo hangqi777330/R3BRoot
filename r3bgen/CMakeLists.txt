@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -30,8 +30,13 @@ endif((${fairroot_major_version} EQUAL 17 AND ${fairroot_minor_version} EQUAL 10
 set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
-    ${R3BROOT_SOURCE_DIR}/field ${R3BROOT_SOURCE_DIR}/generators ${R3BROOT_SOURCE_DIR}/r3bgen
-    ${R3BROOT_SOURCE_DIR}/r3bdata ${Geant4_INCLUDE_DIRS})
+    ${R3BROOT_SOURCE_DIR}/field 
+    ${R3BROOT_SOURCE_DIR}/generators 
+    ${R3BROOT_SOURCE_DIR}/r3bgen
+    ${R3BROOT_SOURCE_DIR}/r3bdata 
+    ${R3BROOT_SOURCE_DIR}/r3bbase 
+    ${Geant4_INCLUDE_DIRS}
+)
 
 include_directories(${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -77,6 +82,7 @@ set(DEPENDENCIES
     FairTools
     Field
     Gen
+    R3BBase
     R3BData
     G4materials
     Boost::iostreams

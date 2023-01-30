@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -112,7 +112,7 @@ void R3BNeulandCal2Hit::SetParameter()
         fAttenuationValues[id] = exp(Neuland::TotalBarLength / fParMap[id].GetLightAttenuationLength());
     }
 
-    LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar();
+    LOG(info) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar();
 }
 
 InitStatus R3BNeulandCal2Hit::ReInit()
@@ -171,8 +171,17 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         if (energy < fEnergyCutoff)
             continue;
 
-        std::array<Double_t, 2> tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1),
-                                        cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+        std::array<Double_t, 2> tdc;
+
+        if (std::isnan(cal[0]->GetTriggerTime()) || std::isnan(cal[0]->GetTriggerTime()))
+        {
+            tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1), cal[1]->GetTime() + parameter.GetTimeOffset(2) };
+        }
+        else
+        {
+            tdc = { cal[0]->GetTime() - cal[0]->GetTriggerTime() + parameter.GetTimeOffset(1),
+                    cal[1]->GetTime() - cal[1]->GetTriggerTime() + parameter.GetTimeOffset(2) };
+        }
 
         // FIXME this should be done in Mapped2Cal
         // In Cal2Hit the difference between all bars should be checked

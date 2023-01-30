@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -99,7 +99,7 @@ class ext_data_struct_info;
     EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
     if (!ok)                                                                               \
     {                                                                                      \
-        R3BLOG(ERROR, "Failed to setup UCESB structure information.");                     \
+        R3BLOG(error, "Failed to setup UCESB structure information.");                     \
         return kFALSE;                                                                     \
     }
 
@@ -173,7 +173,7 @@ class ext_data_struct_info;
         dst._v_len = LENGTH(src##v);                        \
         if (dst._MI_len != dst._v_len)                      \
         {                                                   \
-            R3BLOG(ERROR, "UCESB single-hit array error."); \
+            R3BLOG(error, "UCESB single-hit array error."); \
             exit(EXIT_FAILURE);                             \
         }                                                   \
     } while (0)
@@ -189,7 +189,7 @@ class ext_data_struct_info;
         dst._ME_len = LENGTH(src##ME);                     \
         if (dst._MI_len != dst._ME_len)                    \
         {                                                  \
-            R3BLOG(ERROR, "UCESB multi-hit array error."); \
+            R3BLOG(error, "UCESB multi-hit array error."); \
             exit(EXIT_FAILURE);                            \
         }                                                  \
         dst._ = &src;                                      \

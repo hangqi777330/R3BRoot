@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -52,12 +52,17 @@ mwpc1/*.cxx
 mwpc2/*.cxx
 digi/*.cxx
 online/*.cxx
+mwpc3/R3BMwpc3.cxx
+mwpc3/R3BMwpc3ContFact.cxx
+mwpc3/R3BMwpc3CalPar.cxx
+mwpc3/R3BMwpc3Mapped2Cal.cxx
+mwpc3/R3BMwpc3Mapped2CalPar.cxx
 )
 
 if(WITH_SOFIA)
 file(GLOB SRCS 
 ${SRCS}
-mwpc3/*.cxx
+mwpc3/R3BMwpc3Cal2Hit.cxx
 )
 endif(WITH_SOFIA)
 
@@ -71,3 +76,6 @@ set(DEPENDENCIES
   R3BBase R3BData R3BTracking)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(geobase)
+add_subdirectory(test)

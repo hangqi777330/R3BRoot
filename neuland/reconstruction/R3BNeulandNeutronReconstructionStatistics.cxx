@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,6 +13,7 @@
 
 #include "R3BNeulandNeutronReconstructionStatistics.h"
 #include "FairLogger.h"
+#include <FairRootManager.h>
 #include <TFile.h>
 #include <iostream>
 #include <numeric>
@@ -58,7 +59,7 @@ InitStatus R3BNeulandNeutronReconstructionStatistics::Init()
     }
     catch (const std::exception& e)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstruction" << e.what();
+        LOG(fatal) << "R3BNeulandNeutronReconstruction" << e.what();
     }
 
     TH1::AddDirectory(kFALSE);

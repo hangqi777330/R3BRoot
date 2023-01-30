@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -117,8 +117,8 @@ void R3BDch2pDigitizer::SetParContainers()
 
     if (fDch2pDigiPar)
     {
-        LOG(INFO) << "R3BDch2pDigitizer::SetParContainers() ";
-        LOG(INFO) << "Container R3BDch2pDigiPar  loaded ";
+        LOG(info) << "R3BDch2pDigitizer::SetParContainers() ";
+        LOG(info) << "Container R3BDch2pDigiPar  loaded ";
     }
 }
 

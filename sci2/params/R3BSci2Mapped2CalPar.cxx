@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -113,7 +113,7 @@ InitStatus R3BSci2Mapped2CalPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BSci2Mapped2CalPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BSci2Mapped2CalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -147,20 +147,20 @@ void R3BSci2Mapped2CalPar::Exec(Option_t* option)
 
         if (iDetector > (fNofDetectors - 1))
         {
-            LOG(ERROR) << "R3BSci2Mapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
+            LOG(error) << "R3BSci2Mapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
                        << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels - 1))
         {
-            LOG(ERROR) << "R3BSci2Mapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
+            LOG(error) << "R3BSci2Mapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
                        << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes - 1))
         {
-            LOG(ERROR) << "R3BSci2Mapped2CalPar::Exec() : more time-types than expected! Type: " << iType
+            LOG(error) << "R3BSci2Mapped2CalPar::Exec() : more time-types than expected! Type: " << iType
                        << " allowed are 0.." << (fNofTypes - 1);
             continue;
         }

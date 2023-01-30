@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,6 +24,7 @@
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_verbose)
@@ -50,18 +51,18 @@ R3BFiberMAPMTMapped2Cal::~R3BFiberMAPMTMapped2Cal()
 
 InitStatus R3BFiberMAPMTMapped2Cal::Init()
 {
-    R3BLOG(INFO, "For firber " << fName);
+    R3BLOG(info, "For firber " << fName);
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found.");
+        R3BLOG(fatal, "FairRootManager not found.");
         return kFATAL;
     }
     auto name = fName + "Mapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        R3BLOG(FATAL, "Branch " << name << " not found.");
+        R3BLOG(fatal, "Branch " << name << " not found.");
         return kFATAL;
     }
     mgr->Register(fName + "Cal", "Fiber Cal Data", fCalItems, !fOnline);
@@ -79,7 +80,7 @@ void R3BFiberMAPMTMapped2Cal::SetParContainers()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not get access to " << name << " container.");        \
+            R3BLOG(error, "Could not get access to " << name << " container.");        \
         }                                                                              \
     } while (0)
     GET_TCALPAR(MAPMT);
@@ -96,7 +97,7 @@ InitStatus R3BFiberMAPMTMapped2Cal::ReInit()
 void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
+    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName() << '.');
 
     if (mapped_num == 0)
         return;
@@ -107,7 +108,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        R3BLOG(DEBUG,
+        R3BLOG(debug,
                "Channel=" << channel << ":Side=" << mapped->GetSide()
                           << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 
@@ -124,7 +125,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         }
         if (!par)
         {
-            R3BLOG(WARNING, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
+            R3BLOG(warn, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
             continue;
         }
 
@@ -136,13 +137,13 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        R3BLOG(DEBUG, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
+        R3BLOG(debug, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
 
         // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns > fClockFreq)
         {
-            R3BLOG(ERROR,
+            R3BLOG(error,
                    "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
                        << ",ns=" << fine_ns << ").");
             continue;
@@ -154,7 +155,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-        R3BLOG(DEBUG, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
+        R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
 
         if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
         {

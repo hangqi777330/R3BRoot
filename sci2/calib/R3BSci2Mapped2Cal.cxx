@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -64,7 +64,7 @@ R3BSci2Mapped2Cal::R3BSci2Mapped2Cal(const char* name, Int_t iVerbose)
 
 R3BSci2Mapped2Cal::~R3BSci2Mapped2Cal()
 {
-    LOG(DEBUG) << "R3BSci2Mapped2Cal::Destructor";
+    LOG(debug) << "R3BSci2Mapped2Cal::Destructor";
     if (fCalItems)
     {
         delete fCalItems;
@@ -75,7 +75,7 @@ R3BSci2Mapped2Cal::~R3BSci2Mapped2Cal()
 
 InitStatus R3BSci2Mapped2Cal::Init()
 {
-    LOG(INFO) << "R3BSci2Mapped2Cal::Init : read " << fNofModules << " modules";
+    LOG(info) << "R3BSci2Mapped2Cal::Init : read " << fNofModules << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -112,7 +112,7 @@ void R3BSci2Mapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Sci2TCalPar");
     if (!fTcalPar)
     {
-        LOG(FATAL) << "Could not get access to Sci2TCalPar-Container.";
+        LOG(fatal) << "Could not get access to Sci2TCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -149,7 +149,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            LOG(INFO) << "R3BSci2Mapped2Cal::Exec : Detector number out of range: " << iDet;
+            LOG(info) << "R3BSci2Mapped2Cal::Exec : Detector number out of range: " << iDet;
             continue;
         }
 
@@ -160,7 +160,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
 
         if (!par)
         {
-            LOG(INFO) << "R3BSci2Mapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
+            LOG(info) << "R3BSci2Mapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
                       << ", Type: " << iType;
             continue;
         }
@@ -172,7 +172,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
         if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
         {
 
-            LOG(INFO) << "R3BSci2Mapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
+            LOG(info) << "R3BSci2Mapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
                       << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
                       << ", time in ns = " << times_raw_ns;
             continue;
@@ -287,7 +287,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeV_r_ns = times_ns;
                 if (calItem->fTimeV_r_ns < 0. || IS_NAN(calItem->fTimeV_r_ns))
-                    LOG(INFO) << "Problem with  fTimeV_r_ns: " << calItem->fTimeV_r_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeV_r_ns: " << calItem->fTimeV_r_ns << " " << times_ns << " "
                               << endl;
             }
 
@@ -295,7 +295,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeL_r_ns = times_ns;
                 if (calItem->fTimeL_r_ns < 0. || IS_NAN(calItem->fTimeL_r_ns))
-                    LOG(INFO) << "Problem with  fTimeL_r_ns: " << calItem->fTimeL_r_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeL_r_ns: " << calItem->fTimeL_r_ns << " " << times_ns << " "
                               << endl;
             }
 
@@ -303,7 +303,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeT_r_ns = times_ns;
                 if (calItem->fTimeT_r_ns < 0. || IS_NAN(calItem->fTimeT_r_ns))
-                    LOG(INFO) << "Problem with  fTimeT_r_ns: " << calItem->fTimeT_r_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeT_r_ns: " << calItem->fTimeT_r_ns << " " << times_ns << " "
                               << endl;
             }
         }
@@ -315,7 +315,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeV_l_ns = times_ns;
                 if (calItem->fTimeV_l_ns < 0. || IS_NAN(calItem->fTimeV_l_ns))
-                    LOG(INFO) << "Problem with  fTimeV_l_ns: " << calItem->fTimeV_l_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeV_l_ns: " << calItem->fTimeV_l_ns << " " << times_ns << " "
                               << endl;
             }
 
@@ -323,7 +323,7 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeL_l_ns = times_ns;
                 if (calItem->fTimeL_l_ns < 0. || IS_NAN(calItem->fTimeL_l_ns))
-                    LOG(INFO) << "Problem with  fTimeL_l_ns: " << calItem->fTimeL_l_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeL_l_ns: " << calItem->fTimeL_l_ns << " " << times_ns << " "
                               << endl;
             }
 
@@ -331,15 +331,15 @@ void R3BSci2Mapped2Cal::Exec(Option_t* option)
             {
                 calItem->fTimeT_l_ns = times_ns;
                 if (calItem->fTimeT_l_ns < 0. || IS_NAN(calItem->fTimeT_l_ns))
-                    LOG(INFO) << "Problem with  fTimeT_l_ns: " << calItem->fTimeT_l_ns << " " << times_ns << " "
+                    LOG(info) << "Problem with  fTimeT_l_ns: " << calItem->fTimeT_l_ns << " " << times_ns << " "
                               << endl;
             }
         }
 
         continue;
     skip_event_pileup:
-        LOG(WARNING) << "R3BSci2Mapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                     << " iCal: " << iCal << " Skip event because of pileup.";
+        LOG(warn) << "R3BSci2Mapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
+                  << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     ++fNEvent;

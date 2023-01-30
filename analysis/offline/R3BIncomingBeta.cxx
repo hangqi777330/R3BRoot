@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -66,21 +66,21 @@ R3BIncomingBeta::R3BIncomingBeta(const char* name, Int_t iVerbose)
 
 R3BIncomingBeta::~R3BIncomingBeta()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFrsDataCA)
         delete fFrsDataCA;
 }
 
 void R3BIncomingBeta::SetParContainers()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = (R3BIncomingIDPar*)rtdb->getContainer("IncomingIDPar");
-    R3BLOG_IF(FATAL, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
-    R3BLOG_IF(INFO, fIncomingID_Par, "IncomingIDPar container was found");
+    R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
 
     return;
 }
@@ -104,19 +104,19 @@ void R3BIncomingBeta::SetParameter()
 
 InitStatus R3BIncomingBeta::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     fHeader = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
     // Get access to Sci2 data at hit level
     fHitSci2 = (TClonesArray*)mgr->GetObject("Sci2Hit");
-    R3BLOG_IF(WARNING, !fHitSci2, "Could not find Sci2Hit");
+    R3BLOG_IF(warn, !fHitSci2, "Could not find Sci2Hit");
 
     // Get access to hit data of the LOS
     fHitLos = (TClonesArray*)mgr->GetObject("LosHit");
-    R3BLOG_IF(WARNING, !fHitLos, "LosHit not found");
+    R3BLOG_IF(warn, !fHitLos, "LosHit not found");
 
     // Output data
     fFrsDataCA = (TClonesArray*)mgr->GetObject("FrsData");
@@ -124,7 +124,7 @@ InitStatus R3BIncomingBeta::Init()
     {
         fFrsDataCA = new TClonesArray("R3BFrsData");
         mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
-        R3BLOG(INFO, "FrsData register done, it is OK");
+        R3BLOG(info, "FrsData register done, it is OK");
     }
 
     SetParameter();
@@ -186,7 +186,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
             numDet = hittcal->GetSciId();
             if (numDet > fNumDet)
             {
-                R3BLOG(WARNING, "Sci2 detector id:" << numDet << " is out of range!");
+                R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
                 continue;
             }
             if (multSci2[numDet - 1] >= MAXMULT)
@@ -229,6 +229,10 @@ void R3BIncomingBeta::Exec(Option_t* option)
                 if (num_tof_candidates > 0)
                     break;
                 ToFraw_m1 = fTimeStitch->GetTime(timeLosV[i][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
+
+                if (ToFraw_m1 > 0. && fHeader->GetExpId() == 515)
+                    ToFraw_m1 = ToFraw_m1 - 40960.;
+
                 ToFrawwTref_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
 
                 Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
@@ -259,16 +263,22 @@ void R3BIncomingBeta::Exec(Option_t* option)
 void R3BIncomingBeta::FinishEvent()
 {
     if (fHitSci2)
+    {
         fHitSci2->Clear();
+    }
     if (fHitLos)
+    {
         fHitLos->Clear();
+    }
 }
 
 void R3BIncomingBeta::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing FrsData Structure");
+    R3BLOG(debug1, "Clearing FrsData Structure");
     if (fFrsDataCA)
+    {
         fFrsDataCA->Clear();
+    }
 }
 
 // -----   Private method AddData  --------------------------------------------

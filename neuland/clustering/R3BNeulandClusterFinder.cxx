@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -52,7 +52,7 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
     auto clusteredDigis = fClusteringEngine.Clusterize(digis);
     const auto nClusters = clusteredDigis.size();
 
-    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
+    LOG(debug) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
 
     for (auto& cluster : clusteredDigis)
     {

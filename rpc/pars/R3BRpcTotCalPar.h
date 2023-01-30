@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,7 +14,7 @@
 #ifndef R3BRPCTOTCALPAR_H
 #define R3BRPCTOTCALPAR_H
 // 41 Strips +  5 Bars
-#define N_NUM (41*2 + 5*2)
+#define N_NUM (41 * 2 + 5 * 2)
 
 #include "FairParGenericSet.h"
 #include "TObject.h"
@@ -31,8 +31,8 @@ class R3BRpcTotCalPar : public FairParGenericSet
   public:
     /** Standard constructor **/
     R3BRpcTotCalPar(const char* name = "RpcTotCalPar",
-                 const char* title = "RPC Cal Parameters",
-                 const char* context = "R3BRpcTotCalParContext");
+                    const char* title = "RPC Cal Parameters",
+                    const char* context = "R3BRpcTotCalParContext");
 
     /** Destructor **/
     virtual ~R3BRpcTotCalPar();

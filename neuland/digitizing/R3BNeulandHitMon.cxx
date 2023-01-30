@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,10 @@
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
 #include "TDirectory.h"
-#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include <TFile.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -31,14 +31,14 @@ R3BNeulandHitMon::R3BNeulandHitMon(TString input, TString output, const Option_t
     , fHits(input)
     , fIs3DTrackEnabled(false)
 {
-    LOG(INFO) << "Using R3B NeuLAND NeulandHit Monitor";
+    LOG(info) << "Using R3B NeuLAND NeulandHit Monitor";
 
     TString opt = option;
     opt.ToUpper();
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization";
+        LOG(info) << "... with 3D track visualization";
     }
 }
 
@@ -86,13 +86,17 @@ void R3BNeulandHitMon::Exec(Option_t*)
 
     // checking paddle multihits
     std::map<Int_t, Int_t> paddlenum;
-    for(const auto &hit : hits){
+    for (const auto& hit : hits)
+    {
         auto result = paddlenum.insert(std::pair<Int_t, Int_t>(hit->GetPaddle(), 1));
-        if(result.second == false)
+        if (result.second == false)
             result.first->second++;
     }
-    auto max = std::max_element(paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs){return (lhs.second < rhs.second);});
-    LOG(DEBUG) << "max dupli: " << max->second;
+    auto max = std::max_element(
+        paddlenum.begin(), paddlenum.end(), [](std::pair<Int_t, Int_t> lhs, std::pair<Int_t, Int_t> rhs) {
+            return (lhs.second < rhs.second);
+        });
+    LOG(debug) << "max dupli: " << max->second;
 
     if (fIs3DTrackEnabled)
     {

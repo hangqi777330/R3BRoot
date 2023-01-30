@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -42,7 +42,7 @@ void R3BVacVesselCool::ConstructGeometry()
 
     if (TString(GetName()) != TString("LiH"))
     {
-        LOG(FATAL) << "VacVesselCool is only supposed to work with LiH Target";
+        LOG(fatal) << "VacVesselCool is only supposed to work with LiH Target";
         // At least if the previous code was interpreted correctly
     }
     R3BModule::ConstructGeometry();

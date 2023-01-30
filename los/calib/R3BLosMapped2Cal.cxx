@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -74,7 +74,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BLosMapped2Cal::~R3BLosMapped2Cal()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fCalItems)
         delete fCalItems;
     if (fCalTriggerItems)
@@ -83,13 +83,13 @@ R3BLosMapped2Cal::~R3BLosMapped2Cal()
 
 InitStatus R3BLosMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -101,13 +101,13 @@ InitStatus R3BLosMapped2Cal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
     if (NULL == fMappedItems)
     {
-        R3BLOG(FATAL, "LosMapped not found");
+        R3BLOG(fatal, "LosMapped not found");
         return kFATAL;
     }
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = (TClonesArray*)mgr->GetObject("LosTriggerMapped");
-    R3BLOG_IF(WARNING, !fMappedTriggerItems, "LosTriggerMapped not found");
+    R3BLOG_IF(warn, !fMappedTriggerItems, "LosTriggerMapped not found");
 
     // Request storage of Cal data in output tree
     mgr->Register("LosCal", "LosCal data", fCalItems, !fOnline);
@@ -128,7 +128,7 @@ void R3BLosMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-        R3BLOG(FATAL, "Could not get access to LosTCalPar-Container.");
+        R3BLOG(fatal, "Could not get access to LosTCalPar-Container.");
         fNofTcalPars = 0;
         return;
     }
@@ -180,13 +180,13 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
-            R3BLOG(WARNING, "Detector number out of range: " << iDet);
+            R3BLOG(warn, "Detector number out of range: " << iDet);
             continue;
         }
 
         if (hit->GetTimeCoarse() > 8192)
         {
-            R3BLOG(WARNING, "Coarse counter > 8192: Det " << iDet << " , Ch: " << iCha << " , type: " << iType);
+            R3BLOG(warn, "Coarse counter > 8192: Det " << iDet << " , Ch: " << iCha << " , type: " << iType);
             continue;
         }
 
@@ -199,8 +199,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
             if (!par)
             {
-                R3BLOG(WARNING,
-                       "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
+                R3BLOG(warn, "Tcal par not found, Detector: " << iDet << ", Channel: " << iCha << ", Type: " << iType);
                 continue;
             }
 
@@ -211,7 +210,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
             {
 
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Bad time in ns: det= " << iDet << ", ch= " << iCha << ", type= " << iType
                                                << ", time in channels = " << hit->GetTimeFine()
                                                << ", time in ns = " << times_raw_ns);
@@ -406,7 +405,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeV_ns[iCha - 1] = times_ns;
             if (calItem->fTimeV_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeV_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeV_ns: " << calItem->fTimeV_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeV_ns: " << calItem->fTimeV_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -414,7 +413,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeL_ns[iCha - 1] = times_ns;
             if (calItem->fTimeL_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeL_ns: " << calItem->fTimeL_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -422,7 +421,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -430,7 +429,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             calItem->fTimeM_ns[iCha - 1] = times_ns;
             if (calItem->fTimeM_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeM_ns[iCha - 1]))
-                LOG(INFO) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
+                LOG(info) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 
@@ -442,7 +441,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         continue;
         // skip_event_pileup:
-        //   LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
+        //   LOG(warn) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
         //              << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
@@ -470,7 +469,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             auto par = fTcalPar->GetModuleParAt(2 + iDetector, iChannel, iType);
             if (!par)
             {
-                R3BLOG(WARNING, "Trigger Tcal par not found.");
+                R3BLOG(warn, "Trigger Tcal par not found.");
                 continue;
             }
 

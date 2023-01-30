@@ -2,7 +2,7 @@
 
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,7 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BCalifaContFact;
-#pragma link C++ class R3BCalifaHitPar+;
+#pragma link C++ class R3BCalifaClusterPar+;
 #pragma link C++ class R3BCalifaMappingPar+;
 #pragma link C++ class R3BCalifaCrystalCalPar+;
 #pragma link C++ class R3BCalifaTotCalPar+;
@@ -33,7 +33,7 @@
 #pragma link C++ class R3BCalifaMapped2CrystalCal+;
 #pragma link C++ class R3BCalifaMapped2CrystalCalPar+;
 #pragma link C++ class R3BCalifaCrystalCal2TotCalPar+;
-#pragma link C++ class R3BCalifaCrystalCal2Hit+;
+#pragma link C++ class R3BCalifaCrystalCal2Cluster+;
 #pragma link C++ class R3BCalifaCrystalCalDataAnalysis+;
 #pragma link C++ class R3BCalifaCrystalCal2CrystalCalPID+;
 #pragma link C++ class R3BCalifaOnlineSpectra+;

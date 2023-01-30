@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -26,6 +26,7 @@
 #include "R3BSci2TcalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 
@@ -50,7 +51,7 @@ R3BSci2Tcal2Hit::R3BSci2Tcal2Hit(const char* name, Int_t iVerbose)
 
 R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
 {
-    LOG(DEBUG) << "R3BSci2Tcal2Hit::Destructor";
+    LOG(debug) << "R3BSci2Tcal2Hit::Destructor";
     if (fHitItems)
     {
         delete fHitItems;
@@ -60,22 +61,22 @@ R3BSci2Tcal2Hit::~R3BSci2Tcal2Hit()
 
 void R3BSci2Tcal2Hit::SetParContainers()
 {
-    LOG(INFO) << "R3BSci2Tcal2Hit::SetParContainers()";
+    LOG(info) << "R3BSci2Tcal2Hit::SetParContainers()";
     // Parameter Container
     // Reading IncomingIDPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
     fSci2Hit_Par = (R3BSci2HitPar*)rtdb->getContainer("Sci2HitPar");
     if (!fSci2Hit_Par)
     {
-        LOG(ERROR) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
+        LOG(error) << "R3BSci2Tcal2Hit:: Couldn't get handle on R3BSci2HitPar container";
     }
     else
     {
-        LOG(INFO) << "R3BSci2Tcal2Hit:: R3BSci2HitPar container open";
+        LOG(info) << "R3BSci2Tcal2Hit:: R3BSci2HitPar container open";
     }
 }
 
@@ -127,16 +128,16 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
     Bool_t tCh[2][3][64];
     for (UShort_t d = 0; d < 2; d++)
     {
-	    tHits[d] = 0;
+        tHits[d] = 0;
         for (UShort_t pmt = 0; pmt < 3; pmt++)
         {
             multTcal[d][pmt] = 0;
             for (UShort_t m = 0; m < 64; m++)
-	        {
+            {
                 iRawTimeNs[d][pmt][m] = 0.;
                 tRawTimeNs[d][pmt][m] = 0.;
-		        tCh[d][pmt][m] = false;
-	        }
+                tCh[d][pmt][m] = false;
+            }
         }
     }
 
@@ -145,7 +146,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
     // --- -------------- --- //
     if (fCalItems && fCalItems->GetEntriesFast())
     {
-        nHits = fCalItems->GetEntriesFast(); 
+        nHits = fCalItems->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BSci2TcalData* hittcal = (R3BSci2TcalData*)fCalItems->At(ihit);
@@ -154,67 +155,66 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             iDet = hittcal->GetDetector() - 1;
             iCh = hittcal->GetChannel() - 1;
             iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]] = hittcal->GetRawTimeNs();
-	        Bool_t inHit = false;
-	    
-	        //Check if a coincident hit exists
-	        for(UShort_t d = 0; d < 2; d++)
-	        {
-		        if(iDet != d)	//skip for different detectors
-			        continue;
-		        for(Int_t j = 0; j < tHits[d]; j++)
-		        {
-			        if(iCh == 2)	//skip reference channel
-				        break;
-			        for(Int_t ch = 0; ch < 2; ch++)
-			        {
-				        if(!tCh[d][ch][j])
-					        continue;
-				        Double_t COINC_WINDOW = fCoincWindow;	//time window
-				        Double_t tdiff = 0.;
-				        tdiff = fabs(tRawTimeNs[d][ch][j] - iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]]);
-					    if(tdiff < COINC_WINDOW)
-				        {
-					        if(tCh[d][iCh][j])	//skip event if already set. Pileup
-					        {
-						        LOG(WARNING) << "Pileup Event. Skipping Event.";
-						        return;
-					        }
-			    
-					        tRawTimeNs[d][iCh][j] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
-					        tCh[d][iCh][j] = true;
-					        inHit = true;
-					        break;
-	 			        }
-			        }		    
-		        }
-	        }
-	        //If no coincident hits make a new hit
-	        if(!inHit && (iCh == 0 || iCh == 1)) 
-	        {
-   		        tRawTimeNs[iDet][iCh][tHits[iDet]] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
-		        tCh[iDet][iCh][tHits[iDet]] = true;
-		        tHits[iDet]++;
-	        }
-	        multTcal[iDet][iCh]++;
+            Bool_t inHit = false;
+
+            // Check if a coincident hit exists
+            for (UShort_t d = 0; d < 2; d++)
+            {
+                if (iDet != d) // skip for different detectors
+                    continue;
+                for (Int_t j = 0; j < tHits[d]; j++)
+                {
+                    if (iCh == 2) // skip reference channel
+                        break;
+                    for (Int_t ch = 0; ch < 2; ch++)
+                    {
+                        if (!tCh[d][ch][j])
+                            continue;
+                        Double_t COINC_WINDOW = fCoincWindow; // time window
+                        Double_t tdiff = 0.;
+                        tdiff = fabs(tRawTimeNs[d][ch][j] - iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]]);
+                        if (tdiff < COINC_WINDOW)
+                        {
+                            if (tCh[d][iCh][j]) // skip event if already set. Pileup
+                            {
+                                LOG(warn) << "Pileup Event. Skipping Event.";
+                                return;
+                            }
+
+                            tRawTimeNs[d][iCh][j] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
+                            tCh[d][iCh][j] = true;
+                            inHit = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            // If no coincident hits make a new hit
+            if (!inHit && (iCh == 0 || iCh == 1))
+            {
+                tRawTimeNs[iDet][iCh][tHits[iDet]] = iRawTimeNs[iDet][iCh][multTcal[iDet][iCh]];
+                tCh[iDet][iCh][tHits[iDet]] = true;
+                tHits[iDet]++;
+            }
+            multTcal[iDet][iCh]++;
 
         } // --- end of loop over Tcal data --- //
         for (UShort_t d = 0; d < 2; d++)
         {
-		    for (int m = 0; m < tHits[d]; m++)
+            for (int m = 0; m < tHits[d]; m++)
             {
-		       	if(tCh[d][0][m] && tCh[d][1][m])	//only take hits for which both sides have signal
-		       	{
-			    	PosCal = fPos_p0 + fPos_p1 * (tRawTimeNs[d][0][m] - tRawTimeNs[d][1][m]);
-			    	Tmean = 0.5 * (tRawTimeNs[d][0][m] + tRawTimeNs[d][1][m]);
-			    	if (multTcal[d][2] == 1)
-					Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
-			    	AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
-			    }
-				
-              }	
-              // end of hit loop
-        }     // end of loop over the number of detectors
-    }         // end of if Tcal data
+                if (tCh[d][0][m] && tCh[d][1][m]) // only take hits for which both sides have signal
+                {
+                    PosCal = fPos_p0 + fPos_p1 * (tRawTimeNs[d][0][m] - tRawTimeNs[d][1][m]);
+                    Tmean = 0.5 * (tRawTimeNs[d][0][m] + tRawTimeNs[d][1][m]);
+                    if (multTcal[d][2] == 1)
+                        Tmean_w_Tref = Tmean - iRawTimeNs[d][2][0];
+                    AddHitData(d + 1, PosCal, Tmean, Tmean_w_Tref);
+                }
+            }
+            // end of hit loop
+        } // end of loop over the number of detectors
+    }     // end of if Tcal data
     return;
 }
 

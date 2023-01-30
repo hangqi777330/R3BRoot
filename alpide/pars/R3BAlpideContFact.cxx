@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -43,7 +43,7 @@ void R3BAlpideContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the Alpide library.
 
-    FairContainer* p1 = new FairContainer("alpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
+    FairContainer* p1 = new FairContainer("AlpideGeoPar", "ALPIDE Geometry Parameters", "GeometryParContext");
     p1->addContext("GeometryParContext");
     containers->Add(p1);
 
@@ -57,9 +57,9 @@ FairParSet* R3BAlpideContFact::createContainer(FairContainer* c)
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
     const char* name = c->GetName();
-    R3BLOG(INFO, "Create container name: " << name);
+    R3BLOG(info, "Create container name: " << name);
     FairParSet* p = 0;
-    if (strcmp(name, "alpideGeoPar") == 0)
+    if (strcmp(name, "AlpideGeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

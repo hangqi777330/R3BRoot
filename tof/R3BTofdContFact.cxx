@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -69,9 +69,9 @@ void R3BTofdContFact::setAllContainers()
      containers->Add(p2);
      */
 
-   // FairContainer* p2 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "TestDefaultContext");
-   // p2->addContext("TestNonDefaultContext");
-  //  containers->Add(p2);
+    // FairContainer* p2 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "TestDefaultContext");
+    // p2->addContext("TestNonDefaultContext");
+    //  containers->Add(p2);
 }
 
 FairParSet* R3BTofdContFact::createContainer(FairContainer* c)
@@ -89,11 +89,11 @@ FairParSet* R3BTofdContFact::createContainer(FairContainer* c)
     if (strcmp(name,"CbmGeoStsPar")==0) {
       p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     }*/
-/*
-    if (strcmp(name, "tofdGeoPar") == 0)
-    {
-        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }*/
+    /*
+        if (strcmp(name, "tofdGeoPar") == 0)
+        {
+            p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+        }*/
 
     return p;
 }

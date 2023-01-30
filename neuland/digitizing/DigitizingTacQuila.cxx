@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -32,8 +32,9 @@ namespace Neuland
         {
         }
 
-        Channel::Channel(const Params& p)
+        Channel::Channel(const Params& p, SideOfChannel side)
             : par(p)
+            , Digitizing::Channel(side)
         {
         }
 
@@ -59,7 +60,7 @@ namespace Neuland
             return cachedFirstHitOverThresh.get() != fPMTHits.end();
         }
 
-        Double_t Channel::GetQDC(UShort_t index) const
+        Double_t Channel::GetQDC() const
         {
             if (!cachedQDC.valid())
             {
@@ -68,7 +69,7 @@ namespace Neuland
             return cachedQDC;
         }
 
-        Double_t Channel::GetTDC(UShort_t index) const
+        Double_t Channel::GetTDC() const
         {
             if (!cachedTDC.valid())
             {
@@ -77,7 +78,7 @@ namespace Neuland
             return cachedTDC;
         }
 
-        Double_t Channel::GetEnergy(UShort_t index) const
+        Double_t Channel::GetEnergy() const
         {
             if (!cachedEnergy.valid())
             {
@@ -124,7 +125,7 @@ namespace Neuland
 
         Double_t Channel::BuildEnergy() const
         {
-            Double_t e = GetQDC(0);
+            Double_t e = GetQDC();
             // Apply reverse attenuation (TODO: Should be last?)
             e = e * exp((2. * (Digitizing::Paddle::gHalfLength)) * Digitizing::Paddle::gAttenuation / 2.);
             // Apply saturation
@@ -178,8 +179,8 @@ namespace Neuland
     {
     }
 
-    std::unique_ptr<Digitizing::Channel> DigitizingTacQuila::BuildChannel()
+    std::unique_ptr<Digitizing::Channel> DigitizingTacQuila::BuildChannel(Digitizing::Channel::SideOfChannel side)
     {
-        return std::unique_ptr<Digitizing::Channel>(new TacQuila::Channel(fTQP));
+        return std::unique_ptr<Digitizing::Channel>(new TacQuila::Channel(fTQP, side));
     }
 }; // namespace Neuland

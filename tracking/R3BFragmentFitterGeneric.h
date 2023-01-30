@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -29,11 +29,11 @@ class R3BFragmentFitterGeneric
     virtual void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE) = 0;
 
     virtual Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
-    
+
     virtual Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 
     virtual Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
-    
+
     virtual Int_t FitTrackBackward2D(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 
     ClassDef(R3BFragmentFitterGeneric, 1)

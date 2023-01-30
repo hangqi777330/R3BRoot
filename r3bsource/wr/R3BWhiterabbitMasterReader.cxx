@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -15,9 +15,9 @@
 #include "FairRootManager.h"
 
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BWRData.h"
 #include "R3BWhiterabbitMasterReader.h"
-#include "R3BLogger.h"
 
 #include "TClonesArray.h"
 
@@ -47,19 +47,16 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
     {
         delete fArray;
     }
-    if (fEventHeader){
-        delete fEventHeader;
-        }
 }
 
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRMASTER, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information");
+        R3BLOG(fatal, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -68,11 +65,11 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO,"EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, !fOnline);
@@ -94,7 +91,7 @@ Bool_t R3BWhiterabbitMasterReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->TIMESTAMP_MASTER_ID);

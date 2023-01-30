@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -45,7 +45,7 @@ R3BBunchedFiberHitModulePar::~R3BBunchedFiberHitModulePar() {}
 
 void R3BBunchedFiberHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BBunchedFiberHitModulePar::putParams() called";
+    LOG(info) << "R3BBunchedFiberHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -75,14 +75,14 @@ void R3BBunchedFiberHitModulePar::clear() { fFiber = 0; }
 
 void R3BBunchedFiberHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BBunchedFiberHitModulePar: FIBER HIT Calibration Parameters: ";
-    LOG(INFO) << "   fFiber: " << fFiber;
-    LOG(INFO) << "   fOffset1: " << fOffset1;
-    LOG(INFO) << "   fOffset2: " << fOffset2;
-    LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fGainMA: " << fGainMA;
-    LOG(INFO) << "   fGainS: " << fGainS;
-    LOG(INFO) << "   fSync2: " << fSync;
+    LOG(info) << "   R3BBunchedFiberHitModulePar: FIBER HIT Calibration Parameters: ";
+    LOG(info) << "   fFiber: " << fFiber;
+    LOG(info) << "   fOffset1: " << fOffset1;
+    LOG(info) << "   fOffset2: " << fOffset2;
+    LOG(info) << "   fVeff: " << fVeff;
+    LOG(info) << "   fGainMA: " << fGainMA;
+    LOG(info) << "   fGainS: " << fGainS;
+    LOG(info) << "   fSync2: " << fSync;
 }
 
 void R3BBunchedFiberHitModulePar::DrawParams()

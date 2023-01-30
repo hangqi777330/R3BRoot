@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -61,7 +61,7 @@ Bool_t R3BTofiReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        LOG(ERROR) << "Failed to setup structure information.";
+        LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
     // Register output array in tree

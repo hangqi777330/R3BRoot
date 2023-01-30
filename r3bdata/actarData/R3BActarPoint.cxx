@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -63,7 +63,7 @@ R3BActarPoint::~R3BActarPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BActarPoint::Print(const Option_t* opt) const
 {
-    LOG(INFO) << "R3BActarPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << "    Position ("
+    LOG(info) << "R3BActarPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << "    Position ("
               << fX << ", " << fY << ", " << fZ << ") cm"
               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV"
               << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06

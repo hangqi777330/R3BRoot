@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,6 +18,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include <FairRootManager.h>
 
 #include "R3BBunchedFiberCalData.h"
 #include "R3BBunchedFiberMapped2Cal.h"
@@ -82,7 +83,7 @@ R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     if (fSPMTElectronics)
     {
         switch (fSPMTElectronics)
@@ -102,14 +103,14 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found.");
+        R3BLOG(fatal, "FairRootManager not found.");
         return kERROR;
     }
     auto name = fName + "Mapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        R3BLOG(ERROR, "Branch " << name << " not found.");
+        R3BLOG(error, "Branch " << name << " not found.");
         return kERROR;
     }
     mgr->Register(fName + "Cal", fName + " cal data", fCalItems, !fOnline);
@@ -121,7 +122,7 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
 void R3BBunchedFiberMapped2Cal::SetParContainers()
 {
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 #define GET_TCALPAR(NAME)                                                      \
     do                                                                         \
     {                                                                          \
@@ -129,7 +130,7 @@ void R3BBunchedFiberMapped2Cal::SetParContainers()
         f##NAME##TCalPar = (R3BTCalPar*)rtdb->getContainer(name);              \
         if (!f##NAME##TCalPar)                                                 \
         {                                                                      \
-            R3BLOG(ERROR, "Could not get access to " << name << " container"); \
+            R3BLOG(error, "Could not get access to " << name << " container"); \
         }                                                                      \
     } while (0)
 
@@ -139,12 +140,12 @@ void R3BBunchedFiberMapped2Cal::SetParContainers()
 
     if (0 == fMAPMTTCalPar->GetNumModulePar())
     {
-        R3BLOG(ERROR, "No TCal parameters in containers " << fMAPMTTCalPar->GetName());
+        R3BLOG(error, "No TCal parameters in containers " << fMAPMTTCalPar->GetName());
     }
 
     if ((!fSkipSPMT || 0 == fSPMTTCalPar->GetNumModulePar()))
     {
-        R3BLOG(ERROR, "No TCal parameters in containers " << fSPMTTCalPar->GetName());
+        R3BLOG(error, "No TCal parameters in containers " << fSPMTTCalPar->GetName());
     }
 }
 
@@ -157,7 +158,7 @@ InitStatus R3BBunchedFiberMapped2Cal::ReInit()
 void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    R3BLOG(DEBUG, "fMappedItems=" << fMappedItems->GetName() << '.');
+    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName() << '.');
     if (mapped_num == 0)
     {
         return;
@@ -167,7 +168,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
     {
         auto mapped = (R3BFiberMappedData*)fMappedItems->At(i);
         auto channel = mapped->GetChannel();
-        R3BLOG(DEBUG, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
+        R3BLOG(debug, "Channel=" << channel << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;
@@ -183,7 +184,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         }
         if (!par)
         {
-            R3BLOG(WARNING, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
+            R3BLOG(warn, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
             continue;
         }
 
@@ -200,10 +201,10 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
         if (mapped->IsMAPMT() || mapped->IsMAPMTTrigger())
         {
             auto fine_ns = par->GetTimeClockTDC(fine_raw);
-            R3BLOG(DEBUG, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
+            R3BLOG(debug, "Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.');
             if (fine_ns < 0. || fine_ns > fClockFreq)
             {
-                R3BLOG(ERROR,
+                R3BLOG(error,
                        "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
                            << ",ns=" << fine_ns << ").");
                 continue;
@@ -215,7 +216,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             // new clock TDC firmware need here a minus
             time_ns = (mapped->GetCoarse() + 1) * fClockFreq - fine_ns;
 
-            R3BLOG(DEBUG, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
+            R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
         }
         else
         {
@@ -227,14 +228,14 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             auto fine_ns = par->GetTimeVFTX(fine_raw);
             if (fine_ns < 0. || fine_ns > fTamexFreq)
             {
-                R3BLOG(ERROR,
+                R3BLOG(error,
                        "(" << fName << "): Channel=" << channel << ": Bad Tamex fine time (raw=" << fine_raw
                            << ",ns=" << fine_ns << ").");
                 continue;
             }
             time_ns = (mapped->GetCoarse() + 1) * fTamexFreq - fine_ns;
 
-            R3BLOG(DEBUG, "Channel=" << channel << ": Time=" << time_ns << "ns.");
+            R3BLOG(debug, "Channel=" << channel << ": Time=" << time_ns << "ns.");
         }
         if (3 == mapped->GetSide())
         {

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -25,7 +25,7 @@ class R3BDistribution2D : public R3BDistribution<2>
     using Arr = std::array<Double_t, 2>;
 
   public:
-    static R3BDistribution<2> Delta(const Double_t value1, const Double_t value2) { return Delta({value1, value2}); }
+    static R3BDistribution<2> Delta(const Double_t value1, const Double_t value2) { return Delta({ value1, value2 }); }
     static R3BDistribution<2> Delta(const Arr values);
     static R3BDistribution<2> Flat(const Arr lower_values, const Arr upper_values);
     static R3BDistribution<2> Gaussian(const Double_t mean, const Double_t sigma);

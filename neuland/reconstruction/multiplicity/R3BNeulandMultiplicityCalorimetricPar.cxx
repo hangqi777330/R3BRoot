@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -54,10 +54,10 @@ Bool_t R3BNeulandMultiplicityCalorimetricPar::getParams(FairParamList* l)
 
 void R3BNeulandMultiplicityCalorimetricPar::printParams()
 {
-    LOG(INFO) << "R3BNeulandMultiplicityCalorimetricPar: Neuland Neutron Cuts ...";
+    LOG(info) << "R3BNeulandMultiplicityCalorimetricPar: Neuland Neutron Cuts ...";
     for (const auto& nc : GetNeutronCuts())
     {
-        LOG(INFO) << nc.first;
+        LOG(info) << nc.first;
         nc.second->Print();
     }
 }
@@ -77,7 +77,7 @@ std::map<UInt_t, TCutG*> R3BNeulandMultiplicityCalorimetricPar::GetNeutronCuts()
 {
     if (fNeutronCuts == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
     }
 
     std::map<UInt_t, TCutG*> map;
@@ -101,7 +101,7 @@ UInt_t R3BNeulandMultiplicityCalorimetricPar::GetNeutronMultiplicity(const Doubl
     // Note: it might be better to implement std::map as a member and sync between the tmap for this type of usage.
     if (fNeutronCuts == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
+        LOG(fatal) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
     }
 
     if (nClusters < 1)

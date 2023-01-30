@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,7 @@
 #include "FairParSet.h"    // for FairParSet
 #include "FairRuntimeDb.h" // for FairRuntimeDb
 #include "R3BNeulandHitPar.h"
+#include "R3BNeulandMappingPar.h"
 #include "R3BNeulandQCalPar.h"
 #include "TList.h"   // for TList
 #include "TString.h" // for TString
@@ -51,6 +52,9 @@ void R3BNeulandParFact::setAllContainers()
     FairContainer* p2 = new FairContainer("NeulandQCalPar", "NeuLAND Pedestal Parameters", "TestDefaultContext");
     p2->addContext("TestNonDefaultContext");
     containers->Add(p2);
+    FairContainer* p3 = new FairContainer("neulandMappingPar", "Neuland Mapping parameters", "neulandMappingContext");
+    p3->addContext("neulandMappingContext");
+    containers->Add(p3);
 }
 
 FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
@@ -60,7 +64,7 @@ FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BNeulandParFact::createContainer : " << name;
+    LOG(info) << "R3BNeulandParFact::createContainer : " << name;
     FairParSet* p = NULL;
 
     if (strcmp(name, "NeulandHitPar") == 0)
@@ -71,6 +75,11 @@ FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
     {
         p = new R3BNeulandQCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
+    else if (strcmp(name, "neulandMappingPar") == 0)
+    {
+        p = new R3BNeulandMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+
     return p;
 }
 

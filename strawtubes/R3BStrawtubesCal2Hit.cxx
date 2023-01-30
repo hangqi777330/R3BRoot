@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,6 +16,7 @@
 #include "R3BStrawtubesCalData.h"
 #include "R3BStrawtubesHitData.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 
 R3BStrawtubesCal2Hit::R3BStrawtubesCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)

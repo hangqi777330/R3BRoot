@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -142,7 +142,7 @@ void R3BAladinFieldMap::Init()
 
         sprintf(str, "R3BAladinFieldMap ---> %d: cos %7.4f sin %7.4f", i, gCoords[i].fCosa, gCoords[i].fSina);
 
-        LOG(INFO) << str;
+        LOG(info) << str;
     }
 
     // Read the field maps
@@ -169,13 +169,13 @@ void R3BAladinFieldMap::Init()
         TString mapName(filename);
         TString dir = getenv("VMCWORKDIR");
         TString fMapFileName = dir + "/field/magField/Aladin/newmap/" + mapName;
-        LOG(INFO) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName;
+        LOG(info) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName;
 
         fin = fopen(fMapFileName, "r");
 
         if (!fin)
         {
-            LOG(ERROR) << "Failure opening field map : " << fMapFileName;
+            LOG(error) << "Failure opening field map : " << fMapFileName;
         }
 
         // free(fMapFileName.Data());
@@ -214,14 +214,14 @@ void R3BAladinFieldMap::Init()
                            &bdummy);
 
             if (n != 9)
-                LOG(ERROR) << "Failure parsing field from map: " << filename << " @ line: % " << line;
+                LOG(error) << "Failure parsing field from map: " << filename << " @ line: % " << line;
 
             if (I != measured_I[i])
-                LOG(ERROR) << "Wrong current " << I << " when parsing field from map " << filename
+                LOG(error) << "Wrong current " << I << " when parsing field from map " << filename
                            << " @ line: " << line;
 
             if (rl != 0 && rl != 1)
-                LOG(ERROR) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
+                LOG(error) << "Wrong box " << rl << " when parsing field from map " << filename << " @line: " << line;
 
             for (int j = 0; j < 3; j++)
             {
@@ -237,7 +237,7 @@ void R3BAladinFieldMap::Init()
                             field->f[rl][0]._np[j],
                             filename,
                             line);
-                    LOG(ERROR) << str;
+                    LOG(error) << str;
                 }
             }
 
@@ -262,7 +262,7 @@ void R3BAladinFieldMap::Init()
 
         gMapIFieldOrig.insert(map_fields_ALADiN::value_type(measured_I[i], field));
 
-        LOG(INFO) << "R3BAladinFieldMap: Reading field map: " << filename;
+        LOG(info) << "R3BAladinFieldMap: Reading field map: " << filename;
     }
 
     // Has to ben changed somehow using
@@ -280,7 +280,7 @@ void R3BAladinFieldMap::Init()
     gRot->RotateY(-1. * Glad_angle);
     gTrans = new TVector3(0.0, 0.0, -1. * DistanceFromtargetToAladinCenter);
 
-    LOG(INFO) << "R3BAladinFieldMap::Init() called";
+    LOG(info) << "R3BAladinFieldMap::Init() called";
     InitField();
 
     // Init has been called
@@ -348,15 +348,15 @@ void R3BAladinFieldMap::CalcFieldDiv(R3BFieldInterp f[3], double d[3])
                 }
                 if (divF == 0)
                 {
-                    LOG(DEBUG) << "  0   ";
+                    LOG(debug) << "  0   ";
                 }
                 else
                 {
                     sprintf(str, "%5.2f ", divF / sqrt(divF_var));
-                    LOG(DEBUG) << str;
+                    LOG(debug) << str;
                 }
             }
-            LOG(DEBUG);
+            LOG(debug);
         }
     }
 }
@@ -407,7 +407,7 @@ void R3BAladinFieldMap::InitField()
 
     if (iter2 == gMapIFieldOrig.begin())
     {
-        LOG(ERROR) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
+        LOG(error) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current << " A, too low.";
     }
     --iter1;
 
@@ -417,7 +417,7 @@ void R3BAladinFieldMap::InitField()
     fCurField = new fields_ALADiN;
 
     if (!fCurField)
-        LOG(DEBUG) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure.";
+        LOG(debug) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure.";
 
     double w2 = (current - iter1->first) / (iter2->first - iter1->first);
     double w1 = 1 - w2;
@@ -559,16 +559,24 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
         if (rl == 0)
         {
             if (ic[2] > 21)
-                goto no_field_map; // this is outside range
+            {
+                continue; // this is outside range
+            }
             else if (ic[2] > 20)
+            {
                 w = 1 - dc[2];
+            }
         }
         else
         {
             if (ic[2] < -1)
-                goto no_field_map; // this is outside range
+            {
+                continue; // this is outside range
+            }
             else if (ic[2] < 0)
+            {
                 w = dc[2];
+            }
         }
 
         wsum += w;
@@ -605,8 +613,6 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
         Bp[2] = -gCoords[rl].fSina * Bbi[2] + gCoords[rl].fCosa * Bbi[0];
 
         continue;
-
-    no_field_map:;
         // printf (")\n");
     }
 
@@ -630,7 +636,7 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
     // rotate_field(B,Bi[0],Bi[1],Bi[2]);
     TVector3 BLab(Bi[0], Bi[1], Bi[2]);
     //   BLab.Transform(*gRot);
-    // copy value @ end
+    // copy value @ end /old/standard version
     // bField[0] = -1.*BLab.X()*10.; // [kGauss]
     // bField[1] = -1.*BLab.Y()*10.; // [kGauss]
     // bField[2] = -1.*BLab.Z()*10.; // [kGauss]
@@ -639,10 +645,6 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
     bField[2] = -1. * BLab.X() * 10.; // [kGauss]
     bField[1] = -1. * BLab.Y() * 10.; // [kGauss]
     bField[0] = +1. * BLab.Z() * 10.; // [kGauss]
-    ////old/standard version(?):
-    // bField[2] = -1.*BLab.X()*10.; // [kGauss]
-    // bField[1] = -1.*BLab.Y()*10.; // [kGauss]
-    // bField[0] = -1.*BLab.Z()*10.; // [kGauss]
 
     //  cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
     //  cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
@@ -684,4 +686,4 @@ void R3BAladinFieldMap::ReadAsciiFile(const char* fileName) {}
 
 Double_t R3BAladinFieldMap::Interpolate(Double_t dx, Double_t dy, Double_t dz) { return 0.; }
 
-ClassImp(R3BAladinFieldMap)
+ClassImp(R3BAladinFieldMap);

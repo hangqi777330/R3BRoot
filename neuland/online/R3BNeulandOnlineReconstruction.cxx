@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -22,6 +22,7 @@
 #include "TH3D.h"
 #include "THttpServer.h"
 #include "TStyle.h"
+#include <FairRootManager.h>
 #include <numeric>
 
 /* This function is required to suppress boxes for empty bins - make them transparent.*/

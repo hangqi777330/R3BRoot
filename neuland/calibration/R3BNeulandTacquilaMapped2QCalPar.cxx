@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,6 +20,7 @@
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
+#include <FairRootManager.h>
 
 #define nPMTs 2 * fPaddles* fPlanes
 

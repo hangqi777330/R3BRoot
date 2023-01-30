@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,6 +18,7 @@
 #include "R3BCalifa.h"
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaPoint.h"
+#include "R3BLogger.h"
 #include "R3BMCStack.h"
 
 #include "TClonesArray.h"
@@ -74,14 +75,15 @@ void R3BCalifa::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BCalifa::Initialize()";
-    LOG(DEBUG) << "R3BCalifa: Vol (McId) def";
+    R3BLOG(info, " ");
 
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
 
     if (!R3BCalifaGeometry::Instance()->Init(fGeometryVersion))
-        LOG(ERROR) << "R3BCalifa::Initialize() Califa geometry not found";
+    {
+        R3BLOG(error, "Califa geometry not found");
+    }
     return;
 }
 
@@ -129,7 +131,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 
     // Note: TF1s and friends are evil, because they will generally break the
     // stack when they crash (e.g. because of SIGFPE, which GEANT4 helpfully
-    // activates on Tuesdays and Debug builds (->G4FPE_DEBUG).
+    // activates on Tuesdays and Debug builds (->G4FPE_debug).
 
     auto makeCompFun = [](std::array<double, 5> p) {
         return [p](double x) { return (x > 0.0) ? 1. / (p[0] + p[1] * pow(x, p[2]) + p[3] / pow(x, p[4])) : 0.0; };
@@ -243,7 +245,7 @@ TClonesArray* R3BCalifa::GetCollection(Int_t iColl) const
 void R3BCalifa::Print(Option_t* option) const
 {
     Int_t nPoints = fCalifaCollection->GetEntriesFast();
-    LOG(INFO) << "R3BCalifa: " << nPoints << " points registered in this event";
+    LOG(info) << "R3BCalifa: " << nPoints << " points registered in this event";
 }
 
 void R3BCalifa::Reset()
@@ -255,7 +257,7 @@ void R3BCalifa::Reset()
 void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BCalifa: " << nEntries << " entries to add";
+    LOG(info) << "R3BCalifa: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BCalifaPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -266,7 +268,7 @@ void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BCalifaPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BCalifa: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BCalifa: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
@@ -284,8 +286,10 @@ R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
     TClonesArray& clref = *fCalifaCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BCalifa: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+    {
+        LOG(info) << "R3BCalifa: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
+    }
     return new (clref[size]) R3BCalifaPoint(trackID, detID, ident, posIn, momIn, time, length, eLoss, Nf, Ns, EventId);
 }
 

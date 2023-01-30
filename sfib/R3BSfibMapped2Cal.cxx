@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,7 @@
 #include "R3BSfibMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BSfibMapped2Cal::R3BSfibMapped2Cal(Int_t a_verbose, enum R3BTCalEngine::CTDCVariant a_variant)
@@ -40,21 +41,21 @@ InitStatus R3BSfibMapped2Cal::Init()
 {
     if (!fTCalPar)
     {
-        LOG(ERROR) << "TCal parameter containers missing, "
+        LOG(error) << "TCal parameter containers missing, "
                       "did you forget SetParContainers?";
         return kERROR;
     }
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        LOG(ERROR) << "FairRootManager not found.";
+        LOG(error) << "FairRootManager not found.";
         return kERROR;
     }
     auto name = "SfibMapped";
     fMappedItems = (TClonesArray*)mgr->GetObject(name);
     if (!fMappedItems)
     {
-        LOG(ERROR) << "Branch " << name << " not found.";
+        LOG(error) << "Branch " << name << " not found.";
         return kERROR;
     }
     mgr->Register("SfibCal", "Land", fCalItems, kTRUE);
@@ -67,7 +68,7 @@ void R3BSfibMapped2Cal::SetParContainers()
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-        LOG(ERROR) << "Could not get access to " << name << " container.";
+        LOG(error) << "Could not get access to " << name << " container.";
     }
 }
 
@@ -80,14 +81,14 @@ InitStatus R3BSfibMapped2Cal::ReInit()
 void R3BSfibMapped2Cal::Exec(Option_t* option)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    LOG(DEBUG) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
+    LOG(debug) << "R3BSfibMapped2Cal::Exec:fMappedItems=" << fMappedItems->GetName() << '.';
     for (auto i = 0; i < mapped_num; i++)
     {
         auto mapped = (R3BSfibMappedData*)fMappedItems->At(i);
         assert(mapped);
 
         auto channel = mapped->GetChannel();
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
+        LOG(debug) << " R3BSfibMapped2Cal::Exec:Channel=" << channel
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
@@ -97,7 +98,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
         // std::cout << 1 + mapped->IsTop() << ' ' << channel << ' ' << tcal_channel_i << ' ' << par << std::endl;
         if (!par)
         {
-            LOG(WARNING) << "R3BSfibMapped2Cal::Exec: Channel=" << channel << ": TCal par not found.";
+            LOG(warn) << "R3BSfibMapped2Cal::Exec: Channel=" << channel << ": TCal par not found.";
             continue;
         }
 
@@ -109,12 +110,12 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
             continue;
         }
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
         Double_t time_ns = -1;
         if (fine_ns < 0. || fine_ns >= fClockFreq)
         {
-            LOG(ERROR) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
+            LOG(error) << "R3BSfibMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
             continue;
         }
@@ -125,7 +126,7 @@ void R3BSfibMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-        LOG(DEBUG) << " R3BSfibMapped2Cal::Exec: Channel=" << channel << ": Time=" << time_ns << "ns.";
+        LOG(debug) << " R3BSfibMapped2Cal::Exec: Channel=" << channel << ": Time=" << time_ns << "ns.";
         new ((*fCalItems)[fCalItems->GetEntriesFast()])
             R3BSfibCalData(1 + mapped->IsTop(), channel, mapped->IsLeading(), time_ns);
     }

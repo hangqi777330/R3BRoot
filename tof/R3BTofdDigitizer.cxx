@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -191,7 +191,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                                         }
                     */
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    LOG(INFO) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                    LOG(info) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
                               << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
                               << " eloss = " << Energy_Loss[channel];
 

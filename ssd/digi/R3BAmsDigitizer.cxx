@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -34,7 +34,7 @@ R3BAmsDigitizer::R3BAmsDigitizer()
 
 R3BAmsDigitizer::~R3BAmsDigitizer()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fPointData)
     {
         fPointData->Delete();
@@ -44,11 +44,11 @@ R3BAmsDigitizer::~R3BAmsDigitizer()
 
 InitStatus R3BAmsDigitizer::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rootManager = FairRootManager::Instance();
 
-    R3BLOG_IF(FATAL, !rootManager, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rootManager, "FairRootManager not found");
 
     fPointData = (TClonesArray*)rootManager->GetObject("TraPoint");
     if (!fPointData)
@@ -112,7 +112,7 @@ void R3BAmsDigitizer::Exec(Option_t* option)
 
 void R3BAmsDigitizer::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing StripCalData Structure");
+    R3BLOG(debug1, "Clearing StripCalData Structure");
     if (fCalData)
         fCalData->Clear();
 }
@@ -122,7 +122,7 @@ R3BAmsStripCalData* R3BAmsDigitizer::AddCal(Int_t detid, Int_t sideid, Int_t str
     TClonesArray& clref = *fCalData;
     Int_t size = clref.GetEntriesFast();
 
-    R3BLOG_IF(INFO,
+    R3BLOG_IF(info,
               fVerbose,
               "Adding StripCalData "
                   << " with unique identifier " << detid << " strip " << stripid << " side " << sideid

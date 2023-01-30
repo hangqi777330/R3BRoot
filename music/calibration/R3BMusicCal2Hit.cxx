@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -68,7 +68,7 @@ R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
 // Virtual R3BMusicCal2Hit: Destructor
 R3BMusicCal2Hit::~R3BMusicCal2Hit()
 {
-    LOG(DEBUG) << "R3BMusicCal2Hit::Destructor";
+    LOG(debug) << "R3BMusicCal2Hit::Destructor";
     if (fMusicHitDataCA)
         delete fMusicHitDataCA;
 }
@@ -80,17 +80,17 @@ void R3BMusicCal2Hit::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not found";
+        LOG(error) << "FairRuntimeDb not found";
     }
 
     fCal_Par = (R3BMusicHitPar*)rtdb->getContainer("musicHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMusicCal2HitPar::Init() Couldn't get handle on musicHitPar container";
+        LOG(error) << "R3BMusicCal2HitPar::Init() Couldn't get handle on musicHitPar container";
     }
     else
     {
-        LOG(INFO) << "R3BMusicCal2HitPar:: musicHitPar container open";
+        LOG(info) << "R3BMusicCal2HitPar:: musicHitPar container open";
     }
 }
 
@@ -106,7 +106,7 @@ void R3BMusicCal2Hit::SetParameter()
     }
 
     fNumParams = fCal_Par->GetNumParZFit(); // Number of Parameters
-    LOG(INFO) << "R3BMusicCal2Hit::SetParameter() Nb parameters for charge-Z: " << fNumParams;
+    LOG(info) << "R3BMusicCal2Hit::SetParameter() Nb parameters for charge-Z: " << fNumParams;
     CalZParams = new TArrayF();
     CalZParams->Set(fNumParams);
     CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
@@ -120,21 +120,21 @@ void R3BMusicCal2Hit::SetParameter()
     // Parameters detector
     if (fNumParams == 2)
     {
-        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z: " << CalZParams->GetAt(0) << " : "
+        LOG(info) << "R3BMusicCal2Hit parameters for charge-Z: " << CalZParams->GetAt(0) << " : "
                   << CalZParams->GetAt(1);
         fZ0 = CalZParams->GetAt(0);
         fZ1 = CalZParams->GetAt(1);
     }
     else if (fNumParams == 3)
     {
-        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z:" << CalZParams->GetAt(0) << " : " << CalZParams->GetAt(1)
+        LOG(info) << "R3BMusicCal2Hit parameters for charge-Z:" << CalZParams->GetAt(0) << " : " << CalZParams->GetAt(1)
                   << " : " << CalZParams->GetAt(2);
         fZ0 = CalZParams->GetAt(0);
         fZ1 = CalZParams->GetAt(1);
         fZ2 = CalZParams->GetAt(2);
     }
     else
-        LOG(ERROR) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters must be < 4, "
+        LOG(error) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters must be < 4, "
                       "currently it is "
                    << fNumParams;
 }
@@ -142,20 +142,20 @@ void R3BMusicCal2Hit::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicCal2Hit::Init()
 {
-    LOG(INFO) << "R3BMusicCal2Hit::Init()";
+    LOG(info) << "R3BMusicCal2Hit::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BMusicCal2Hit::Init() Root-manager not found.";
+        LOG(error) << "R3BMusicCal2Hit::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicCalDataCA = (TClonesArray*)rootManager->GetObject("MusicCalData");
     if (!fMusicCalDataCA)
     {
-        LOG(ERROR) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
+        LOG(error) << "R3BMusicCal2Hit::Init() MusicCalData not found.";
         return kFATAL;
     }
 
@@ -235,7 +235,7 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
         }
     }
 
-    // if(nba!=fNumAnodesAngleFit)LOG(ERROR) << "R3BMusicCal2Hit::nba("<< nba<<") and
+    // if(nba!=fNumAnodesAngleFit)LOG(error) << "R3BMusicCal2Hit::nba("<< nba<<") and
     // fNumAnodesAngleFit("<<fNumAnodesAngleFit <<") are different";
 
     if (fNumAnodesAngleFit > 2 && Esum / nba > 0.)
@@ -338,7 +338,7 @@ void R3BMusicCal2Hit::ExecSim(int nHits)
 // -----   Public method Reset   ------------------------------------------------
 void R3BMusicCal2Hit::Reset()
 {
-    LOG(DEBUG) << "Clearing R3BMusicHitData Structure";
+    LOG(debug) << "Clearing R3BMusicHitData Structure";
     if (fMusicHitDataCA)
         fMusicHitDataCA->Clear();
 }

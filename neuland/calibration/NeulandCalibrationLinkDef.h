@@ -2,7 +2,7 @@
 
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -36,6 +36,7 @@
 #pragma link C++ class R3BNeulandQCalPar+;
 #pragma link C++ class R3BNeulandQCalFiller+;
 #pragma link C++ class R3BNeulandProvideTStart+;
+#pragma link C++ class R3BNeulandMappingPar+;
 #pragma link C++ class Neuland::Calibration::TSyncer+;
 #pragma link C++ class Neuland::Calibration::HitCalibrationBar+;
 #pragma link C++ class Neuland::Calibration::CosmicTracker+;

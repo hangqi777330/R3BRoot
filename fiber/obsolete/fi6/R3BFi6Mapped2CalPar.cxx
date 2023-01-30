@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -82,7 +82,7 @@ InitStatus R3BFi6Mapped2CalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("Fi6TCalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BFi6Mapped2CalPar::Init() Couldn't get handle on Fi6TCalPar. ";
+        LOG(error) << "R3BFi6Mapped2CalPar::Init() Couldn't get handle on Fi6TCalPar. ";
         return kFATAL;
     }
 

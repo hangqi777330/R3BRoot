@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -63,11 +63,11 @@ class TClonesArray;
     do                                                                                         \
     {                                                                                          \
         int ok;                                                                                \
-        R3BLOG(INFO, "");                                                                      \
+        R3BLOG(info, "");                                                                      \
         EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_##NAME, 0); \
         if (!ok)                                                                               \
         {                                                                                      \
-            R3BLOG(ERROR, "Failed to setup UCESB structure information.");                     \
+            R3BLOG(error, "Failed to setup UCESB structure information.");                     \
             return kFALSE;                                                                     \
         }                                                                                      \
         memset(data, 0, sizeof *data);                                                         \
@@ -94,7 +94,7 @@ class TClonesArray;
         dst._ME_len = LENGTH(src##ME);                    \
         if (dst._MI_len != dst._ME_len)                   \
         {                                                 \
-            LOG(ERROR) << "UCESB multi-hit array error."; \
+            LOG(error) << "UCESB multi-hit array error."; \
             exit(EXIT_FAILURE);                           \
         }                                                 \
         dst._ = &src;                                     \

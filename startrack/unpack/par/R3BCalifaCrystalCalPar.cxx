@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -85,17 +85,17 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list)
 {
     if (!list)
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
+        LOG(warn) << "R3BCalifaCrystalCalPar::getParams(): list is NULL";
         return kFALSE;
     }
     Int_t ndus;
     if (!list->fill("NrOfDUnits", &ndus))
     {
-        LOG(WARNING) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
+        LOG(warn) << "R3BCalifaCrystalCalPar::getParams(): Could not read NrOfDUnits from parameter list";
         return kFALSE;
     }
 
-    LOG(DEBUG) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
+    LOG(debug) << "R3BCalifaCrystalCalPar::getParams(): NrOFUNits " << ndus;
 
     TArrayD* values = new TArrayD(9);
 

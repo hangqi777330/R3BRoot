@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -25,10 +25,15 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/tof
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${R3BROOT_SOURCE_DIR}/r3bdata/mwpcData
+${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -50,6 +55,8 @@ R3BFragmentFitterChi2.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
+R3BMDFWrapper.cxx
+R3BTrackingS515.cxx
 )
 
 # fill list of header files from list of source files
@@ -59,7 +66,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF TrackingLinkDef.h)
 Set(LIBRARY_NAME R3BTracking)
 Set(DEPENDENCIES
-    Base ParBase Minuit)
+  Base ParBase TrkBase R3BBase Minuit)
 
 GENERATE_LIBRARY()
 

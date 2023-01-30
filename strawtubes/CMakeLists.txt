@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -48,8 +48,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 Set(LINKDEF StrawtubesLinkDef.h)
 Set(LIBRARY_NAME R3BStrawtubes)
-#Set(DEPENDENCIES
-#    R3Bbase R3BData R3BPassive R3BTCal)
+Set(DEPENDENCIES
+    R3BBase R3BData R3BPassive R3BTCal)
 
 GENERATE_LIBRARY()
 

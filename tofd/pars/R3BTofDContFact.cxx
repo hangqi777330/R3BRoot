@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -63,7 +63,7 @@ FairParSet* R3BTofDContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    R3BLOG(INFO, name);
+    R3BLOG(info, name);
     FairParSet* p = 0;
     if (strcmp(name, "tofdGeoPar") == 0)
     {

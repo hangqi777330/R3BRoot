@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -90,7 +90,7 @@ R3BFileSource::R3BFileSource(TFile* f, const char* Title, UInt_t)
 {
     if (fSourceInstance)
     {
-        R3BLOG(FATAL, "Singleton instance already exists.");
+        R3BLOG(fatal, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
@@ -144,7 +144,7 @@ R3BFileSource::R3BFileSource(const TString* RootFileName, const char* Title, UIn
 {
     if (fSourceInstance)
     {
-        R3BLOG(FATAL, "Singleton instance already exists.");
+        R3BLOG(fatal, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
@@ -199,7 +199,7 @@ R3BFileSource::R3BFileSource(const TString RootFileName, const char* Title, UInt
 {
     if (fSourceInstance)
     {
-        R3BLOG(FATAL, "Singleton instance already exists.");
+        R3BLOG(fatal, "Singleton instance already exists.");
         return;
     }
     fSourceInstance = this;
@@ -224,11 +224,11 @@ R3BFileSource::~R3BFileSource()
 
 Bool_t R3BFileSource::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     if (IsInitialized)
     {
-        R3BLOG(INFO, "R3BFileSource already initialized");
+        R3BLOG(info, "R3BFileSource already initialized");
         return kTRUE;
     }
     if (!fInChain)
@@ -382,18 +382,18 @@ Bool_t R3BFileSource::Init()
     fInputFile.open(fInputFileName.Data(), std::fstream::in);
     if (!fInputFile.is_open())
     {
-        R3BLOG(WARNING, "Input file for RunIds was not found, it is Ok!");
+        R3BLOG(warn, "Input file for RunIds was not found, it is Ok!");
     }
     else
     {
-        R3BLOG(INFO, "Input file for RunIds " << fInputFileName.Data() << " was found");
+        R3BLOG(info, "Input file for RunIds " << fInputFileName.Data() << " was found");
         fInputFile.clear();
         fInputFile.seekg(0, std::ios::beg);
     }
 
     if (fInputFile.is_open())
     {
-        R3BLOG(INFO, "Reading RunId file");
+        R3BLOG(info, "Reading RunId file");
         Int_t rid;
         Int_t expRun;
         int64_t ts;
@@ -405,7 +405,7 @@ Bool_t R3BFileSource::Init()
             fInputFile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
 
-        R3BLOG(INFO, "End of reading RunId file");
+        R3BLOG(info, "End of reading RunId file");
         fInputFile.close();
     }
     else
@@ -432,7 +432,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     UInt_t fArraysize = fTimestamp.size();
     if (fArraysize != fRunid.size())
     {
-        R3BLOG(ERROR, "\033[5m\033[31m Different number of RunIds and timestamps \033[0m");
+        R3BLOG(error, "\033[5m\033[31m Different number of RunIds and timestamps \033[0m");
         prevts = 0;
         nextts = 0;
         return 1;
@@ -443,7 +443,7 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
         {
             prevts = fTimestamp[j];
             nextts = fTimestamp[j + 1];
-            R3BLOG(DEBUG, "New timestamp " << nextts << " for RunId " << fRunid[j]);
+            R3BLOG(debug, "New timestamp " << nextts << " for RunId " << fRunid[j]);
             return fRunid[j];
         }
 
@@ -451,13 +451,13 @@ Int_t R3BFileSource::GetRunid(uint64_t st)
     {
         prevts = fTimestamp[fArraysize - 1];
         nextts = fTimestamp[fArraysize - 1];
-        R3BLOG(DEBUG, "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1]);
+        R3BLOG(debug, "Prev/next timestamp " << prevts << "/" << nextts << " for runid " << fRunid[fArraysize - 1]);
         return fRunid[fArraysize - 1];
     }
 
     if (nextts > 0)
     {
-        R3BLOG(WARNING, "\033[5m\033[33m RunId was not found, it will be 1 \033[0m");
+        R3BLOG(warn, "\033[5m\033[33m RunId was not found, it will be 1 \033[0m");
     }
     prevts = 0;
     nextts = 0;
@@ -602,26 +602,26 @@ void R3BFileSource::PrintFriendList()
     // List files from the input chain together with all files of
     // all friend chains
 
-    LOG(INFO) << "The input consists out of the following trees and files: ";
-    LOG(INFO) << " - " << fInChain->GetName();
+    LOG(info) << "The input consists out of the following trees and files: ";
+    LOG(info) << " - " << fInChain->GetName();
     TObjArray* fileElements = fInChain->GetListOfFiles();
     TIter next(fileElements);
     TChainElement* chEl = 0;
     while ((chEl = static_cast<TChainElement*>(next())))
     {
-        LOG(INFO) << "    - " << chEl->GetTitle();
+        LOG(info) << "    - " << chEl->GetTitle();
     }
 
     for (const auto& mi : fFriendTypeList)
     {
         TChain* chain = static_cast<TChain*>(mi.second);
-        LOG(INFO) << " - " << chain->GetName();
+        LOG(info) << " - " << chain->GetName();
         fileElements = chain->GetListOfFiles();
         TIter next1(fileElements);
         chEl = 0;
         while ((chEl = static_cast<TChainElement*>(next1())))
         {
-            LOG(INFO) << "    - " << chEl->GetTitle();
+            LOG(info) << "    - " << chEl->GetTitle();
         }
     }
 }
@@ -658,7 +658,6 @@ void R3BFileSource::CheckFriendChains()
             if (runid.size() != map1.size())
             {
                 errorFlag = 1;
-                //        goto error_label;
                 break;
             }
             Int_t counter = 0;
@@ -668,7 +667,6 @@ void R3BFileSource::CheckFriendChains()
                 if ((bla[0] != runid[counter]) || (bla[1] != events[counter]))
                 {
                     errorFlag = 2;
-                    //          goto error_label;
                     break;
                 }
                 counter++;
@@ -680,8 +678,6 @@ void R3BFileSource::CheckFriendChains()
         }
     }
 
-    // Use goto to leave double loop at once in case of error
-    // error_label:
     if (errorFlag > 0)
     {
         LOG(error) << "The input chain and the friend chain " << inputLevel.Data() << " have a different structure:";
@@ -818,9 +814,9 @@ Bool_t R3BFileSource::CompareBranchList(TFile* fileHandle, TString inputLevel)
     // same
     if (branches.size() != 0)
     {
-        LOG(INFO) << "Compare Branch List will return kFALSE. The list has " << branches.size() << " branches:";
+        LOG(info) << "Compare Branch List will return kFALSE. The list has " << branches.size() << " branches:";
         for (auto branchName : branches)
-            LOG(INFO) << "  -> " << branchName;
+            LOG(info) << "  -> " << branchName;
         return kFALSE;
     }
 
@@ -850,7 +846,7 @@ void R3BFileSource::SetInputFile(TString name)
     {
         LOG(fatal) << "Error opening the Input file";
     }
-    LOG(INFO) << "R3BFileSource set------------";
+    LOG(info) << "R3BFileSource set------------";
 }
 
 Int_t R3BFileSource::CheckMaxEventNo(Int_t EvtEnd)

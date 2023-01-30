@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -108,6 +108,7 @@ set(SRCS
 ./trloii/R3BTrloiiScalerReader_s467.cxx
 ./wr/R3BTimestampMasterReader.cxx
 ./pspx/R3BPspxReader.cxx
+./pspx/R3BS515PspxReader.cxx
 ./fibers/R3BBunchedFiberReader.cxx
 ./fibers/R3BBunchedFiberSPMTTrigReader.cxx
 ./beammonitor/R3BBeamMonitorReader.cxx
@@ -221,25 +222,12 @@ Set(STRUCT_HEADERS
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
 
-set(LINKDEF_FILE SourceLinkDef.h)
+set(LINKDEF SourceLinkDef.h)
 set(DEPENDENCIES
     GeoBase ParBase MbsAPI Base FairTools
     R3BBase R3BData Core Geom GenVector
     Physics Matrix MathCore R3BPsp
     ${ucesb_LIBRARY_SHARED})
 set(LIBRARY_NAME R3Bsource)
-
-If(ROOT_FOUND_VERSION LESS 59999)
-  Set(DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/G__${LIBRARY_NAME}Dict.cxx)
-  ROOT_GENERATE_DICTIONARY_OLD_EXTRA("${HEADERS}" "${LINKDEF_FILE}" "${DICTIONARY}" "${INCLUDE_DIRECTORIES}${SYSTEM_INCLUDE_DIRECTORIES}")
-  Set(SRCS ${SRCS} ${DICTIONARY})
-  CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
-  Set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
-  Set(LINKDEF ${LINKDEF_FILE})
-  ROOT_GENERATE_ROOTMAP()
-  Set(LINKDEF )
-Else(ROOT_FOUND_VERSION LESS 59999)
-  Set(LINKDEF ${LINKDEF_FILE})
-EndIf(ROOT_FOUND_VERSION LESS 59999)
 
 GENERATE_LIBRARY()

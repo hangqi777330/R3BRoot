@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFACRYSTALCALPAR_H
-#define R3BCALIFACRYSTALCALPAR_H
+#define R3BCALIFACRYSTALCALPAR_H 1
 
 #include "FairParGenericSet.h"
 #include "TObject.h"
@@ -25,7 +25,6 @@ class FairParamList;
 
 class R3BCalifaCrystalCalPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BCalifaCrystalCalPar(const char* name = "califaCrystalCalPar",
@@ -47,6 +46,7 @@ class R3BCalifaCrystalCalPar : public FairParGenericSet
     /** Method to print values of parameters to the standard output **/
     virtual void print();
     void printParams();
+    void printCalCrystalInfo(const UInt_t cryID);
 
     /** Accessor functions **/
     const Double_t GetNumCrystals() { return fNumCrystals; }

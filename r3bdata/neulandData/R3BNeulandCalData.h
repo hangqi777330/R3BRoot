@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,11 +21,12 @@ class R3BNeulandCalData : public TObject
 {
   public:
     R3BNeulandCalData() = default;
-    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Int_t qdc);
+    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Double_t triggertime, Int_t qdc);
 
     Int_t GetBarId() const { return fBarId; }
     Int_t GetSide() const { return fSide; }
     Double_t GetTime() const { return fTime; }
+    Double_t GetTriggerTime() const { return fTriggerTime; }
     Int_t GetQdc() const { return fQdc; }
 
     void Print(const Option_t*) const override;
@@ -34,9 +35,10 @@ class R3BNeulandCalData : public TObject
     Int_t fBarId;
     Int_t fSide;
     Double_t fTime;
+    Double_t fTriggerTime;
     Int_t fQdc;
 
-    ClassDefOverride(R3BNeulandCalData, 1)
+    ClassDefOverride(R3BNeulandCalData, 2)
 };
 
 std::ostream& operator<<(std::ostream&, const R3BNeulandCalData&); // Support easy printing

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -28,7 +28,7 @@
 class TClonesArray;
 class R3BMusliHitPar;
 class R3BTGeoPar;
-//class R3BEventHeader;
+// class R3BEventHeader;
 
 class R3BMusliCal2Hit : public FairTask
 {
@@ -60,17 +60,20 @@ class R3BMusliCal2Hit : public FairTask
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetExpId(Int_t exp) { fExpId = exp; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
+    void SetExpId(Int_t exp)
+    {
+        fExpId = exp;
+    } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
     void SetDirectBeta(Double_t beta) { fDirectBeta = beta; }
 
   private:
     void SetParameters();
     Double_t BetaCorr_pol1(Double_t beta, Double_t p0, Double_t p1) { return p0 + p1 * beta; }
     Double_t BetaCorr_std(Double_t beta, Double_t p0, Double_t p1) { return p0 + p1 * pow(beta, -5. / 3.); }
-    Double_t SqrtE2Z(Double_t SqrtE, Double_t p0, Double_t p1, Double_t p2) { return p0 + p1 * SqrtE + p2 * SqrtE; }
+    Double_t SqrtE2Z(Double_t SqrtE, Double_t p0, Double_t p1, Double_t p2) { return p0 + p1 * SqrtE + p2 * SqrtE * SqrtE; }
 
     //    R3BEventHeader* header; /**< Event header. */
-    
+
     Int_t fNumGroups;
     Int_t fNumTypes;
     Int_t fMaxMult;

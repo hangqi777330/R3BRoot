@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -57,37 +57,37 @@ R3BTwimGainMatching::R3BTwimGainMatching(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BTwimGainMatching::Destructor
-R3BTwimGainMatching::~R3BTwimGainMatching() { R3BLOG(DEBUG1, ""); }
+R3BTwimGainMatching::~R3BTwimGainMatching() { R3BLOG(debug1, ""); }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTwimGainMatching::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fTwimMappedDataCA = (TClonesArray*)rootManager->GetObject("TwimMappedData");
     if (!fTwimMappedDataCA)
     {
-        R3BLOG(FATAL, "TwimMappedData not found");
+        R3BLOG(fatal, "TwimMappedData not found");
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        R3BLOG(ERROR, "FairRuntimeDb not found");
+        R3BLOG(error, "FairRuntimeDb not found");
         return kFATAL;
     }
 
     fCal_Par = (R3BTwimCalPar*)rtdb->getContainer("twimCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(FATAL, "Couldn't get handle on twimCalPar container");
+        R3BLOG(fatal, "Couldn't get handle on twimCalPar container");
         return kFATAL;
     }
 

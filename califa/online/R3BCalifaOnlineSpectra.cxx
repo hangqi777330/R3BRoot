@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 #include "R3BCalifaOnlineSpectra.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BCalifaCrystalCalData.h"
-#include "R3BCalifaHitData.h"
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
@@ -108,7 +108,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
 
 R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fMappedItemsCalifa)
         delete fMappedItemsCalifa;
     if (fCalItemsCalifa)
@@ -126,16 +126,16 @@ void R3BCalifaOnlineSpectra::SetParContainers()
     // Parameter Container
     // Reading amsStripCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BCalifaMappingPar*)rtdb->getContainer("califaMappingPar");
     if (!fMap_Par)
     {
-        R3BLOG(ERROR, "Couldn't get handle on califaMappingPar container");
+        R3BLOG(error, "Couldn't get handle on califaMappingPar container");
     }
     else
     {
-        R3BLOG(INFO, "CalifaMappingPar container open");
+        R3BLOG(info, "CalifaMappingPar container open");
     }
 }
 
@@ -160,11 +160,11 @@ bool R3BCalifaOnlineSpectra::isFootDetect(TVector3 hit)
 
 void R3BCalifaOnlineSpectra::SetParameter()
 {
-    R3BLOG_IF(ERROR, !fMap_Par, "CalifaMappingPar container not found");
+    R3BLOG_IF(error, !fMap_Par, "CalifaMappingPar container not found");
 
     //--- Parameter Container ---
     fNbCalifaCrystals = fMap_Par->GetNumCrystals(); // Number of crystals
-    R3BLOG(INFO, "NumCry " << fNbCalifaCrystals);
+    R3BLOG(info, "NumCry " << fNbCalifaCrystals);
     // fMap_Par->printParams();
 
     for (Int_t c = 1; c <= fNbCalifaCrystals; c++)
@@ -172,28 +172,34 @@ void R3BCalifaOnlineSpectra::SetParameter()
 
         if (c <= fNbCalifaCrystals / 2)
         {
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
-                fMap_Par->GetFebexSlot(c);
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
-                fMap_Par->GetFebexMod(c);
+            if (fMap_Par->GetInUse(c) == 1 && fMap_Par->GetHalf(c) > 0)
+            { // only for installed crystals (see issue 681)
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
+                    fMap_Par->GetFebexSlot(c);
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
+                    fMap_Par->GetFebexMod(c);
+            }
         }
         else
         {
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
-                fMap_Par->GetFebexSlot(c);
-            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
-                fMap_Par->GetFebexMod(c);
+            if (fMap_Par->GetInUse(c) == 1 && fMap_Par->GetHalf(c) > 0)
+            {
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
+                    fMap_Par->GetFebexSlot(c);
+                fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
+                    fMap_Par->GetFebexMod(c);
+            }
         }
     }
 }
 
 InitStatus R3BCalifaOnlineSpectra::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* mgr = FairRootManager::Instance();
 
-    R3BLOG_IF(FATAL, NULL == mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
 
@@ -218,29 +224,29 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedData");
     if (!fMappedItemsCalifa)
     {
-        R3BLOG(ERROR, "R3BCalifaOnlineSpectra::CalifaCrystalMappedData not found");
+        R3BLOG(error, "R3BCalifaOnlineSpectra::CalifaCrystalMappedData not found");
         return kFATAL;
     }
 
     // get access to trigger Mapped data
     fTrigMappedItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaMappedtrigData");
-    R3BLOG_IF(WARNING, !fTrigMappedItemsCalifa, "CalifaMappedtrigData not found");
+    R3BLOG_IF(warn, !fTrigMappedItemsCalifa, "CalifaMappedtrigData not found");
 
     // get access to Cal data
     fCalItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaCrystalCalData");
-    R3BLOG_IF(WARNING, !fCalItemsCalifa, "CalifaCrystalCalData not found");
+    R3BLOG_IF(warn, !fCalItemsCalifa, "CalifaCrystalCalData not found");
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
-    R3BLOG_IF(WARNING, !fHitItemsCalifa, "CalifaHitData not found");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
+    R3BLOG_IF(warn, !fHitItemsCalifa, "CalifaClusterData not found");
 
     // get access to WR-Califa data
     fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
-    R3BLOG_IF(WARNING, !fWRItemsCalifa, "WRCalifaData not found");
+    R3BLOG_IF(warn, !fWRItemsCalifa, "WRCalifaData not found");
 
     // get access to WR-Master data
     fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
-    R3BLOG_IF(WARNING, !fWRItemsMaster, "WRMasterData not found");
+    R3BLOG_IF(warn, !fWRItemsMaster, "WRMasterData not found");
 
     SetParameter();
 
@@ -249,7 +255,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     ifstream* FileHistos = new ifstream(fCalifaFile);
     if (!FileHistos->is_open())
     {
-        R3BLOG(WARNING, "No Histogram definition file");
+        R3BLOG(warn, "No Histogram definition file");
         noFile = kTRUE;
     }
 
@@ -1003,7 +1009,7 @@ InitStatus R3BCalifaOnlineSpectra::ReInit()
 
 void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     if (fWRItemsCalifa)
     {
@@ -1105,7 +1111,7 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 
 void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     cCalifa_cry_energy->cd();
     if (fLogScale)
     {
@@ -1225,7 +1231,7 @@ void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
 
 void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     char Name[255];
     char Side[50];
@@ -1618,7 +1624,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         Double_t califa_e[nHits];
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            auto hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            auto hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();

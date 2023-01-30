@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,7 +17,7 @@
 // --------------------------------------------------------------
 
 #ifndef R3BMusicHitPar_H
-#define R3BMusicHitPar_H
+#define R3BMusicHitPar_H 1
 
 #include "FairParGenericSet.h" // for FairParGenericSet
 
@@ -31,7 +31,6 @@ class FairParamList;
 
 class R3BMusicHitPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BMusicHitPar(const char* name = "musicHitPar",
@@ -82,6 +81,7 @@ class R3BMusicHitPar : public FairParGenericSet
 
     R3BMusicHitPar(const R3BMusicHitPar&); /*< a copy constructor >*/
 
+  public:
     ClassDef(R3BMusicHitPar, 1);
 };
 

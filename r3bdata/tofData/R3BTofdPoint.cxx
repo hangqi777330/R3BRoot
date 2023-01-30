@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,8 +24,8 @@ R3BTofdPoint::R3BTofdPoint()
 {
     fPlane = 0;
     fPaddle = 0;
-    fZfrag=0.;
-    fAfrag=0.;
+    fZfrag = 0.;
+    fAfrag = 0.;
     fX_out = fY_out = fZ_out = 0.;
     fPx_out = fPy_out = fPz_out = 0.;
 }
@@ -69,8 +69,8 @@ R3BTofdPoint::R3BTofdPoint(Int_t trackID,
     fPx_out = momOut.Px();
     fPy_out = momOut.Py();
     fPz_out = momOut.Pz();
-    fZfrag=Z;
-    fAfrag=A;
+    fZfrag = Z;
+    fAfrag = A;
 }
 // -------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ R3BTofdPoint::~R3BTofdPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BTofdPoint::Print(const Option_t* opt) const
 {
-    R3BLOG(INFO,
+    R3BLOG(info,
            "Point for track " << fTrackID << " in plane " << fPlane << " and paddle " << fPaddle << "    Position ("
                               << fX << ", " << fY << ", " << fZ << ") cm"
                               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV"

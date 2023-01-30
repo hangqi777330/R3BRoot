@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -44,8 +44,8 @@ R3BAlpideNoisyPixels::R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose)
     , fNbSensors(1)
     , fThr(1000)
 {
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
         {
             fMap[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -56,14 +56,14 @@ R3BAlpideNoisyPixels::R3BAlpideNoisyPixels(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BAlpideNoisyPixels::Destructor
-R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(DEBUG1, "Destructor"); }
+R3BAlpideNoisyPixels::~R3BAlpideNoisyPixels() { R3BLOG(debug1, ""); }
 
 // ----  Method SetNbSensors ---------------------------------------------------
 void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
 {
     fNbSensors = n;
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
         {
             fMap[c][r].resize(fNbSensors);
             for (Int_t s = 0; s < fNbSensors; s++)
@@ -74,11 +74,11 @@ void R3BAlpideNoisyPixels::SetNbSensors(UInt_t n)
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideNoisyPixels::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -86,16 +86,16 @@ InitStatus R3BAlpideNoisyPixels::Init()
     fAlpideMappedData = (TClonesArray*)mgr->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
-        R3BLOG(FATAL, "AlpideMappedData not found");
+        R3BLOG(fatal, "AlpideMappedData not found");
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
     if (!fMap_Par)
     {
-        R3BLOG(FATAL, "Couldn't get handle on alpideMappingPar container");
+        R3BLOG(fatal, "Couldn't get handle on alpideMappingPar container");
         return kFATAL;
     }
 
@@ -107,8 +107,10 @@ void R3BAlpideNoisyPixels::Exec(Option_t* option)
 {
     // Reading the Input -- Mapped Data --
     Int_t nHits = fAlpideMappedData->GetEntries();
-    if (!nHits)
+    if (nHits == 0)
+    {
         return;
+    }
 
     auto mappedData = new R3BAlpideMappedData*[nHits];
 
@@ -128,8 +130,8 @@ void R3BAlpideNoisyPixels::Exec(Option_t* option)
 void R3BAlpideNoisyPixels::FinishTask()
 {
     fMap_Par->SetNbSensors(fNbSensors);
-    for (Int_t c = 0; c < AlpideCols; c++)
-        for (Int_t r = 0; r < AlpideRows; r++)
+    for (Int_t c = 0; c < DAlpideCols; c++)
+        for (Int_t r = 0; r < DAlpideRows; r++)
             for (Int_t s = 0; s < fNbSensors; s++)
                 if (fMap[c][r][s] > fThr)
                 {

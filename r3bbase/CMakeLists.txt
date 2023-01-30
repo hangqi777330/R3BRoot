@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -33,16 +33,6 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
-#set(SRCS
-#R3BModule.cxx
-#R3BDetector.cxx
-#R3BEventHeader.cxx
-#R3BEventHeaderPropagator.cxx
-#R3BWhiterabbitPropagator.cxx
-#R3BDataPropagator.cxx
-#R3BFileSource.cxx
-#)
-
 file(GLOB SRCS 
 *.cxx 
 )
@@ -50,11 +40,13 @@ file(GLOB SRCS
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
+install(FILES "R3BLogger.h" DESTINATION include)
 
 Set(LINKDEF BaseLinkDef.h)
 
 Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
+    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics
+    Matrix MathCore Hist Graf Gpad Net Imt RIO RHTTP Spectrum)
 
 Set(LIBRARY_NAME R3BBase)
 

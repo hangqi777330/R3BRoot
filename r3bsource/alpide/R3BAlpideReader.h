@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,16 +17,10 @@
 // ---------------------------------------------------------------------
 
 #ifndef R3BALPIDEREADER_H
-#define R3BALPIDEREADER_H
+#define R3BALPIDEREADER_H 1
 
 #include "R3BReader.h"
-#include "TLeaf.h"
-#include "TString.h"
-#include "TTree.h"
-#include <fstream>
 #include <stdint.h>
-
-using std::ifstream;
 
 class TClonesArray;
 
@@ -56,23 +50,14 @@ class R3BAlpideReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
-    // Set input file
-    void SetFile(TString name) { fFileName = name; }
-
-    // Set input root file
-    void SetRootFile(TString name) { fRootName = name; }
+    // Set number of sensors
+    void SetNbDet(uint n) { fNbDet = n; }
 
   private:
-    // Input file
-    ifstream* fInput;
-    TTree* fTree;
-    TString fFileName;
-    TString fRootName;
-    int ae;
-    int b, c, d, e, f, g;
-    TLeaf *fRow, *fCol, *fDet, *trgNum, *trgTime;
     // An event counter
     unsigned int fNEvent;
+    // Number of ALPIDE sensors
+    uint fNbDet;
     // Reader specific data structure from ucesb
     EXT_STR_h101_ALPIDE_onion* fData;
     // Data offset
@@ -83,7 +68,7 @@ class R3BAlpideReader : public R3BReader
     TClonesArray* fArray;
 
   public:
-    ClassDefOverride(R3BAlpideReader, 0);
+    ClassDefOverride(R3BAlpideReader, 1);
 };
 
 #endif /* R3BALPIDEREADER_H */

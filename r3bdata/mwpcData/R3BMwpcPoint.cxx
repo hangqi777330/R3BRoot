@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -51,7 +51,7 @@ R3BMwpcPoint::~R3BMwpcPoint() {}
 // -----   Public method Print   -------------------------------------------
 void R3BMwpcPoint::Print(const Option_t* opt) const
 {
-    LOG(INFO) << "R3BMwpcPoint: Point for track " << fTrackID << " in detector " << fDetectorID << "\n"
+    LOG(info) << "R3BMwpcPoint: Point for track " << fTrackID << " in detector " << fDetectorID << "\n"
               << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm \n"
               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV \n"
               << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06

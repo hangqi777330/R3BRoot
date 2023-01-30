@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,7 +24,7 @@ R3BNeulandQCalPar::~R3BNeulandQCalPar() {}
 
 void R3BNeulandQCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandQCalPar::putParams() called";
+    LOG(info) << "R3BNeulandQCalPar::putParams() called";
     if (!list)
     {
         return;
@@ -34,7 +34,7 @@ void R3BNeulandQCalPar::putParams(FairParamList* list)
 
 Bool_t R3BNeulandQCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandQCalPar::getParams() called";
+    LOG(info) << "R3BNeulandQCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -55,11 +55,11 @@ void R3BNeulandQCalPar::SetSize(Int_t size)
 void R3BNeulandQCalPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " NeuLAND Parameters -------------  ";
-    LOG(INFO) << " Number of Parameters " << fParams.GetSize();
+    LOG(info) << " -----------  " << GetName() << " NeuLAND Parameters -------------  ";
+    LOG(info) << " Number of Parameters " << fParams.GetSize();
     for (Int_t i = 0; i < fParams.GetSize(); i++)
-        LOG(INFO) << "PMT Nr. " << i << " : pedestal level = " << fParams.At(i);
-    LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(info) << "PMT Nr. " << i << " : pedestal level = " << fParams.At(i);
+    LOG(info) << "----------------------------------------------------------------------";
 }
 
 ClassImp(R3BNeulandQCalPar);

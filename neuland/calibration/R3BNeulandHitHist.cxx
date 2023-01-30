@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -138,12 +138,12 @@ void R3BNeulandHitHist::Exec(Option_t* option)
         fnEvents += 1;
         if (0 == (fnEvents % 100000))
         {
-            LOG(INFO) << "R3BNeulandHitHist : " << fnEvents << " events collected,  start time=" << startTime;
+            LOG(info) << "R3BNeulandHitHist : " << fnEvents << " events collected,  start time=" << startTime;
             if (count)
             {
-                LOG(INFO) << ",  mean time=" << (tmean / (Double_t)count);
+                LOG(info) << ",  mean time=" << (tmean / (Double_t)count);
             }
-            LOG(INFO);
+            LOG(info);
         }
     }
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -48,7 +48,7 @@ class R3BParticleGenerator : public FairGenerator, public R3BParticleSelector
 
     int fPDGCode;     // The PDG Code of the Particle
     double fMass_GeV; // The Mass of the Particle
-    TRandom3 fRNG;      // the RNG
+    TRandom3 fRNG;    // the RNG
 
     ClassDefOverride(R3BParticleGenerator, 1)
 };

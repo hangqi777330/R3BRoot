@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -51,28 +51,28 @@ InitStatus R3BLandDigitizerQA::Init()
     FairRootManager* rm = FairRootManager::Instance();
     if (NULL == rm)
     {
-        LOG(ERROR) << "R3BLandDigitizerQA: no pointer to FairRootManager...";
+        LOG(error) << "R3BLandDigitizerQA: no pointer to FairRootManager...";
         return kERROR;
     }
 
     fTracks = (TClonesArray*)rm->GetObject("MCTrack");
     if (NULL == fTracks)
     {
-        LOG(ERROR) << "R3BLandDigitizerQA: no MCTrack array...";
+        LOG(error) << "R3BLandDigitizerQA: no MCTrack array...";
         return kERROR;
     }
 
     fPoints = (TClonesArray*)rm->GetObject("LandPoint");
     if (NULL == fPoints)
     {
-        LOG(ERROR) << "R3BLandDigitizerQA: no LandPoint array...";
+        LOG(error) << "R3BLandDigitizerQA: no LandPoint array...";
         return kERROR;
     }
 
     fDigis = (TClonesArray*)rm->GetObject("LandDigi");
     if (NULL == fDigis)
     {
-        LOG(ERROR) << "R3BLandDigitizerQA: no LandDigi array...";
+        LOG(error) << "R3BLandDigitizerQA: no LandDigi array...";
         return kERROR;
     }
 
@@ -189,7 +189,7 @@ void R3BLandDigitizerQA::Exec(Option_t* option)
         sprintf(str2, "%4d", nTracks);
         sprintf(str3, "%4d", nPoints);
         sprintf(str4, "%4d", nDigis);
-        LOG(INFO) << "R3BLandDigitizerQA: event # " << str1 << ", MCTrack: " << str2 << ", LandPoint: " << str3
+        LOG(info) << "R3BLandDigitizerQA: event # " << str1 << ", MCTrack: " << str2 << ", LandPoint: " << str3
                   << ", LandDigi: " << str4;
     }
 }

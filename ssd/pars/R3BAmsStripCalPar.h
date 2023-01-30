@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,7 +30,6 @@ class FairParamList;
 
 class R3BAmsStripCalPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BAmsStripCalPar(const char* name = "amsStripCalPar",
@@ -82,6 +81,7 @@ class R3BAmsStripCalPar : public FairParGenericSet
     const R3BAmsStripCalPar& operator=(const R3BAmsStripCalPar&);
     R3BAmsStripCalPar(const R3BAmsStripCalPar&);
 
+  public:
     ClassDef(R3BAmsStripCalPar, 1);
 };
 

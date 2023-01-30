@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,6 +19,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BBunchedFiberMapped2CalPar::R3BBunchedFiberMapped2CalPar(const char* a_name,
@@ -64,7 +65,7 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not get " << name);                                   \
+            R3BLOG(error, "Could not get " << name);                                   \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \
@@ -72,10 +73,10 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
     } while (0)
 
     auto rm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
-    R3BLOG_IF(FATAL, !fMapped, fName + "Mapped not found");
+    R3BLOG_IF(fatal, !fMapped, fName + "Mapped not found");
 
     GET_TCALPAR(MAPMT);
     GET_TCALPAR(MAPMTTrig);
@@ -109,7 +110,7 @@ void R3BBunchedFiberMapped2CalPar::Exec(Option_t* option)
 
 void R3BBunchedFiberMapped2CalPar::FinishTask()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     fMAPMTEngine->CalculateParamClockTDC(fCTDCVariant);
     fMAPMTTrigEngine->CalculateParamClockTDC(fCTDCVariant);
     switch (fSPMTElectronics)

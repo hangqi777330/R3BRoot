@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -43,23 +43,16 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT* data, size_t offset)
 {
 }
 
-R3BTrloiiTpatReader::~R3BTrloiiTpatReader()
-{
-    R3BLOG(INFO, "");
-    if (fEventHeader)
-    {
-        delete fEventHeader;
-    }
-}
+R3BTrloiiTpatReader::~R3BTrloiiTpatReader() { R3BLOG(info, ""); }
 
 Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_TPAT_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TPAT, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information");
+        R3BLOG(fatal, "Failed to setup structure information");
         return kFALSE;
     }
 
@@ -67,12 +60,12 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(FATAL, "EventHeader. not found");
+        R3BLOG(fatal, "EventHeader. not found");
         return kFALSE;
     }
     else
     {
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
     }
     Reset();
     memset(fData, 0, sizeof *fData);
@@ -82,9 +75,9 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
-    // R3BLOG(INFO, "Event : " << fNEvent);
+    // R3BLOG(info, "Event : " << fNEvent);
 
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     if (fEventHeader)
     {
         fEventHeader->SetTpat(0);
@@ -99,7 +92,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     if (0 == (fNEvent % 1000000))
     {
-        R3BLOG(DEBUG1, "Event : " << fNEvent);
+        R3BLOG(debug1, "Event : " << fNEvent);
     }
 
     if (fTrigger > 0 && fEventHeader && fTpatmin < 0 && fTpatmax < 0)
@@ -146,7 +139,7 @@ Bool_t R3BTrloiiTpatReader::Read()
                 }
                 else if (tpatbin != 0)
                 {
-                    R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                    R3BLOG(debug1, "Accepted Tpat" << i + 1);
                     valid = true;
                 }
             }
@@ -183,7 +176,7 @@ Bool_t R3BTrloiiTpatReader::Read()
                     }
                     else if (tpatbin != 0)
                     {
-                        R3BLOG(DEBUG1, "Accepted Tpat" << i + 1);
+                        R3BLOG(debug1, "Accepted Tpat" << i + 1);
                         valid = true;
                     }
                 }

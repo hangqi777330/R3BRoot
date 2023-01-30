@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -42,11 +42,11 @@ R3BBunchedFiberSPMTTrigReader::~R3BBunchedFiberSPMTTrigReader()
 Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_FIB_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_FIB, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information.");
+        R3BLOG(fatal, "Failed to setup structure information.");
         return kFALSE;
     }
 

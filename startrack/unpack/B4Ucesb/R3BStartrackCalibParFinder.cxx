@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -66,15 +66,15 @@ void R3BStartrackCalibParFinder::SetParContainers()
 
     if (fVerbose && fStartrackCalibPar)
     {
-        LOG(INFO) << "R3BStartrackCalibParFinder::SetParContainers() ";
-        LOG(INFO) << "Container R3BStartrackCalibPar loaded ";
+        LOG(info) << "R3BStartrackCalibParFinder::SetParContainers() ";
+        LOG(info) << "Container R3BStartrackCalibPar loaded ";
     }
 }
 
 // Register: Protected method
 void R3BStartrackCalibParFinder::Register()
 {
-    LOG(DEBUG) << "Registering";
+    LOG(debug) << "Registering";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {

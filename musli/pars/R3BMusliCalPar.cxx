@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,11 +30,13 @@ R3BMusliCalPar::R3BMusliCalPar(const char* name, const char* title, const char* 
     , fNumGroupsAnodes(15)
     , fNumParamsEneFit(2)
     , fNumParamsPosFit(2)
+    , fNumParamsMultHit(2)
     , fMaxMult(20)
 {
     fIn_use = new TArrayI(fNumSignals);
     fEneCalParams = new TArrayF(fNumGroupsAnodes * fNumParamsEneFit);
     fPosCalParams = new TArrayF(fNumGroupsAnodes * fNumParamsPosFit);
+    fMultHitCalParams = new TArrayF(fNumGroupsAnodes * fNumParamsMultHit);
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -47,6 +49,8 @@ R3BMusliCalPar::~R3BMusliCalPar()
         delete fEneCalParams;
     if (fPosCalParams)
         delete fPosCalParams;
+    if (fMultHitCalParams)
+        delete fMultHitCalParams;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -59,10 +63,10 @@ void R3BMusliCalPar::clear()
 // ----  Method putParams ------------------------------------------------------
 void R3BMusliCalPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return;
     }
 
@@ -71,65 +75,71 @@ void R3BMusliCalPar::putParams(FairParamList* list)
     list->add("musliMaxMultPar", fMaxMult);
     list->add("musliNumParamsEneFitPar", fNumParamsEneFit);
     list->add("musliNumParamsPosFitPar", fNumParamsPosFit);
+    list->add("musliNumParamsMultHitPar", fNumParamsMultHit);
 
     fIn_use->Set(fNumGroupsAnodes);
     list->add("musliInUsePar", *fIn_use);
 
     Int_t array_e = fNumGroupsAnodes * fNumParamsEneFit;
-    LOG(INFO) << "Array size for musli energy calibration: " << array_e;
+    LOG(info) << "Array size for musli energy calibration: " << array_e;
     fEneCalParams->Set(array_e);
     list->add("musliEneCalPar", *fEneCalParams);
 
     Int_t array_pos = fNumGroupsAnodes * fNumParamsPosFit;
-    LOG(INFO) << "Array size  musli position calibration: " << array_pos;
+    LOG(info) << "Array size  musli position calibration: " << array_pos;
     fPosCalParams->Set(array_pos);
     list->add("musliPosCalPar", *fPosCalParams);
+    
+    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
+    LOG(info) << "Array size  musli Multi hit calibration: " << array_mult;
+    fMultHitCalParams->Set(array_pos);
+    list->add("musliMultHitCalPar", *fMultHitCalParams);
 }
 
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BMusliCalPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
     if (!list)
     {
-        R3BLOG(FATAL, "Could not find FairParamList");
+        R3BLOG(fatal, "Could not find FairParamList");
         return kFALSE;
     }
 
     if (!list->fill("musliNumSignalsPar", &fNumSignals))
     {
-        LOG(ERROR) << "Could not initialize musliNumSignalsPar";
+        LOG(error) << "Could not initialize musliNumSignalsPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumGroupsAnodesPar", &fNumGroupsAnodes))
     {
-        LOG(ERROR) << "Could not initialize musliNumGroupsAnodesPar";
+        LOG(error) << "Could not initialize musliNumGroupsAnodesPar";
         return kFALSE;
     }
 
     if (!list->fill("musliMaxMultPar", &fMaxMult))
     {
-        LOG(ERROR) << "Could not initialize musliMaxMultPar";
+        LOG(error) << "Could not initialize musliMaxMultPar";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsEneFitPar", &fNumParamsEneFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsEneFit";
+        LOG(error) << "Could not initialize musliNumParamsEneFit";
         return kFALSE;
     }
 
     if (!list->fill("musliNumParamsPosFitPar", &fNumParamsPosFit))
     {
-        LOG(ERROR) << "Could not initialize musliNumParamsPosFitPar";
+        LOG(error) << "Could not initialize musliNumParamsPosFitPar";
         return kFALSE;
     }
 
     fIn_use->Set(fNumGroupsAnodes);
     if (!(list->fill("musliInUsePar", fIn_use)))
     {
-        LOG(ERROR) << "Could not initialize musliInUsePar ";
+        LOG(error) << "Could not initialize musliInUsePar ";
         return kFALSE;
     }
 
@@ -137,7 +147,7 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
     fEneCalParams->Set(array_e);
     if (!(list->fill("musliEneCalPar", fEneCalParams)))
     {
-        LOG(ERROR) << "Could not initialize musliEneCalPar";
+        LOG(error) << "Could not initialize musliEneCalPar";
         return kFALSE;
     }
 
@@ -145,7 +155,21 @@ Bool_t R3BMusliCalPar::getParams(FairParamList* list)
     fPosCalParams->Set(array_pos);
     if (!(list->fill("musliPosCalPar", fPosCalParams)))
     {
-        LOG(ERROR) << "Could not initialize musliPosCalPar";
+        LOG(error) << "Could not initialize musliPosCalPar";
+        return kFALSE;
+    }
+    
+    if (!list->fill("musliNumParamsMultHitPar", &fNumParamsMultHit))
+    {
+        LOG(error) << "Could not initialize musliNumParamsMultHitPar";
+        return kFALSE;
+    }
+
+    Int_t array_mult = fNumGroupsAnodes * fNumParamsMultHit;
+    fMultHitCalParams->Set(array_mult);
+    if (!(list->fill("musliMultHitCalPar", fMultHitCalParams)))
+    {
+        LOG(error) << "Could not initialize musliMultHitCalPar";
         return kFALSE;
     }
 
@@ -158,29 +182,40 @@ void R3BMusliCalPar::print() { printParams(); }
 // ----  Method printParams ----------------------------------------------------
 void R3BMusliCalPar::printParams()
 {
-    R3BLOG(INFO, "Nb of musli signals: " << fNumSignals);
-    R3BLOG(INFO, "Nb of musli groups anodes signals: " << fNumGroupsAnodes);
-    R3BLOG(INFO, "Nb of musli Max. multiplicity per anode: " << fMaxMult);
+    R3BLOG(info, "Nb of musli signals: " << fNumSignals);
+    R3BLOG(info, "Nb of musli groups anodes signals: " << fNumGroupsAnodes);
+    R3BLOG(info, "Nb of musli Max. multiplicity per anode: " << fMaxMult);
 
-    R3BLOG(INFO, "Musli anode parameters for energy calibration");
-    R3BLOG(INFO, "Nb of energy parameter per signal: " << fNumParamsEneFit);
+    R3BLOG(info, "Musli anode parameters for energy calibration");
+    R3BLOG(info, "Nb of energy parameter per signal: " << fNumParamsEneFit);
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)
     {
-        LOG(INFO) << "Group of Anodes number: " << i + 1;
+        LOG(info) << "Group of Anodes number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsEneFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j << ") = " << fEneCalParams->GetAt(i * fNumParamsEneFit + j);
+            LOG(info) << "FitParam(" << j << ") = " << fEneCalParams->GetAt(i * fNumParamsEneFit + j);
         }
     }
 
-    R3BLOG(INFO, "Musli anode parameters for position calibration");
-    R3BLOG(INFO, "Nb of position parameter per signal: " << fNumParamsPosFit);
+    R3BLOG(info, "Musli anode parameters for position calibration");
+    R3BLOG(info, "Nb of position parameter per signal: " << fNumParamsPosFit);
     for (Int_t i = 0; i < fNumGroupsAnodes; i++)
     {
-        LOG(INFO) << "Group of Anodea number: " << i + 1;
+        LOG(info) << "Group of Anodes number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsPosFit; j++)
         {
-            LOG(INFO) << "FitParam(" << j << ") = " << fPosCalParams->GetAt(i * fNumParamsPosFit + j);
+            LOG(info) << "FitParam(" << j << ") = " << fPosCalParams->GetAt(i * fNumParamsPosFit + j);
+        }
+    }
+    
+    R3BLOG(info, "Musli anode parameters for multi hit calibration");
+    R3BLOG(info, "Nb of multi hit parameter per signal: " << fNumParamsMultHit);
+    for (Int_t i = 0; i < fNumGroupsAnodes; i++)
+    {
+        LOG(info) << "Group of Anodes number: " << i + 1;
+        for (Int_t j = 0; j < fNumParamsMultHit; j++)
+        {
+            LOG(info) << "FitParam(" << j << ") = " << fMultHitCalParams->GetAt(i * fNumParamsMultHit + j);
         }
     }
 }

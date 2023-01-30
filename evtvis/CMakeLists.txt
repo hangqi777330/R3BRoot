@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -44,7 +44,7 @@ set(SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
 R3BCalifaEventDisplay.cxx
-R3BCalifaHitEventDisplay.cxx
+R3BCalifaClusterEventDisplay.cxx
 R3BMCTracks.cxx
 R3BIonName.cxx
 )
@@ -56,7 +56,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BEventDisplayLinkDef.h)
 set(LIBRARY_NAME R3BEvtVis)
 set(DEPENDENCIES
-    Field R3BData R3BCalifa Geane EventDisplay)
+  Field R3BData R3BCalifa Geane EventDisplay Eve Gui Ged RGL Graf3d)
 
 GENERATE_LIBRARY()
 

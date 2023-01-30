@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,12 +23,15 @@
 #include "FairRuntimeDb.h"
 #include "TClonesArray.h"
 
+#include "TDecompSVD.h"
 #include "TMath.h"
+#include "TMatrixD.h"
 #include "TRandom.h"
 #include "TVector3.h"
 #include <iostream>
 #include <string>
 
+#include "R3BLogger.h"
 #include "R3BMCTrack.h"
 #include "R3BTwimHitData.h"
 #include "R3BTwimPoint.h"
@@ -47,35 +50,33 @@ R3BTwimDigitizer::R3BTwimDigitizer(const TString& name, Int_t iVerbose)
     , fMCTrack(NULL)
     , fTwimPoints(NULL)
     , fTwimHits(NULL)
-    , fsigma_x(0.003)
-    , fPosX(0.)
-    , fPosZ(0.)
-    , fangle(0.)
+    , fsigma_x(0.030) // 30um
+    , fZsig(0.)
 {
 }
 
 // Virtual R3BTwimDigitizer: Destructor ----------------------------
 R3BTwimDigitizer::~R3BTwimDigitizer()
 {
-    LOG(INFO) << "R3BSof" + fName + "Digitizer: Delete instance";
+    R3BLOG(debug1, "");
     if (fTwimHits)
+    {
         delete fTwimHits;
+    }
 }
 
 // ----   Public method Init  -----------------------------------------
 InitStatus R3BTwimDigitizer::Init()
 {
-    LOG(INFO) << "R3BSof" + fName + "Digitizer::Init()";
+    R3BLOG(info, "");
 
     // Get input array
     FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
-        LOG(fatal) << "Init: No FairRootManager";
+    R3BLOG_IF(fatal, !ioman, "FairRootManager not found");
 
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
     fTwimPoints = (TClonesArray*)ioman->GetObject(fName + "Point");
-    if (!fTwimPoints)
-        LOG(fatal) << fName + "Point not found";
+    R3BLOG_IF(fatal, !fTwimPoints, fName + "Point not found");
 
     // Register output array fTwimHits
     fTwimHits = new TClonesArray("R3BTwimHitData");
@@ -95,73 +96,87 @@ void R3BTwimDigitizer::Exec(Option_t* opt)
     Reset();
     // Reading the Input -- Point Data --
     Int_t nHits = fTwimPoints->GetEntriesFast();
-    if (!nHits)
-        return;
-    // Data from Point level
-    R3BTwimPoint** pointData;
-    pointData = new R3BTwimPoint*[nHits];
-    Int_t TrackId = 0, PID = 0, anodeId = 0;
-    Double_t x[4], zf[4], y = 0., z = 0.;
-    for (Int_t i = 0; i < 4; i++)
+    if (nHits == 0)
     {
-        x[i] = 0.;
-        zf[i] = 0.;
+        return;
     }
-    // Double_t eloss[64];
-    // for (Int_t i = 0; i < 64; i++)
-    //  eloss[i] = 0.;
+
+    // Data from Point level
+    R3BTwimPoint** pointData = new R3BTwimPoint*[nHits];
+    Int_t TrackId = 0, PID = 0, anodeId = 0;
+
+    std::vector<double> fPos[4][2];
+    std::vector<double> fCharge;
+    fCharge.resize(4);
+    std::vector<double> fPosX;
+    fPosX.resize(4);
 
     for (Int_t i = 0; i < nHits; i++)
     {
         pointData[i] = (R3BTwimPoint*)(fTwimPoints->At(i));
         TrackId = pointData[i]->GetTrackID();
 
-        R3BMCTrack* Track = (R3BMCTrack*)fMCTrack->At(TrackId);
+        auto Track = (R3BMCTrack*)fMCTrack->At(TrackId);
         PID = Track->GetPdgCode();
-        anodeId = pointData[i]->GetDetCopyID();
-        // eloss[anodeId] = eloss[anodeId] + pointData[i]->GetEnergyLoss() * 1000.;
 
-        if (PID > 1000080160 && (anodeId == 0 || anodeId == 16 || anodeId == 32 || anodeId == 48)) // Z=8 and A=16
+        if (PID > 1000080160) // Z=8 and A=16
         {
+            anodeId = pointData[i]->GetDetCopyID();
+            double fX_in = pointData[i]->GetXIn();
+            double fX_out = pointData[i]->GetXOut();
+            double fZ_in = pointData[i]->GetZIn();
+            double fZ_out = pointData[i]->GetZOut();
 
-            Double_t fX_in = pointData[i]->GetXIn();
-            // Double_t fY_in = pointData[i]->GetYIn();
-            // Double_t fZ_in = pointData[i]->GetZIn();
-            Double_t fX_out = pointData[i]->GetXOut();
-            // Double_t fY_out = pointData[i]->GetYOut();
-            // Double_t fZ_out = pointData[i]->GetZOut();
-
-            if (anodeId == 0)
+            int secID = anodeId / 17;
+            int index = fPos[secID][0].size() + 1;
+            fPos[secID][0].resize(index);
+            fPos[secID][1].resize(index);
+            fPos[secID][0][index - 1] = 10. * (fX_out + fX_in) / 2.; // mm
+            fPos[secID][1][index - 1] = 10. * (fZ_out + fZ_in) / 2.; // mm
+            if (anodeId % 16 == 8)
             {
-                x[0] = (fX_out + fX_in) / 2.;
-                zf[0] = pointData[i]->GetZFF();
-            }
-            else if (anodeId == 16)
-            {
-                x[1] = (fX_out + fX_in) / 2.;
-                zf[1] = pointData[i]->GetZFF();
-            }
-            else if (anodeId == 32)
-            {
-                x[2] = (fX_out + fX_in) / 2.;
-                zf[2] = pointData[i]->GetZFF();
-            }
-            else if (anodeId == 48)
-            {
-                x[3] = (fX_out + fX_in) / 2.;
-                zf[3] = pointData[i]->GetZFF();
+                fCharge[secID] = pointData[i]->GetZFF();
+                fPosX[secID] = 10. * (fX_out + fX_in) / 2.; // mm
             }
         }
     }
 
     for (Int_t i = 0; i < 4; i++)
     {
-        if (zf[i] > 1)
-            AddR3BHitData(i + 1, x[i], zf[i]);
+        const int index = fPos[i][0].size();
+        if (index > 6)
+        {
+            TVectorD fPosZ;
+            double posz[index];
+            double posx[index];
+            for (Int_t j = 0; j < index; j++)
+            {
+                posx[j] = gRandom->Gaus(fPos[i][0][j], fsigma_x);
+                posz[j] = fPos[i][1][j];
+            }
+            fPosZ.Use(index, posz);
+            TMatrixD A(index, 2);
+            TMatrixDColumn(A, 0) = 1.0;
+            TMatrixDColumn(A, 1) = fPosZ;
+            TDecompSVD svd(A);
+            Bool_t ok;
+            TVectorD dt_r;
+            dt_r.Use(index, posx);
+            TVectorD c_svd_r = svd.Solve(dt_r, ok);
+            // These parameters are calculated in the Lab. frame.
+            auto offset = c_svd_r[0];
+            auto theta = c_svd_r[1];
+            R3BLOG(debug,
+                   "SecId: " << i + 1 << ", charge: " << fCharge[i] << ", offset (mm);" << offset
+                             << ", theta (rad):" << theta);
+            AddR3BHitData(i + 1, theta, gRandom->Gaus(fCharge[i], fZsig), gRandom->Gaus(fPosX[i], fsigma_x), offset);
+        }
     }
-
     if (pointData)
-        delete pointData;
+    {
+        delete[] pointData;
+    }
+    LOG(info) << "R3B" << fName << "Digitizer: " << fTwimHits->GetEntriesFast() << " points registered in this event";
     return;
 }
 
@@ -171,18 +186,20 @@ InitStatus R3BTwimDigitizer::ReInit() { return kSUCCESS; }
 // -----   Public method Reset   -----------------------------------------------
 void R3BTwimDigitizer::Reset()
 {
-    LOG(DEBUG) << "Clearing R3BSof" + fName + "Digitizer Structure";
+    R3BLOG(debug, "");
     if (fTwimHits)
+    {
         fTwimHits->Clear();
+    }
 }
 
 // -----   Private method AddR3BHitData  -------------------------------------------
-R3BTwimHitData* R3BTwimDigitizer::AddR3BHitData(Int_t secId, Double_t theta, Double_t z)
+R3BTwimHitData* R3BTwimDigitizer::AddR3BHitData(Int_t secId, Double_t theta, Double_t z, Double_t x, Double_t offset)
 {
     // It fills the R3BHit
     TClonesArray& clref = *fTwimHits;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BTwimHitData(secId, theta, z);
+    return new (clref[size]) R3BTwimHitData(secId, theta, z, x, offset);
 }
 
 ClassImp(R3BTwimDigitizer);

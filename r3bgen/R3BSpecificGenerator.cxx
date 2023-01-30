@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -730,7 +730,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 // output
                 if (verboseLevel > 0)
                 {
-                    cout << endl << "______________ INFO PRIMARY ____________" << endl;
+                    cout << endl << "______________ info PRIMARY ____________" << endl;
                     cout << " Specific particle: " << particle->GetName() << endl;
                     cout << " momCM (" << momCM.X() << ", " << momCM.Y() << ", " << momCM.Z() << ") with module "
                          << momModuleCM << endl;
@@ -747,7 +747,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 // output
                 if (verboseLevel > 0)
                 {
-                    cout << endl << "______________ INFO PRIMARY ____________" << endl;
+                    cout << endl << "______________ info PRIMARY ____________" << endl;
                     cout << " Specific particle: " << particle->GetName() << endl;
                     cout << " momLAB (" << momLAB.X() << ", " << momLAB.Y() << ", " << momLAB.Z() << ") with module "
                          << momModuleLAB << endl;

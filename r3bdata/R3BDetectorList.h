@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -79,6 +79,11 @@ enum DetectorId
 #ifdef GTPC
     kGTPC,
 #endif
+#ifdef ASYEOS
+    kCHIMERA,
+    kKRAB,
+    kKRATTA,
+#endif
     kLAST
 };
 /** Unique identifier for all R3B Point and Hit types **/
@@ -124,6 +129,7 @@ enum fDetectorType
     kFI33Point,
     kSFIPoint,
     kMUSICPoint,
+    kLOSPoint,
     kRpcPoint,
     kSOFMWPC0Point,
     kSOFMWPC1Point,
@@ -138,11 +144,14 @@ enum fDetectorType
     kSOFTofWallPoint
 #endif
 #ifdef GTPC
-    /* note that the value of kGTPCPoint will depend on
-     * whether SOFIA is defined. --pklenze
-     */
     ,
     kGTPCPoint
+#endif
+#ifdef ASYEOS
+    ,
+    kCHIMERAPoint,
+    kKRABPoint,
+    kKRATTAPoint
 #endif
 };
 

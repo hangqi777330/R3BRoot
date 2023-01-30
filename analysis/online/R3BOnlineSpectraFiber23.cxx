@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -87,7 +87,7 @@ InitStatus R3BOnlineSpectraFiber23::Init()
     // Initialize random number:
     std::srand(std::time(0)); // use current time as seed for random generator
 
-    LOG(INFO) << "R3BOnlineSpectraFiber23::Init ";
+    LOG(info) << "R3BOnlineSpectraFiber23::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -206,7 +206,7 @@ void R3BOnlineSpectraFiber23::Exec(Option_t* option)
     if (NULL == mgr)
     {
         // FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-        LOG(ERROR) << "FairRootManager not found";
+        LOG(error) << "FairRootManager not found";
         return;
     }
 

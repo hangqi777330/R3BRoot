@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,6 +13,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include <FairRootManager.h>
 
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -78,15 +79,15 @@ void R3BTofDMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fMapPar = (R3BTofDMappingPar*)FairRuntimeDb::instance()->getContainer("tofdMappingPar");
-    R3BLOG_IF(WARNING, !fMapPar, "Could not get access to tofdMappingPar container");
+    R3BLOG_IF(warn, !fMapPar, "Could not get access to tofdMappingPar container");
 
     fTcalPar = (R3BTCalPar*)rtdb->getContainer("TofdTCalPar");
     if (!fTcalPar)
     {
-        R3BLOG(ERROR, "Could not get access to TofdTCalPar-Container.");
+        R3BLOG(error, "Could not get access to TofdTCalPar-Container.");
         fNofTcalPars = 0;
     }
     return;
@@ -95,7 +96,7 @@ void R3BTofDMapped2Cal::SetParContainers()
 void R3BTofDMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
-    R3BLOG_IF(INFO, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
+    R3BLOG_IF(info, fMapPar, "Nb of planes " << fMapPar->GetNbPlanes() << " and paddles " << fMapPar->GetNbPaddles());
     if (fMapPar)
     {
         fNofPlanes = fMapPar->GetNbPlanes();
@@ -103,17 +104,17 @@ void R3BTofDMapped2Cal::SetParameter()
     }
 
     fNofTcalPars = fTcalPar->GetNumModulePar();
-    R3BLOG_IF(FATAL, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
+    R3BLOG_IF(fatal, fNofTcalPars == 0, "There are no TCal parameters in container TofdTCalPar");
     return;
 }
 
 InitStatus R3BTofDMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -121,12 +122,12 @@ InitStatus R3BTofDMapped2Cal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
     if (!fMappedItems)
     {
-        R3BLOG(FATAL, "TofdMapped not found");
+        R3BLOG(fatal, "TofdMapped not found");
         return kFATAL;
     }
 
     fMappedTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerMapped");
-    R3BLOG_IF(WARNING, !fMappedTriggerItems, "TofdTriggerMapped not found");
+    R3BLOG_IF(warn, !fMappedTriggerItems, "TofdTriggerMapped not found");
 
     // request storage of TCal data in output tree
     mgr->Register("TofdCal", "TofdCal data", fCalItems, !fOnline);
@@ -136,7 +137,7 @@ InitStatus R3BTofDMapped2Cal::Init()
     }
 
     SetParameter();
-    R3BLOG(INFO, "Read " << fNofTcalPars << " modules");
+    R3BLOG(info, "Read " << fNofTcalPars << " modules");
     return kSUCCESS;
 }
 
@@ -180,12 +181,12 @@ void R3BTofDMapped2Cal::Exec(Option_t* option)
 
         if ((mapped->GetDetectorId() < 1) || (mapped->GetDetectorId() > fNofPlanes))
         {
-            R3BLOG(DEBUG, "Plane number out of range: " << mapped->GetDetectorId());
+            R3BLOG(debug, "Plane number out of range: " << mapped->GetDetectorId());
             continue;
         }
         if ((mapped->GetBarId() < 1) || (mapped->GetBarId() > fPaddlesPerPlane))
         {
-            R3BLOG(DEBUG, "Bar number out of range: " << mapped->GetBarId() << ", " << fPaddlesPerPlane);
+            R3BLOG(debug, "Bar number out of range: " << mapped->GetBarId() << ", " << fPaddlesPerPlane);
             continue;
         }
 
@@ -194,7 +195,7 @@ void R3BTofDMapped2Cal::Exec(Option_t* option)
             mapped->GetDetectorId(), mapped->GetBarId(), 2 * mapped->GetSideId() + mapped->GetEdgeId() - 2);
         if (!par)
         {
-            R3BLOG(ERROR,
+            R3BLOG(error,
                    "Tcal par not found, Plane: " << mapped->GetDetectorId() << ", Bar: " << mapped->GetBarId()
                                                  << ", Side: " << mapped->GetSideId()
                                                  << ", Edge: " << mapped->GetEdgeId());
@@ -282,7 +283,7 @@ void R3BTofDMapped2Cal::Exec(Option_t* option)
 
             if (mapped->GetDetectorId() != fNofPlanes + 1)
             {
-                R3BLOG(DEBUG, "Trigger plane number out of range: " << mapped->GetDetectorId());
+                R3BLOG(debug, "Trigger plane number out of range: " << mapped->GetDetectorId());
                 continue;
             }
 
@@ -290,7 +291,7 @@ void R3BTofDMapped2Cal::Exec(Option_t* option)
             auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), 1);
             if (!par)
             {
-                R3BLOG(WARNING,
+                R3BLOG(warn,
                        "Trigger Tcal par not found, Plane: " << mapped->GetDetectorId()
                                                              << ", Bar: " << mapped->GetBarId());
                 continue;

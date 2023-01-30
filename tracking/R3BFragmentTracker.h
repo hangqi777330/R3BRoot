@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,8 +58,8 @@ class R3BFragmentTracker : public FairTask
     TClonesArray* fArrayFragments;
     Int_t fNEvents;
     Bool_t fVis;
-//   	Double_t amu = 0.93149410242;
-   	Double_t amu = 0.938272;
+    //   	Double_t amu = 0.93149410242;
+    Double_t amu = 0.938272;
 
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;

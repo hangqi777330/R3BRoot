@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------
-// -----             R3BTwimVertexReconstruction                        -----
-// -----    Created 30/11/19 by J.L. Rodriguez-Sanchez     -----
+// -----       R3BTwimVertexReconstruction source file     -----
+// -----      Created on 18/07/22 by A. Grana Gonzalez     -----
 // -------------------------------------------------------------
 
 #ifndef R3BTwimVertexReconstruction_H
@@ -28,7 +28,6 @@ class R3BEventHeader;
 
 class R3BTwimVertexReconstruction : public FairTask
 {
-
   public:
     /** Default constructor **/
     R3BTwimVertexReconstruction();
@@ -42,19 +41,17 @@ class R3BTwimVertexReconstruction : public FairTask
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
 
-    // Fair specific
     /** Virtual method Init **/
     virtual InitStatus Init();
 
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
   private:
-    R3BEventHeader* header; /**< Event header. */
+    R3BEventHeader* header;
     Int_t fTpat;
-
-    TClonesArray* fTwimHitDataCA; /**< Array with Twim Hit-output data. >*/
-
     TF1 *f1, *f2;
+
+    TClonesArray* fTwimHitDataCA;
 
   public:
     // Class definition

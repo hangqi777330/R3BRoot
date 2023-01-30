@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,6 +19,7 @@
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairVolume.h"
+#include <FairRootManager.h>
 
 #include "R3BMCStack.h"
 #include "R3BMwpc1.h"
@@ -61,11 +62,11 @@ void R3BMwpc1::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BMwpc1: initialisation";
-    LOG(DEBUG) << "R3BMwpc1: Sens. Vol. (McId) " << gMC->VolId("MWPC1");
+    LOG(info) << "R3BMwpc1: initialisation";
+    LOG(debug) << "R3BMwpc1: Sens. Vol. (McId) " << gMC->VolId("MWPC1");
 }
 
-void R3BMwpc1::SetSpecialPhysicsCuts() { LOG(INFO) << "R3BMwpc1: Adding customized Physics cut ... "; }
+void R3BMwpc1::SetSpecialPhysicsCuts() { LOG(info) << "R3BMwpc1: Adding customized Physics cut ... "; }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BMwpc1::ProcessHits(FairVolume* vol)
@@ -176,7 +177,7 @@ TClonesArray* R3BMwpc1::GetCollection(Int_t iColl) const
 void R3BMwpc1::Print(Option_t* option) const
 {
     Int_t nHits = fSofMWPCCollection->GetEntriesFast();
-    LOG(INFO) << "R3BMwpc1: " << nHits << " points registered in this event";
+    LOG(info) << "R3BMwpc1: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -192,7 +193,7 @@ void R3BMwpc1::Reset()
 void R3BMwpc1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BMwpc1: " << nEntries << " entries to add";
+    LOG(info) << "R3BMwpc1: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BMwpcPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -203,7 +204,7 @@ void R3BMwpc1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BMwpcPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BMwpc1: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(info) << "R3BMwpc1: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -221,7 +222,7 @@ R3BMwpcPoint* R3BMwpc1::AddPoint(Int_t trackID,
     TClonesArray& clref = *fSofMWPCCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BMwpc1: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(info) << "R3BMwpc1: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BMwpcPoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -230,7 +231,7 @@ Bool_t R3BMwpc1::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("MWPC1"))
     {
-        LOG(DEBUG) << "Found MWPC1 geometry from ROOT file: " << name;
+        LOG(debug) << "Found MWPC1 geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -37,7 +37,9 @@ R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex_onion* d
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
+    , fSkiptriggertimes(kFALSE)
     , fArray(new TClonesArray("R3BPaddleTamexMappedData"))
+    , fArrayTrigger(new TClonesArray("R3BPaddleTamexMappedData"))
     , fNofPlanes(sizeof(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P) /
                  sizeof(*(((EXT_STR_h101_raw_nnp_tamex_onion*)(data))->NN_P)))
 {
@@ -45,29 +47,41 @@ R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex_onion* d
 
 R3BNeulandTamexReader::~R3BNeulandTamexReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
     {
         delete fArray;
+    }
+    if (fArrayTrigger)
+    {
+        delete fArrayTrigger;
     }
 }
 
 Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_raw_nnp_tamex, 0);
 
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
 
-    R3BLOG(INFO, "Number of planes " << fNofPlanes);
+    R3BLOG(info, "Number of planes " << fNofPlanes);
 
-    // Register output array in tree
+    // Register output arrays in tree
     FairRootManager::Instance()->Register("NeulandMappedData", "Neuland", fArray, !fOnline);
+    if (!fSkiptriggertimes)
+    {
+        FairRootManager::Instance()->Register("NeulandTrigMappedData", "Neuland", fArrayTrigger, !fOnline);
+    }
+    else
+    {
+        fArrayTrigger = NULL;
+    }
     Reset();
     memset(fData, 0, sizeof *fData);
 
@@ -76,7 +90,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-    const auto data = (EXT_STR_h101_raw_nnp_tamex_onion*)fData;
+    const auto data = fData;
 
     for (int plane = 0; plane < fNofPlanes; ++plane)
     {
@@ -143,9 +157,32 @@ Bool_t R3BNeulandTamexReader::Read()
         }
     }
 
+    // Cards' trigger.
+    if (fArrayTrigger)
+    {
+        int v_i = 0;
+        for (int i_i = 0; i_i < fData->NN_TRIGCM; ++i_i)
+        {
+            auto ch = fData->NN_TRIGCMI[i_i];
+            for (; v_i < fData->NN_TRIGCME[i_i]; ++v_i)
+            {
+                auto coarse = fData->NN_TRIGCv[v_i];
+                auto fine = fData->NN_TRIGFv[v_i];
+                auto mapped = new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()]) R3BPaddleTamexMappedData(0, ch);
+                mapped->fCoarseTime1LE = coarse;
+                mapped->fFineTime1LE = fine;
+            }
+        }
+    }
+
     return kTRUE;
 }
 
-void R3BNeulandTamexReader::Reset() { fArray->Clear(); }
+void R3BNeulandTamexReader::Reset()
+{
+    fArray->Clear();
+    if (fArrayTrigger)
+        fArrayTrigger->Clear();
+}
 
 ClassImp(R3BNeulandTamexReader);

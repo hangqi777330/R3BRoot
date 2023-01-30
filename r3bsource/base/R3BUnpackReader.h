@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -42,7 +42,7 @@ class R3BUnpackReader : public R3BReader
 
   private:
     // An event counter
-    UInt_t fNEvent;
+    uint64_t fNEvent;
     // Reader specific data structure from ucesb
     EXT_STR_h101_unpack* fData;
     // Offset of detector specific data in full data structure

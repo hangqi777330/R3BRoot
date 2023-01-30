@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,11 +14,13 @@
 #ifndef R3B_NEULAND_DIGITIZER_H
 #define R3B_NEULAND_DIGITIZER_H
 
+#include <TClonesArray.h>
 #include "DigitizingEngine.h"
 #include "FairTask.h"
 #include "Filterable.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandHit.h"
+#include "R3BNeulandHitPar.h"
 #include "R3BNeulandPoint.h"
 #include "TCAConnector.h"
 
@@ -62,6 +64,7 @@ class R3BNeulandDigitizer : public FairTask
   public:
     void Exec(Option_t*) override;
     void AddFilter(const Filterable<R3BNeulandHit&>::Filter& f) { fHitFilters.Add(f); }
+    void SetHitParName(const TString& name) { fHitParName = name; };
 
   private:
     TCAInputConnector<R3BNeulandPoint> fPoints;
@@ -73,6 +76,7 @@ class R3BNeulandDigitizer : public FairTask
 
     R3BNeulandGeoPar* fNeulandGeoPar; // non-owning
 
+    TString fHitParName{};
     TH1F* hMultOne;
     TH1F* hMultTwo;
     TH1F* hRLTimeToTrig;

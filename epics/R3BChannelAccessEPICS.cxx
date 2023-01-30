@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -92,10 +92,10 @@ bool R3BChannelAccessGroupEPICS::PendIO(char const* op)
         case ECA_NORMAL:
             return true;
         case ECA_TIMEOUT:
-            LOG(ERROR) << "R3BChannelAccessGroupEPICS::Get : CA " << op << " failed.";
+            LOG(error) << "R3BChannelAccessGroupEPICS::Get : CA " << op << " failed.";
             return false;
         default:
-            LOG(ERROR) << "R3BChannelAccessGroupEPICS::Get : Unexpected CA " << op << " error.";
+            LOG(error) << "R3BChannelAccessGroupEPICS::Get : Unexpected CA " << op << " error.";
             return false;
     }
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef _R3BREADER_H
-#define _R3BREADER_H
+#define _R3BREADER_H 1
 
 #include "TObject.h"
 #include "TString.h"
@@ -21,9 +21,6 @@ extern "C"
 {
 #include "ext_data_struct_info.hh"
 }
-
-//#define EXP_SPECIFIC_H101_FILE "jun16_ext_h101.h"
-//#define EXP_SPECIFIC_H101_FILE "ext_h101.h"
 
 class TClonesArray;
 class R3BEventHeader;
@@ -52,4 +49,4 @@ class R3BReader : public TObject
     ClassDef(R3BReader, 0);
 };
 
-#endif
+#endif /* _R3BREADER_H */

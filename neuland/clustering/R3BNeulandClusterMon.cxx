@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,10 +18,10 @@
 #include "R3BNeulandCluster.h"
 #include "TClonesArray.h"
 #include "TDirectory.h"
-#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include <TFile.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -43,7 +43,7 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const 
     , fOutput(std::move(output))
     , fBeta(0.793) // 600 Mev?
 {
-    LOG(INFO) << "Using R3B NeuLAND NeulandCluster Monitor";
+    LOG(info) << "Using R3B NeuLAND NeulandCluster Monitor";
 
     TString opt = option;
     opt.ToUpper();
@@ -51,7 +51,7 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const 
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization";
+        LOG(info) << "... with 3D track visualization";
     }
     else
     {
@@ -66,7 +66,7 @@ InitStatus R3BNeulandClusterMon::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
     {
-        LOG(FATAL) << "R3BNeulandClusterMon::Init: No FairRootManager";
+        LOG(fatal) << "R3BNeulandClusterMon::Init: No FairRootManager";
         return kFATAL;
     }
 

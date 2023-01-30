@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,6 +17,7 @@
 // ----------------------------------------------------------------
 
 #include "R3BTofiMapped2CalPar.h"
+#include <FairRootManager.h>
 
 #include "TClonesArray.h"
 
@@ -84,7 +85,7 @@ InitStatus R3BTofiMapped2CalPar::Init()
     fCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofiTCalPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "R3BTofiMapped2CalPar::Init() Couldn't get handle on TofiTCalPar. ";
+        LOG(error) << "R3BTofiMapped2CalPar::Init() Couldn't get handle on TofiTCalPar. ";
         return kFATAL;
     }
 
@@ -92,7 +93,7 @@ InitStatus R3BTofiMapped2CalPar::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofiMapped2CalPar::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofiMapped2CalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -112,13 +113,13 @@ void R3BTofiMapped2CalPar::Exec(Option_t* option)
 
         if (mapped->GetDetectorId() > fNofPlanes)
         {
-            LOG(ERROR) << "R3BTofiMapped2CalPar::Exec() : more planes than expected! Plane: " << mapped->GetDetectorId()
+            LOG(error) << "R3BTofiMapped2CalPar::Exec() : more planes than expected! Plane: " << mapped->GetDetectorId()
                        << " allowed are 1.." << fNofPlanes;
             continue;
         }
         if (mapped->GetBarId() > fPaddlesPerPlane)
         {
-            LOG(ERROR) << "R3BTofiMapped2CalPar::Exec() : more bars then expected! Det: " << mapped->GetBarId()
+            LOG(error) << "R3BTofiMapped2CalPar::Exec() : more bars then expected! Det: " << mapped->GetBarId()
                        << " allowed are 1.." << fPaddlesPerPlane;
             continue;
         }
@@ -136,7 +137,7 @@ void R3BTofiMapped2CalPar::Exec(Option_t* option)
 
         if (mapped->GetDetectorId() != fNofPlanes + 1)
         {
-            LOG(ERROR) << "R3BTofiMapped2CalPar::Exec() : trigger plane incorrect! Plane: " << mapped->GetDetectorId()
+            LOG(error) << "R3BTofiMapped2CalPar::Exec() : trigger plane incorrect! Plane: " << mapped->GetDetectorId()
                        << " not " << fNofPlanes + 1;
             continue;
         }

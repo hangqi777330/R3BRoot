@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -50,10 +50,8 @@ class R3BTwimDigitizer : public FairTask
     virtual void Reset();
 
     /** Setters for sigmas **/
-    void SetSigma_x(Float_t sigma_x) { fsigma_x = sigma_x; }
-    void SetPosX(Float_t x) { fPosX = x; }
-    void SetPosZ(Float_t z) { fPosZ = z; }
-    void SetAngle(Float_t a) { fangle = a; }
+    void SetSigma_x(Float_t sig) { fsigma_x = sig; }
+    void SetSigCharge(Float_t sig) { fZsig = sig; }
 
   private:
     TClonesArray* fMCTrack;
@@ -61,12 +59,11 @@ class R3BTwimDigitizer : public FairTask
     TClonesArray* fTwimHits;
     Int_t fDetId;
     Float_t fsigma_x;
-    Float_t fangle;
-    Float_t fPosX, fPosZ;
+    Float_t fZsig;
     TString fName;
 
     // Adds a R3BTwimHitData to the HitCollection
-    R3BTwimHitData* AddR3BHitData(Int_t detId, Double_t theta, Double_t z);
+    R3BTwimHitData* AddR3BHitData(Int_t detId, Double_t theta, Double_t z, Double_t x, Double_t offset);
 
   public:
     // Class definition

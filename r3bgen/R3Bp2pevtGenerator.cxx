@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -103,7 +103,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (E <= 0)
     {
-        LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!";
+        LOG(error) << "R3Bp2pevtGenerator: E < 0!";
         return kFALSE;
     }
     fRandom.SetSeed(0);
@@ -125,11 +125,11 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         const double S_first = (EA + Mi) * (EA + Mi) - PA * PA; // Invariant mass (Mandelstam S-variable)
         const double sigma = MOM_SIGMA; // Internal momentum spread of the cluster "a" inside "A"
 
-        LOG(DEBUG) << "\n****** Beam parameters ********";
-        LOG(DEBUG) << "\nMA:\t" << MA << " MeV";
-        LOG(DEBUG) << "\nTotal momentum:\t" << PA << " MeV";
-        LOG(DEBUG) << "\nTotal energy:\t" << EA << " MeV";
-        LOG(DEBUG) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
+        LOG(debug) << "\n****** Beam parameters ********";
+        LOG(debug) << "\nMA:\t" << MA << " MeV";
+        LOG(debug) << "\nTotal momentum:\t" << PA << " MeV";
+        LOG(debug) << "\nTotal energy:\t" << EA << " MeV";
+        LOG(debug) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
 
         while (!evt) // eventloop
         {
@@ -152,7 +152,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
             if (rrtt <= 0)
             {
-                // cout<<"\nERROR off-shell mass!!";//non-zero and real off-shell mass
+                // cout<<"\nerror off-shell mass!!";//non-zero and real off-shell mass
                 // cout<<"\nP:"<< PBx << "\t" << PBy << "\t" << PBz_rf << "\n";//non-zero and real off-shell mass
                 continue;
             }
@@ -206,7 +206,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             TVector3 P2L = R3Bp2pevtGenerator::DREHUNG(P2cm, Pa);
 
             evt = true;
-            LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
+            LOG(debug) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
                        << P1L.Pz() << "\n P2 : " << P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
             primGen->AddTrack(2212, P1L.Px() / 1000., P1L.Py() / 1000., P1L.Pz() / 1000., 0, 0, 0);
             primGen->AddTrack(2212, P2L.Px() / 1000., P2L.Py() / 1000., P2L.Pz() / 1000., 0, 0, 0);
@@ -249,7 +249,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             double rrtt = MA * MA + MB * MB - 2 * MA * sqrt(MB * MB + Pa.Mag2());
             if (rrtt <= 0)
             {
-                // cout<<"\nERROR off-shell mass!!\n";//non-zero and real off-shell mass
+                // cout<<"\nerror off-shell mass!!\n";//non-zero and real off-shell mass
                 continue;
             }
             double Ma_off = sqrt(rrtt);
@@ -304,7 +304,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             // TVector3 P2L = DREHUNG(P2cm,(LVstart.Vect()));
             evt = true;
 
-            LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
+            LOG(debug) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : " << P1L.Px() << " , " << P1L.Py() << " , "
                        << P1L.Pz() << "\n P2 : " << P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
             primGen->AddTrack(2212, P1cm.Px() / 1000., P1cm.Py() / 1000., P1cm.Pz() / 1000., 0, 0, 0);
             primGen->AddTrack(2212, P2cm.Px() / 1000., P2cm.Py() / 1000., P2cm.Pz() / 1000., 0, 0, 0);
@@ -374,10 +374,10 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s, double m2off, double m1, double 
     Z = m1 * m1;
     // And check whether the kinematical function is ok
     // for this specific kinematical case
-    double ERROR_CI = R3Bp2pevtGenerator::CINEMA(X, Y, Z);
-    if (ERROR_CI <= 0.)
+    double error_CI = R3Bp2pevtGenerator::CINEMA(X, Y, Z);
+    if (error_CI <= 0.)
     {
-        // cout << "\nERROR!!! Kinematical function is negative!";
+        // cout << "\nerror!!! Kinematical function is negative!";
         return output;
     }
 
@@ -411,7 +411,7 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s, double m2off, double m1, double 
     double COSINE = (t - 2 * m1 * m1 + 2 * e1_off * e1) / (2 * p1_off * p1);
     if (fabs(COSINE) >= 1)
     { // momentum transfer out of range
-        // cout << "\nERROR! Scattering cosine is larger than 1";
+        // cout << "\nerror! Scattering cosine is larger than 1";
         return output;
     }
 

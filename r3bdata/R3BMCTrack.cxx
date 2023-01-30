@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -55,8 +55,8 @@ void R3BMCTrack::Print(Option_t* option) const
               << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", TOFd " << GetNPoints(kTOFD)
               << ", TOF " << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA) << ", CALIFA " << GetNPoints(kCALIFA)
               << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP) << ", VETO " << GetNPoints(kVETO)
-              << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON " << GetNPoints(kLUMON) << ", NeuLAND "
-              << GetNPoints(kNEULAND) << std::endl;
+              << ", RPC " << GetNPoints(kRPC) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
+              << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << std::endl;
 #ifdef SOFIA
     std::cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM)
               << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 "
@@ -65,13 +65,17 @@ void R3BMCTrack::Print(Option_t* option) const
 #ifdef GTPC
     std::cout << ", GTPC " << GetNPoints(kGTPC) << std::endl;
 #endif
+#ifdef ASYEOS
+    std::cout << ", CHIMERA " << GetNPoints(kCHIMERA) << ", KRAB " << GetNPoints(kKRAB) << ", KRATTA "
+              << GetNPoints(kKRATTA) << std::endl;
+#endif
 }
 
 int R3BMCTrack::GetNPoints(DetectorId detId) const
 {
     if (detId < 0 || detId >= fNPoints.size())
     {
-        LOG(ERROR) << "Unknown detector ID " << detId;
+        LOG(error) << "Unknown detector ID " << detId;
         return 0;
     }
     return fNPoints.at(detId);

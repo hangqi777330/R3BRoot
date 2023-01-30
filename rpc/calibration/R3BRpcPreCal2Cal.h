@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,7 +21,6 @@
 #define R3BRPCPRECAL2CAL_H
 
 #include "FairTask.h"
-
 
 #include "R3BRpcPreCal2CalPar.h"
 
@@ -61,24 +60,24 @@ class R3BRpcPreCal2Cal : public FairTask
     virtual void Finish();
 
     /** Accessor to select online mode **/
-     void SetOnline(Bool_t option) { fOnline = option; }
-    
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
-    
     Int_t fNumChannels;
     R3BRpcTotCalPar* fTotCalPar;
     TArrayF* fParCont;
     UInt_t fNEvent;
     // Don't store data for online
     Bool_t fOnline;
-    
+
     TClonesArray* fPreCalDataCA; /**< Array with RPC PreCal-input data. >*/
 
-    TClonesArray* fRpcCalDataCA;    /**< Array with Strip Cal- output data. >*/
-    Int_t event =0;
-  public: 
+    TClonesArray* fRpcCalDataCA; /**< Array with Strip Cal- output data. >*/
+    Int_t event = 0;
+
+  public:
     // Class definition
     ClassDef(R3BRpcPreCal2Cal, 1)
-};  
+};
 
 #endif

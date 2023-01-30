@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -78,6 +78,11 @@ InitStatus R3BNeulandMapped2CalPar::Init()
     {
         return kFATAL;
     }
+    fHitsTrigger = (TClonesArray*)rm->GetObject("NeulandTrigMappedData");
+    if (!fHitsTrigger)
+    {
+        LOG(info) << "Branch NeulandTrigMapped not found";
+    }
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakelists.txt (in this case in the land directory)
@@ -107,7 +112,7 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
 
     if (checkcounts == fNofPMTs)
     {
-        std::cout << "done " << std::endl;
+        // std::cout << "done " << std::endl;
         //    raise(SIGINT);
     }
 
@@ -178,6 +183,26 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
             checkcounts++;
             std::cout << iPlane << "b     " << iBar << "   " << iSide << std::endl;
             std::cout << checkcounts << std::endl;
+        }
+    }
+
+    // Loop over mapped triggers
+    if (fHitsTrigger)
+    {
+        nHits = fHitsTrigger->GetEntriesFast();
+        for (Int_t i = 0; i < nHits; i++)
+        {
+            auto hit = (R3BPaddleTamexMappedData*)fHitsTrigger->At(i);
+            if (!hit)
+            {
+                continue;
+            }
+
+            // Check bar ID
+            auto iBar = hit->GetBarId();
+            auto iFine = hit->fFineTime1LE;
+
+            fEngine->Fill(100, iBar, 10, iFine);
         }
     }
 

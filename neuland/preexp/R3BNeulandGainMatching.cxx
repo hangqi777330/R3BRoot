@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -15,6 +15,8 @@
 #include "R3BNeulandCalData.h"
 #include "TF1.h"
 #include "TSpectrum.h"
+#include <FairRootManager.h>
+#include <TClonesArray.h>
 
 #include <fstream>
 #include <sstream>
@@ -28,7 +30,7 @@ namespace
     Float_t const Ta = 0.5;   // Adjust PID here !!
     Float_t const xtargetp1 = 95.;
     Float_t const accuracy = 0.01;
-    Float_t const starthv = 1050.;
+    Float_t const starthv = 1100.;
 
     Int_t const LSEARCHNB = 0;
     Int_t const HSEARCHNB = 200;
@@ -105,7 +107,7 @@ InitStatus R3BNeulandGainMatching::Init()
                 hss << "h_p" << pln + 1 << "b" << bar + 1 << "t" << pmt + 1;
 
                 TString hname = hss.str();
-                hCosmicPeak[pln][bar][pmt] = new TH1F(hname, hname, 1000, 0, 1000);
+                hCosmicPeak[pln][bar][pmt] = new TH1F(hname, hname, 300, 0, 600);
 
                 iteration[pln][bar][pmt] = 0;
                 esum[pln][bar][pmt] = 0.;
@@ -124,6 +126,7 @@ InitStatus R3BNeulandGainMatching::Init()
 void R3BNeulandGainMatching::Exec(Option_t* option)
 {
 
+    Double_t maxhv = 1400;
     // check high voltage
 
     if (finished)
@@ -218,7 +221,11 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
                     hv[iPlane][iBar][iSide] = starthv;
                     std::cout << "failed, back to start hv: " << hv[iPlane][iBar][iSide] << std::endl;
                 }
-                if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= 1300)
+
+                maxhv = 1400;
+                if (iPlane < 2)
+                    maxhv = 1800;
+                if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= maxhv)
                 {
                     hventry.vtarget->Set(hv[iPlane][iBar][iSide]);
                     hventry.group->Commit();
@@ -247,7 +254,10 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
                                           Kd * (e - ealt[iPlane][iBar][iSide]) / Ta;
                 ealt[iPlane][iBar][iSide] = e;
                 std::cout << "new hv: " << hv[iPlane][iBar][iSide] << std::endl;
-                if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= 1300)
+                maxhv = 1400;
+                if (iPlane < 2)
+                    maxhv = 1800;
+                if (hv[iPlane][iBar][iSide] >= 0 && hv[iPlane][iBar][iSide] <= maxhv)
                 {
                     hventry.vtarget->Set(hv[iPlane][iBar][iSide]);
                     hventry.group->Commit();
@@ -275,7 +285,7 @@ void R3BNeulandGainMatching::Exec(Option_t* option)
                         hventry.group->Commit();
                     }
                 }
-                hv_file << "caput r3b:nl:hv:p" << iPlane + 1 << "b" << iBar + 1 << "t" << iSide + 1 << ":vtargetV.A "
+                hv_file << "caput r3b:nl:hv:p" << iPlane + 1 << "b" << iBar + 1 << "t" << iSide + 1 << ":vtarget "
                         << newhv << " " << peakmethod << " " << b << std::endl;
             }
             hv_file.close();
@@ -340,7 +350,7 @@ Double_t R3BNeulandGainMatching::getcosmicpeak(TH1* hin)
                 peakmethod = 4;
             }
         }
-        hin->GetXaxis()->SetRange(1, 1000);
+        hin->GetXaxis()->SetRange(1, 600);
         // hin->GetXaxis()->SetDefaults();
     }
     return xp;
@@ -412,7 +422,7 @@ Double_t R3BNeulandGainMatching::searchcosmicpeaknb(TH1* hin, Double_t width)
     std::cout << "searchcosmicpeakNB: Chose cosmic peak at x = " << xp << std::endl;
     //}
     delete s;
-    hin->GetXaxis()->SetRange(1, 1000);
+    hin->GetXaxis()->SetRange(1, 600);
     return xp;
 }
 

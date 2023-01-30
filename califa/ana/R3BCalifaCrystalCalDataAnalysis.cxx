@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -50,7 +50,7 @@ void R3BCalifaCrystalCalDataAnalysis::Exec(Option_t* option)
     }
     if (0 == (fnEvents % 100))
     {
-        LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits;
+        LOG(info) << fnEvents << " events, multiplicity:  " << nHits;
     }
     fnEvents += 1;
 }
@@ -79,7 +79,7 @@ void R3BCalifaCrystalCalDataAnalysis::WriteHistos()
     thNf->Write();
     thNs->Write();
     thTime->Write();
-    LOG(INFO) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ...";
+    LOG(info) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ...";
 }
 
 ClassImp(R3BCalifaCrystalCalDataAnalysis)

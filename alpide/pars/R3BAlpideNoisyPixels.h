@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,7 +58,7 @@ class R3BAlpideNoisyPixels : public FairTask
   private:
     Int_t fNbSensors;
     Int_t fThr;
-    std::vector<Int_t> fMap[AlpideCols][AlpideRows];
+    std::vector<Int_t> fMap[DAlpideCols][DAlpideRows];
     TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
     R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
 

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -51,12 +51,12 @@ R3BTrloiiScalerReader_s467::~R3BTrloiiScalerReader_s467()
 Bool_t R3BTrloiiScalerReader_s467::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BTrloiiScalerReader_s467::Init()";
+    LOG(info) << "R3BTrloiiScalerReader_s467::Init()";
     EXT_STR_h101_TRLO_s467_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TRLO_s467, 0);
 
     if (!ok)
     {
-        LOG(ERROR) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
+        LOG(error) << "R3BTrloiiScalerReader_s467::Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -69,7 +69,7 @@ Bool_t R3BTrloiiScalerReader_s467::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTrloiiScalerReader_s467::Read()
 {
-    LOG(DEBUG) << "R3BTrloiiScalerReader_s467::Read() Event data.";
+    LOG(debug) << "R3BTrloiiScalerReader_s467::Read() Event data.";
 
     for (int ch = 0; ch < 16; ++ch)
     {

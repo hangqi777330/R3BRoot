@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -50,14 +50,14 @@ void R3BModule::ConstructGeometry()
 {
     if (!GetGeometryFileName().EndsWith(".root"))
     {
-        LOG(FATAL) << GetName() << " (which is a " << ClassName() << ") geometry file is not specified!";
+        LOG(fatal) << GetName() << " (which is a " << ClassName() << ") geometry file is not specified!";
     }
     ConstructRootGeometry();
 }
 
 void R3BModule::ConstructRootGeometry()
 {
-    LOG(INFO) << "R3BModule: Constructing " << GetName() << " (which is a " << ClassName()
+    LOG(info) << "R3BModule: Constructing " << GetName() << " (which is a " << ClassName()
               << ") geometry from ROOT file " << GetGeometryFileName() << " ...";
     FairModule::ConstructRootGeometry();
 

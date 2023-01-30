@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,7 +16,7 @@ void testNeulandDigitizer()
     TStopwatch timer;
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogScreenLevel("warn");
 
     FairRunAna run;
     run.SetSource(new FairFileSource("test.simu.root"));

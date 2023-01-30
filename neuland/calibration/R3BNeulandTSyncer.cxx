@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -215,7 +215,7 @@ namespace Neuland
             // seems like we do not have enough statistics in most bars
             if (numberOfEquations < nBars)
             {
-                LOG(INFO) << "Can not synchronize NeuLAND. Not enough equations (" << numberOfEquations << ").";
+                LOG(info) << "Can not synchronize NeuLAND. Not enough equations (" << numberOfEquations << ").";
                 return solution;
             }
 
@@ -318,7 +318,7 @@ namespace Neuland
 
             input->rhs_vec->elements[numberOfEquations] = 0.; // we will use this one the put the mean value to 0
 
-            LOG(DEBUG) << "Syncing Neuland with " << numberOfEquations << " equations...";
+            LOG(debug) << "Syncing Neuland with " << numberOfEquations << " equations...";
 
             lsqr(input, output, work, function, &lhs);
 

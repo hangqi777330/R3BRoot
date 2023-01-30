@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 #ifndef R3BCALIFAMAPPINGPAR_H
-#define R3BCALIFAMAPPINGPAR_H
+#define R3BCALIFAMAPPINGPAR_H 1
 
 #include "FairParGenericSet.h"
 #include "TObject.h"
@@ -47,6 +47,7 @@ class R3BCalifaMappingPar : public FairParGenericSet
     /** Print values of parameters to the standard output **/
     virtual void print();
     void printParams();
+    void printMapCrystalInfo(const UInt_t cryID);
 
     /** Accessor functions **/
     const Int_t GetNumCrystals() { return fNumCrystals; }

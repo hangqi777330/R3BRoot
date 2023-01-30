@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -37,9 +37,9 @@ class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
     bool CheckIfProperlyLoaded() const;
     R3BNeulandMultiplicity::MultiplicityProbabilities GetProbabilities(int nHits, int nClusters, int Edep) const;
 
-    TArrayD GetHitDensity(int n) const {return fHits.at(n);}
-    TArrayD GetClusterDensity(int n) const {return fClusters.at(n);}
-    TArrayD GetEdepDensity(int n) const {return fEdep.at(n);}
+    TArrayD GetHitDensity(int n) const { return fHits.at(n); }
+    TArrayD GetClusterDensity(int n) const { return fClusters.at(n); }
+    TArrayD GetEdepDensity(int n) const { return fEdep.at(n); }
 
     void Finish();
 

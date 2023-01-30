@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,6 +14,7 @@
 #ifndef R3BPDCREADER_H
 #define R3BPDCREADER_H
 
+#include <TClonesArray.h>
 #include "R3BReader.h"
 struct EXT_STR_h101_PDC_t;
 typedef struct EXT_STR_h101_PDC_t EXT_STR_h101_PDC;

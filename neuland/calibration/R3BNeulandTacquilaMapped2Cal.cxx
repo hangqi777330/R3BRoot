@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -98,7 +98,7 @@ R3BNeulandTacquilaMapped2Cal::~R3BNeulandTacquilaMapped2Cal()
 
 InitStatus R3BNeulandTacquilaMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
+    LOG(info) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -150,7 +150,7 @@ void R3BNeulandTacquilaMapped2Cal::SetParameter()
                 i++;
             }
 
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i;
+    LOG(info) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i;
 
     fMapQdcOffset = tempMapQdcOffset;
 }
@@ -250,7 +250,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
 
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
         {
-            LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
+            LOG(debug) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
                        << iPaddle << " / " << iSide;
             continue;
         }
@@ -259,14 +259,14 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time = par->GetTimeTacquila(tdc);
         if (time < 0. || time > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time;
             continue;
         }
 
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide + 2)))
         {
-            LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
+            LOG(debug) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
                        << iPaddle << " / " << (iSide + 2);
             continue;
         }
@@ -275,7 +275,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         time2 = par->GetTimeTacquila(tdc);
         if (time2 < 0. || time2 > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
+            LOG(error) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
                        << ", tdc=" << tdc << ", time=" << time2;
             continue;
         }
@@ -288,7 +288,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         {
             time += wlk(qdc);
         }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iPaddle, iSide, time, qdc);
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iPaddle, iSide, time, NAN, qdc);
         fNPmt += 1;
     }
 }
@@ -297,7 +297,7 @@ void R3BNeulandTacquilaMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1000))
     {
-        LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
+        LOG(info) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

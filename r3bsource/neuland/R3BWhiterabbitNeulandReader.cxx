@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -46,18 +46,16 @@ R3BWhiterabbitNeulandReader::~R3BWhiterabbitNeulandReader()
     {
         delete fArray;
     }
-    if (fEventHeader)
-        delete fEventHeader;
 }
 
 Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_WRNEULAND_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRNEULAND, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "R3BWhiterabbitNeulandReader::Failed to setup structure information.");
+        R3BLOG(error, "R3BWhiterabbitNeulandReader::Failed to setup structure information.");
         return kFALSE;
     }
 
@@ -66,11 +64,11 @@ Bool_t R3BWhiterabbitNeulandReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        R3BLOG(INFO, "EventHeader. found");
+        R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRNeulandData", "WRNeuland", fArray, !fOnline);
@@ -92,7 +90,7 @@ Bool_t R3BWhiterabbitNeulandReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->NN_WR_ID);

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -47,18 +47,19 @@ R3BFootMapped2StripCal::R3BFootMapped2StripCal(const TString& name, Int_t iVerbo
     , NumParams(2)
     , MaxSigma(5)
     , fTimesSigma(3.)
+    , fNStrip(250.)
     , CalParams(NULL)
     , fCal_Par(NULL)
     , fFootMappedData(NULL)
     , fFootCalData(NULL)
     , fOnline(kFALSE)
+
 {
 }
-
 // Virtual R3BFootMapped2StripCal: Destructor
 R3BFootMapped2StripCal::~R3BFootMapped2StripCal()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fFootCalData)
         delete fFootCalData;
 }
@@ -68,16 +69,16 @@ void R3BFootMapped2StripCal::SetParContainers()
     // Parameter Container
     // Reading footCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(ERROR, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
 
     fCal_Par = (R3BFootCalPar*)rtdb->getContainer("footCalPar");
     if (!fCal_Par)
     {
-        R3BLOG(ERROR, "footCalPar container not found");
+        R3BLOG(error, "footCalPar container not found");
     }
     else
     {
-        R3BLOG(INFO, "footCalPar found");
+        R3BLOG(info, "footCalPar found");
     }
 }
 
@@ -88,9 +89,9 @@ void R3BFootMapped2StripCal::SetParameter()
     NumStrips = fCal_Par->GetNumStrips();  // Number of Strips
     NumParams = fCal_Par->GetNumParsFit(); // Number of Parameters
 
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb detectors: " << NumDets;
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb strips: " << NumStrips;
-    LOG(INFO) << "R3BFootMapped2StripCal::Nb parameters from pedestal fit: " << NumParams;
+    LOG(info) << "R3BFootMapped2StripCal::Nb detectors: " << NumDets;
+    LOG(info) << "R3BFootMapped2StripCal::Nb strips: " << NumStrips;
+    LOG(info) << "R3BFootMapped2StripCal::Nb parameters from pedestal fit: " << NumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = NumDets * NumStrips * NumParams;
@@ -106,19 +107,19 @@ void R3BFootMapped2StripCal::SetParameter()
             if (CalParams->GetAt(NumParams * i + 1 + NumStrips * d * NumParams) == -1)
                 numdeadstrips++;
         }
-        LOG(INFO) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
+        LOG(info) << "R3BFootMapped2StripCal::Nb of dead strips in FOOT detector " << d + 1 << ": " << numdeadstrips;
     }
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BFootMapped2StripCal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
 
     FairRootManager* rmg = FairRootManager::Instance();
     if (!rmg)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -126,7 +127,7 @@ InitStatus R3BFootMapped2StripCal::Init()
     fFootMappedData = (TClonesArray*)rmg->GetObject("FootMappedData");
     if (!fFootMappedData)
     {
-        R3BLOG(FATAL, "FootMappedData not found");
+        R3BLOG(fatal, "FootMappedData not found");
         return kFATAL;
     }
 
@@ -167,8 +168,10 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
     Int_t StripNAve[(Int_t)fCal_Par->GetNumDets()];            // Number of Strips to compute average for each detector
     Double_t Ave[(Int_t)fCal_Par->GetNumDets()];               // Average ADC value for each detector
     Double_t StripNAveASIC[(Int_t)fCal_Par->GetNumDets()][10]; // Number of Strips to compute average for each ASICS
-    Double_t AveASIC[(Int_t)fCal_Par->GetNumDets()][10];       // Average ADC value for each ASICS
-    Int_t StripCounter[(Int_t)fCal_Par->GetNumDets()];         // Counter to disregard events with baseline jumps
+    Double_t StripNAveASIC_fine[(Int_t)fCal_Par->GetNumDets()][10];
+    Double_t AveASIC[(Int_t)fCal_Par->GetNumDets()][10]; // Average ADC value for each ASICS
+    Double_t asic_offset_fine[(Int_t)fCal_Par->GetNumDets()][10];
+    Int_t StripCounter[(Int_t)fCal_Par->GetNumDets()]; // Counter to disregard events with baseline jumps
     for (Int_t i = 0; i < fCal_Par->GetNumDets(); i++)
     {
         StripCounter[i] = 0;
@@ -254,9 +257,9 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
             sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
         }
 
-        Int_t ASIC = (Double_t)stripId / 64.;
+        Int_t ASIC1 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma - Ave[detId] - AveASIC[detId][ASIC];
+        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC1];
 
         if (energy > 0. && pedestal != -1)
         {
@@ -276,12 +279,11 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
             sigma = CalParams->GetAt(NumParams * stripId + 1 + detId * NumParams * NumStrips);
         }
 
-        Int_t ASIC = (Double_t)stripId / 64.;
+        Int_t ASIC3 = (Double_t)stripId / 64.;
 
-        energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma - Ave[detId] - AveASIC[detId][ASIC];
-        // energy = mappedData[i]->GetEnergy() - pedestal + 500.;
+        energy = mappedData[i]->GetEnergy() - pedestal - Ave[detId] - AveASIC[detId][ASIC3];
 
-        if (energy > 0. && pedestal != -1 && StripCounter[detId] < 100)
+        if (energy > fTimesSigma * sigma && pedestal != -1 && StripCounter[detId] < fNStrip)
         {
             AddCalData(detId + 1, stripId + 1, energy);
         }
@@ -294,7 +296,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* option)
 // -----   Public method Reset   ------------------------------------------------
 void R3BFootMapped2StripCal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing StripCalData Structure");
+    R3BLOG(debug1, "Clearing StripCalData Structure");
     if (fFootCalData)
         fFootCalData->Clear();
 }

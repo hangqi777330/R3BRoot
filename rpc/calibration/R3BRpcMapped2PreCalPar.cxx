@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -47,40 +47,40 @@ R3BRpcMapped2PreCalPar::R3BRpcMapped2PreCalPar(const char* name, Int_t iVerbose)
 
 R3BRpcMapped2PreCalPar::~R3BRpcMapped2PreCalPar()
 {
-    LOG(INFO) << "R3BRpcMapped2PreCalPar: Delete instance";
-    
+    LOG(info) << "R3BRpcMapped2PreCalPar: Delete instance";
+
     delete fEngine;
 }
 
 InitStatus R3BRpcMapped2PreCalPar::Init()
 {
-    LOG(INFO) << "R3BRpcMapped2PreCalPar::Init()";
+    LOG(info) << "R3BRpcMapped2PreCalPar::Init()";
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() FairRootManager not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() FairRootManager not found";
         return kFATAL;
     }
 
     fMappedDataCA = (TClonesArray*)rootManager->GetObject("R3BRpcMappedData");
     if (!fMappedDataCA)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() fMappedDataCA not found";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() FairRuntimeDb not found";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() FairRuntimeDb not found";
         return kFATAL;
     }
 
     fTCalPar = (R3BTCalPar*)rtdb->getContainer("RpcTCalPar");
     if (!fTCalPar)
     {
-        LOG(ERROR) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
+        LOG(error) << "R3BRpcMapped2PreCalPar::Init() Couldn't get handle on RpcTCalPar container";
         return kFATAL;
     }
 
@@ -91,26 +91,23 @@ InitStatus R3BRpcMapped2PreCalPar::Init()
     return kSUCCESS;
 }
 
-InitStatus R3BRpcMapped2PreCalPar::ReInit()
-{
-    return kSUCCESS;
-}
+InitStatus R3BRpcMapped2PreCalPar::ReInit() { return kSUCCESS; }
 
 void R3BRpcMapped2PreCalPar::Exec(Option_t* opt)
 {
 
-    //loop over the 3 mapped structures
+    // loop over the 3 mapped structures
 
-    //loop over strip data
+    // loop over strip data
     Int_t nHits = fMappedDataCA->GetEntries();
     for (Int_t i = 0; i < nHits; i++)
     {
         auto map1 = (R3BRpcMappedData*)(fMappedDataCA->At(i));
 
         UInt_t iDetector = map1->GetDetId();
-        UInt_t iStrip = map1->GetChannelId();   // now 1..41
-        UInt_t iEdge_Side = map1->GetEdge()*2 + map1->GetSide();           // 0,3
-        fEngine->Fill(iDetector+1, iStrip, iEdge_Side+1, map1->GetFineTime());
+        UInt_t iStrip = map1->GetChannelId();                      // now 1..41
+        UInt_t iEdge_Side = map1->GetEdge() * 2 + map1->GetSide(); // 0,3
+        fEngine->Fill(iDetector + 1, iStrip, iEdge_Side + 1, map1->GetFineTime());
     }
 }
 
@@ -118,7 +115,8 @@ void R3BRpcMapped2PreCalPar::Reset() {}
 
 void R3BRpcMapped2PreCalPar::FinishEvent() {}
 
-void R3BRpcMapped2PreCalPar::FinishTask() {
+void R3BRpcMapped2PreCalPar::FinishTask()
+{
     fEngine->CalculateParamVFTX();
     fTCalPar->printParams();
 }

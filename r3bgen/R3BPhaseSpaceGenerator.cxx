@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -36,7 +36,7 @@ R3BPhaseSpaceGenerator::R3BPhaseSpaceGenerator(unsigned int seed)
 bool R3BPhaseSpaceGenerator::Init()
 {
     if (fMasses.size() < 2)
-        LOG(FATAL) << "R3BPhaseSpaceGenerator::Init: Not enough Particles! At least two are required.";
+        LOG(fatal) << "R3BPhaseSpaceGenerator::Init: Not enough Particles! At least two are required.";
 
     fTotMass = std::accumulate(fMasses.begin(), fMasses.end(), 0.);
     return true;

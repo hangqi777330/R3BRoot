@@ -43,7 +43,7 @@ compile_commands.json
 # Generated folders and files 
 geometry/neuland_v*.root
 geometry/*.geo.root
-build/
+build*/
 input/
 
 macros/
@@ -51,6 +51,7 @@ macros/
 .cache
 .idea/
 .vscode/
+.DS_Store
 build-r3broot.sh
 cmake-build-debug/
 
@@ -59,3 +60,5 @@ sofia/
 glad-tpc/
 
 frs/
+
+asyeos/

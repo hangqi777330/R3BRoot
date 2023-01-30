@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -64,7 +64,7 @@ R3BTofiHitModulePar::~R3BTofiHitModulePar() {}
 
 void R3BTofiHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTofiHitModulePar::putParams() called";
+    LOG(info) << "R3BTofiHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -99,21 +99,21 @@ void R3BTofiHitModulePar::clear() { fPlane = fPaddle = 0; }
 
 void R3BTofiHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BTofiHitModulePar: TOFi HIT Calibration Parameters: ";
-    LOG(INFO) << "   fPlane: " << fPlane;
-    LOG(INFO) << "   fPaddle: " << fPaddle;
-    LOG(INFO) << "   fOffset1: " << fOffset1;
-    LOG(INFO) << "   fOffset2: " << fOffset2;
-    LOG(INFO) << "   fToTOffset1: " << fToTOffset1;
-    LOG(INFO) << "   fToTOffset2: " << fToTOffset2;
-    LOG(INFO) << "   fSync: " << fSync;
-    LOG(INFO) << "   fVeff: " << fVeff;
-    LOG(INFO) << "   fLambda: " << fLambda;
-    LOG(INFO) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
-    LOG(INFO) << "   fDoubleExp2: " << fPar2a << "  " << fPar2b << "  " << fPar2c << "  " << fPar2d;
-    LOG(INFO) << "   fPol3: " << fPola << "  " << fPolb << "  " << fPolc << "  " << fPold;
-    LOG(INFO) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
-    LOG(INFO) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
+    LOG(info) << "   R3BTofiHitModulePar: TOFi HIT Calibration Parameters: ";
+    LOG(info) << "   fPlane: " << fPlane;
+    LOG(info) << "   fPaddle: " << fPaddle;
+    LOG(info) << "   fOffset1: " << fOffset1;
+    LOG(info) << "   fOffset2: " << fOffset2;
+    LOG(info) << "   fToTOffset1: " << fToTOffset1;
+    LOG(info) << "   fToTOffset2: " << fToTOffset2;
+    LOG(info) << "   fSync: " << fSync;
+    LOG(info) << "   fVeff: " << fVeff;
+    LOG(info) << "   fLambda: " << fLambda;
+    LOG(info) << "   fDoubleExp1: " << fPar1a << "  " << fPar1b << "  " << fPar1c << "  " << fPar1d;
+    LOG(info) << "   fDoubleExp2: " << fPar2a << "  " << fPar2b << "  " << fPar2c << "  " << fPar2d;
+    LOG(info) << "   fPol3: " << fPola << "  " << fPolb << "  " << fPolc << "  " << fPold;
+    LOG(info) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
+    LOG(info) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
               << fPar5walk;
 }
 

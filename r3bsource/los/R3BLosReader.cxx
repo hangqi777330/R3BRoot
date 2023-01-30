@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -53,7 +53,7 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, size_t offset)
 
 R3BLosReader::~R3BLosReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     if (fArray)
     {
         delete fArray;
@@ -67,24 +67,24 @@ R3BLosReader::~R3BLosReader()
 Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
     {
-        R3BLOG(FATAL, "Failed to setup structure information.");
+        R3BLOG(fatal, "Failed to setup structure information.");
         return kFALSE;
     }
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !mgr, "FairRootManager not found");
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found");
 
     header = (R3BEventHeader*)mgr->GetObject("EventHeader.");
     if (!header)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "EventHeader. not found");
+        R3BLOG(warn, "EventHeader. not found");
     }
 
     // Register output array in tree
@@ -121,7 +121,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BLosReader::Read()
 {
-    R3BLOG(DEBUG1, "Event data.");
+    R3BLOG(debug1, "Event data.");
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 

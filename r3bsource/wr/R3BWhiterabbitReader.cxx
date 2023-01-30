@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -32,16 +32,12 @@ R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, size_
 {
 }
 
-R3BWhiterabbitReader::~R3BWhiterabbitReader()
-{
-    if (fEventHeader)
-        delete fEventHeader;
-}
+R3BWhiterabbitReader::~R3BWhiterabbitReader() {}
 
 Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    LOG(INFO) << "R3BWhiterabbitReader::Init()";
+    LOG(info) << "R3BWhiterabbitReader::Init()";
     EXT_STR_h101_whiterabbit_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_whiterabbit, 0);
 
     if (!ok)
@@ -56,11 +52,11 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
     fEventHeader = (R3BEventHeader*)frm->GetObject("EventHeader.");
     if (!fEventHeader)
     {
-        LOG(WARNING) << "R3BWhiterabbitReader::Init() R3BEventHeader not found";
+        LOG(warn) << "R3BWhiterabbitReader::Init() R3BEventHeader not found";
         fEventHeader = (R3BEventHeader*)frm->GetObject("R3BEventHeader");
     }
     else
-        LOG(INFO) << "R3BWhiterabbitReader::Init() R3BEventHeader found";
+        LOG(info) << "R3BWhiterabbitReader::Init() R3BEventHeader found";
 
     fData->TIMESTAMP_MASTER_ID = 0;
 
@@ -84,7 +80,7 @@ Bool_t R3BWhiterabbitReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
+                 "Event %lu: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->TIMESTAMP_MASTER_ID);

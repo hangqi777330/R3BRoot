@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -56,7 +56,7 @@ R3BMwpc2Mapped2Cal::R3BMwpc2Mapped2Cal(const char* name, Int_t iVerbose)
 // Virtual R3BMwpc2Mapped2Cal: Destructor
 R3BMwpc2Mapped2Cal::~R3BMwpc2Mapped2Cal()
 {
-    LOG(INFO) << "R3BMwpc2Mapped2Cal: Delete instance";
+    LOG(info) << "R3BMwpc2Mapped2Cal: Delete instance";
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
 }
@@ -68,17 +68,17 @@ void R3BMwpc2Mapped2Cal::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(ERROR) << "FairRuntimeDb not opened!";
+        LOG(error) << "FairRuntimeDb not opened!";
     }
 
     fCal_Par = (R3BMwpc2CalPar*)rtdb->getContainer("mwpc2CalPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BMwpc2Mapped2Cal::Init() Couldn't get handle on mwpc2CalPar container";
+        LOG(error) << "R3BMwpc2Mapped2Cal::Init() Couldn't get handle on mwpc2CalPar container";
     }
     else
     {
-        LOG(INFO) << "R3BMwpc2Mapped2Cal:: mwpc2CalPar container open";
+        LOG(info) << "R3BMwpc2Mapped2Cal:: mwpc2CalPar container open";
     }
     return;
 }
@@ -90,9 +90,9 @@ void R3BMwpc2Mapped2Cal::SetParameter()
     NumPadY = fCal_Par->GetNumPadsY();           // Number of Pads in Y
     NumParams = fCal_Par->GetNumParametersFit(); // Number of parameters in the Fit
 
-    LOG(INFO) << "R3BMwpc2Mapped2Cal: NumPadX: " << NumPadX;
-    LOG(INFO) << "R3BMwpc2Mapped2Cal: NumPadY: " << NumPadY;
-    LOG(INFO) << "R3BMwpc2Mapped2Cal: Number of fit parameters: " << NumParams;
+    LOG(info) << "R3BMwpc2Mapped2Cal: NumPadX: " << NumPadX;
+    LOG(info) << "R3BMwpc2Mapped2Cal: NumPadY: " << NumPadY;
+    LOG(info) << "R3BMwpc2Mapped2Cal: Number of fit parameters: " << NumParams;
 
     CalParams = new TArrayF();
     Int_t array_size = (NumPadX + NumPadY) * NumParams;
@@ -104,7 +104,7 @@ void R3BMwpc2Mapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc2Mapped2Cal::Init()
 {
-    LOG(INFO) << "R3BMwpc2Mapped2Cal::Init()";
+    LOG(info) << "R3BMwpc2Mapped2Cal::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -144,14 +144,14 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
 
     if (!fCal_Par)
     {
-        LOG(ERROR) << "NO Container Parameter!, pedestals will be set to zero";
+        LOG(error) << "NO Container Parameter!, pedestals will be set to zero";
     }
 
     // Reading the Input -- Mapped Data --
     Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY))
-        LOG(WARNING) << "R3BMwpc2Mapped2Cal: nHits>(NumPadX+NumPadY)";
-    if (nHits==0)
+        LOG(warn) << "R3BMwpc2Mapped2Cal: nHits>(NumPadX+NumPadY)";
+    if (nHits == 0)
         return;
 
     R3BMwpcMappedData** mappedData = new R3BMwpcMappedData*[nHits];
@@ -173,7 +173,7 @@ void R3BMwpc2Mapped2Cal::Exec(Option_t* option)
         else if (planeId == 3) // Y
             nbpad = (padId + NumPadX) * NumParams;
         else
-            LOG(ERROR) << "Plane " << planeId << " does not exist in MWPC2";
+            LOG(error) << "Plane " << planeId << " does not exist in MWPC2";
 
         pedestal = CalParams->GetAt(nbpad);
         charge = mappedData[i]->GetQ() - pedestal;
@@ -195,7 +195,7 @@ void R3BMwpc2Mapped2Cal::Finish() {}
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc2Mapped2Cal::Reset()
 {
-    LOG(DEBUG) << "Clearing Mwpc2CalData Structure";
+    LOG(debug) << "Clearing Mwpc2CalData Structure";
     if (fMwpcCalDataCA)
         fMwpcCalDataCA->Clear();
 }

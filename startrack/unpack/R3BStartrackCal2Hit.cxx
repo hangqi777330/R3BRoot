@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -59,7 +59,7 @@ R3BStartrackCal2Hit::R3BStartrackCal2Hit()
 R3BStartrackCal2Hit::~R3BStartrackCal2Hit()
 {
 
-    LOG(INFO) << "R3BStartrackCal2Hit: Delete instance";
+    LOG(info) << "R3BStartrackCal2Hit: Delete instance";
     delete fStartrackHitCA;
     delete fStartrackerHitCA;
 }
@@ -80,8 +80,8 @@ void R3BStartrackCal2Hit::SetParContainers()
 
     if (fStartrackHitPar)
     {
-        LOG(INFO) << "-I- R3BStartrackCal2Hit::SetParContainers() ";
-        LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded ";
+        LOG(info) << "-I- R3BStartrackCal2Hit::SetParContainers() ";
+        LOG(info) << "-I- Container R3BStartrackHitPar  loaded ";
     }
 }
 

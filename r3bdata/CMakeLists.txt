@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -81,7 +81,7 @@ xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
 califaData/R3BCalifaCrystalCalData.cxx
 califaData/R3BCalifaMappedData.cxx
-califaData/R3BCalifaHitData.cxx
+califaData/R3BCalifaClusterData.cxx
 califaData/R3BCalifaPoint.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx
@@ -134,6 +134,7 @@ pspData/R3BPspxCalData.cxx
 pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
 losData/R3BLosCalData.cxx
+losData/R3BLosTCalData.cxx
 losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx
@@ -223,6 +224,6 @@ set(HEADERS ${HEADERS} R3BDetectorList.h)
 
 set(LINKDEF DataLinkDef.h)
 set(LIBRARY_NAME R3BData)
-set(DEPENDENCIES Base FairTools)
+set(DEPENDENCIES Base FairTools ${VMCLIB} FairLogger::FairLogger)
 
 generate_library()

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -52,36 +52,38 @@ R3BAlpideMapped2Cal::R3BAlpideMapped2Cal(const TString& name, Int_t iVerbose)
 // Virtual R3BAlpideMapped2Cal::Destructor
 R3BAlpideMapped2Cal::~R3BAlpideMapped2Cal()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "");
     if (fAlpideCalData)
+    {
         delete fAlpideCalData;
+    }
 }
 
 void R3BAlpideMapped2Cal::SetParContainers()
 {
     // Parameter Container
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
-    R3BLOG_IF(FATAL, !rtdb, "FairRuntimeDb not found");
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fMap_Par = (R3BAlpideMappingPar*)rtdb->getContainer("alpideMappingPar");
-    R3BLOG_IF(FATAL, !fMap_Par, "Container alpideMappingPar not found");
+    R3BLOG_IF(fatal, !fMap_Par, "Container alpideMappingPar not found");
 }
 
 void R3BAlpideMapped2Cal::SetParameter()
 {
     //--- Parameter Container ---
-    // R3BLOG(INFO, "Nb of sensors: " << fMap_Par->GetNbSensors());
+    // R3BLOG(info, "Nb of sensors: " << fMap_Par->GetNbSensors());
     fMap_Par->printParams();
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAlpideMapped2Cal::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     FairRootManager* mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -89,13 +91,14 @@ InitStatus R3BAlpideMapped2Cal::Init()
     fAlpideMappedData = (TClonesArray*)mgr->GetObject("AlpideMappedData");
     if (!fAlpideMappedData)
     {
-        R3BLOG(FATAL, "AlpideMappedData not found");
+        R3BLOG(fatal, "AlpideMappedData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
     fAlpideCalData = new TClonesArray("R3BAlpideCalData");
     mgr->Register("AlpideCalData", "ALPIDE_Cal", fAlpideCalData, !fOnline);
+    Reset();
 
     SetParameter();
     return kSUCCESS;
@@ -112,25 +115,28 @@ InitStatus R3BAlpideMapped2Cal::ReInit()
 // -----   Public method Execution   --------------------------------------------
 void R3BAlpideMapped2Cal::Exec(Option_t* option)
 {
-    // Reset entries in output arrays, local arrays
+    // Reset entries in the output arrays
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fAlpideMappedData->GetEntries();
-    if (!nHits)
+    Int_t nHits = fAlpideMappedData->GetEntriesFast();
+    if (nHits == 0)
+    {
         return;
+    }
 
     auto mappedData = new R3BAlpideMappedData*[nHits];
-
     for (Int_t i = 0; i < nHits; i++)
     {
         mappedData[i] = (R3BAlpideMappedData*)(fAlpideMappedData->At(i));
         auto det = mappedData[i]->GetSensorId();
         auto col = mappedData[i]->GetCol();
-        auto row = mappedData[i]->GetAds();
-        // AddCalData(mappedData[i]->GetSensorId(), GetCol(reg, dcol, ads), GetRow(ads));
+        auto row = mappedData[i]->GetRow();
+        // std::cout << det <<" "<< col <<" "<< row <<std::endl;
         if (fMap_Par->GetInUse(det, col, row) == 1)
+        {
             AddCalData(det, col, row);
+        }
     }
     if (mappedData)
         delete[] mappedData;
@@ -156,9 +162,11 @@ int R3BAlpideMapped2Cal::GetRow(int ads)
 // -----   Public method Reset   ------------------------------------------------
 void R3BAlpideMapped2Cal::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing CalData Structure");
+    R3BLOG(debug1, "Clearing CalData Structure");
     if (fAlpideCalData)
+    {
         fAlpideCalData->Clear();
+    }
 }
 
 // -----   Private method AddCalData  --------------------------------------------

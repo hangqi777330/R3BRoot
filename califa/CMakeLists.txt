@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -48,26 +48,12 @@ ${FAIRROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(SRCS
-#Put here your sourcefiles
-./sim/R3BCalifa.cxx
-./sim/R3BCalifaDigitizer.cxx
-./pars/R3BCalifaContFact.cxx
-./pars/R3BCalifaGeometry.cxx
-./pars/R3BCalifaMappingPar.cxx
-./pars/R3BCalifaCrystalCalPar.cxx
-./pars/R3BCalifaTotCalPar.cxx
-./pars/R3BCalifaHitPar.cxx
-./pars/R3BCalifaCrystalPars4Sim.cxx
-./calibration/R3BCalifaMapped2CrystalCalPar.cxx
-./calibration/R3BCalifaCrystalCal2TotCalPar.cxx
-./calibration/R3BCalifaMapped2CrystalCal.cxx
-./calibration/R3BCalifaCrystalCal2Hit.cxx
-./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
-./online/R3BCalifaOnlineSpectra.cxx
-./online/R3BCalifaJulichOnlineSpectra.cxx
-./online/R3BCalifaDemoOnlineSpectra.cxx
-./ana/R3BCalifaCrystalCalDataAnalysis.cxx
+file(GLOB SRCS 
+./sim/*.cxx
+./pars/*.cxx 
+./online/*.cxx
+./calibration/*.cxx
+./ana/*.cxx
 )
 
 # fill list of header files from list of source files
@@ -81,3 +67,6 @@ set(DEPENDENCIES
   Spectrum R3BBase R3BPassive R3BData R3BTracking Boost::regex)
 
 GENERATE_LIBRARY()
+
+add_subdirectory(geobase)
+add_subdirectory(test)

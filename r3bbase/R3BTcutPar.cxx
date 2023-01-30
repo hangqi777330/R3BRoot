@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -36,7 +36,7 @@ R3BTcutPar::R3BTcutPar(const TString& cutname)
 // ----  Method putParams ------------------------------------------------------
 void R3BTcutPar::putParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called for " << fCut->GetN() << " points");
+    R3BLOG(info, "called for " << fCut->GetN() << " points");
 
     TArrayF* p = new TArrayF(2);
     for (int n = 0; n < fCut->GetN(); n++)
@@ -54,7 +54,7 @@ void R3BTcutPar::putParams(FairParamList* list)
 // ----  Method getParams ------------------------------------------------------
 TCutG* R3BTcutPar::getParams(FairParamList* list)
 {
-    R3BLOG(INFO, "called");
+    R3BLOG(info, "called");
 
     TArrayF* p = new TArrayF(2);
     for (int n = 0; n < fMaxPoints; n++)
@@ -79,17 +79,17 @@ void R3BTcutPar::print()
 {
     if (fCut)
     {
-        R3BLOG(INFO, "for " << fCut->GetName());
+        R3BLOG(info, "for " << fCut->GetName());
         for (int n = 0; n < fCut->GetN(); n++)
         {
             Double_t a[2];
             fCut->GetPoint(n, a[0], a[1]);
-            LOG(INFO) << "CutPoint" << n << ": " << a[0] << " ; " << a[1];
+            LOG(info) << "CutPoint" << n << ": " << a[0] << " ; " << a[1];
         }
     }
     else
     {
-        R3BLOG(WARNING, "Cut parameters not found");
+        R3BLOG(warn, "Cut parameters not found");
     }
 }
 

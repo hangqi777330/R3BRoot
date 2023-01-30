@@ -2,7 +2,7 @@
 
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,7 +30,7 @@
 #pragma link C++ class R3BXBallCrystalHitSim+;
 #pragma link C++ class R3BCalifaMappedData+;
 #pragma link C++ class R3BCalifaCrystalCalData+;
-#pragma link C++ class R3BCalifaHitData+;
+#pragma link C++ class R3BCalifaClusterData+;
 #pragma link C++ class R3BCalifaPoint+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BDchFullPoint+;
@@ -126,6 +126,7 @@
 #pragma link C++ class R3BPspxHitData+;
 #pragma link C++ class R3BLosMappedData+;
 #pragma link C++ class R3BLosCalData+;
+#pragma link C++ class R3BLosTCalData+;
 #pragma link C++ class R3BLosHitData+;
 #pragma link C++ class R3BRoluMappedData+;
 #pragma link C++ class R3BRoluCalData+;

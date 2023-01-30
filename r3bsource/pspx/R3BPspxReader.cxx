@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -44,12 +44,12 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, size_t offset)
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
     printf("Length: %lu\n", LENGTH(data_o->PSPX));
-    R3BLOG(INFO, "Created " << 2 * LENGTH(data_o->PSPX) << " detectors.");
+    R3BLOG(info, "Created " << 2 * LENGTH(data_o->PSPX) << " detectors.");
 }
 
 R3BPspxReader::~R3BPspxReader()
 {
-    R3BLOG(DEBUG1, "");
+    R3BLOG(debug1, "");
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
     for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
     {
@@ -60,11 +60,11 @@ R3BPspxReader::~R3BPspxReader()
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
     if (!ok)
     {
-        R3BLOG(ERROR, "Failed to setup structure information.");
+        R3BLOG(error, "Failed to setup structure information.");
         return kFALSE;
     }
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
@@ -80,7 +80,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
                                                   fMappedItems[2 * d + f],
                                                   !fOnline);
             fMappedItems[2 * d + f]->Clear();
-            R3BLOG(INFO, "Registered Pspx" << d + 1 << "_" << xy[f]);
+            R3BLOG(info, "Registered Pspx" << d + 1 << "_" << xy[f]);
         }
     }
     memset(fData, 0, sizeof *fData);

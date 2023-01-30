@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,16 +19,7 @@
 #include "TMath.h"
 #include <TArrayF.h>
 
-// R3B headers
-#include "R3BEventHeader.h"
-#include "R3BFrsData.h"
-#include "R3BMusicHitData.h"
-
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
 #include "FairTask.h"
 
 class R3BIncomingIDPar;
@@ -101,7 +92,10 @@ class R3BAnalysisIncomingID : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
 
     // Accessor to select the MUSIC for the incoming ID
-    void SetMusicForPID() { fUseLOS = kFALSE; }
+    void SetMusicForPID() { fUseLOS = kFALSE, fUsePspx1 = kFALSE; }
+
+    // Accessor to select the LOS for the incoming ID
+    void SetLosForPID() { fUseLOS = kTRUE, fUsePspx1 = kFALSE; }
 
   private:
     void SetParameter();
@@ -110,10 +104,12 @@ class R3BAnalysisIncomingID : public FairTask
     TClonesArray* fHitItemsMusli;
     TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
     TClonesArray* fHitLos;
+    TClonesArray* fHitPspx1_x;
+    TClonesArray* fHitPspx1_y;
 
-    R3BEventHeader* fHeader; // Event header
-    Bool_t fOnline;          // Don't store data for online
-    Bool_t fUseLOS;          // Use LOS charge (otherwise MUSIC charge)
+    R3BEventHeader* fHeader;   // Event header
+    Bool_t fOnline;            // Don't store data for online
+    Bool_t fUseLOS, fUsePspx1; // Use LOS or PSPX1 charge (otherwise MUSIC charge)
     Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     Double_t fPos_p0;

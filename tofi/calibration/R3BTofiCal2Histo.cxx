@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -181,7 +181,7 @@ InitStatus R3BTofiCal2Histo::Init()
 
     if (!fNofModules)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
 
@@ -197,7 +197,7 @@ void R3BTofiCal2Histo::SetParContainers()
     fCal_Par = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fCal_Par)
     {
-        LOG(ERROR) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
+        LOG(error) << "R3BTofiCal2Histo::Init() Couldn't get handle on TofiHitPar. ";
     }
     //    fCal_Par->setChanged();
 }
@@ -299,7 +299,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2Histo::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -339,7 +339,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -347,7 +347,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitPar::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;
@@ -361,7 +361,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // prepare offset and sync calculation
                 if (fTofiQ < 0.1)
                 {
-                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
+                    LOG(debug) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -386,7 +386,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                         R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                         if (!par)
                         {
-                            LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                            LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                       << ", Bar: " << top->GetBarId();
                             ++top_i;
                             ++bot_i;
@@ -408,7 +408,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     R3BTofiHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
@@ -421,7 +421,7 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                     // walk corrections
                     if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. || para->GetPar3Walk() == 0. ||
                         para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.)
-                        LOG(INFO) << "Walk correction not found!";
+                        LOG(info) << "Walk correction not found!";
                     bot_ns = bot_ns - walk(bot_tot,
                                            para->GetPar1Walk(),
                                            para->GetPar2Walk(),
@@ -459,11 +459,11 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 if (!fTofiSmiley)
                 {
 
-                    LOG(DEBUG) << "Prepare histo for double exponential fit";
+                    LOG(debug) << "Prepare histo for double exponential fit";
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;
@@ -480,12 +480,12 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // prepare charge fit / quench correction
                 if (fTofiZ == true)
                 {
-                    LOG(DEBUG) << "Prepare histo for quenching correction";
+                    LOG(debug) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofiHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
-                        LOG(INFO) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                        LOG(info) << "R3BTofiCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                                   << ", Bar: " << top->GetBarId();
                         ++top_i;
                         ++bot_i;

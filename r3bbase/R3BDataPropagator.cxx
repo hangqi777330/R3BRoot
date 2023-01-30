@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "FairLogger.h"
+#include <FairRootManager.h>
 
 #include "R3BDataPropagator.h"
 #include "R3BLogger.h"
@@ -41,17 +42,17 @@ R3BDataPropagator::~R3BDataPropagator()
 
 InitStatus R3BDataPropagator::Init()
 {
-    LOG(INFO) << "R3BDataPropagator::Init()";
+    LOG(info) << "R3BDataPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
 
     fInputData = (TClonesArray*)frm->GetObject(fNameBranch);
     if (!fInputData)
     {
-        R3BLOG(FATAL, "branch " << fNameBranch << "not found");
+        R3BLOG(fatal, "branch " << fNameBranch << "not found");
         return kFATAL;
     }
     else
-        R3BLOG(INFO, "branch " << fNameBranch << " found");
+        R3BLOG(info, "branch " << fNameBranch << " found");
 
     frm->Register(fNameBranch, "Data", fInputData, kTRUE);
 

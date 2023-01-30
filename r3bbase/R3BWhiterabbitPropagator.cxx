@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -37,7 +37,7 @@ R3BWhiterabbitPropagator::R3BWhiterabbitPropagator(const TString& name, Int_t iV
 
 R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 {
-    LOG(DEBUG) << "R3BWhiterabbitPropagator::Delete instance";
+    LOG(debug) << "R3BWhiterabbitPropagator::Delete instance";
     if (fInputItem)
     {
         delete fInputItem;
@@ -47,11 +47,11 @@ R3BWhiterabbitPropagator::~R3BWhiterabbitPropagator()
 
 InitStatus R3BWhiterabbitPropagator::Init()
 {
-    LOG(INFO) << "R3BWhiterabbitPropagator::Init()";
+    LOG(info) << "R3BWhiterabbitPropagator::Init()";
     FairRootManager* frm = FairRootManager::Instance();
     if (NULL == frm)
     {
-        LOG(FATAL) << "R3BWhiterabbitPropagator::Init() FairRootManager not found";
+        LOG(fatal) << "R3BWhiterabbitPropagator::Init() FairRootManager not found";
         return kFATAL;
     }
 
@@ -59,7 +59,7 @@ InitStatus R3BWhiterabbitPropagator::Init()
     fInputItem = (TClonesArray*)frm->GetObject(fNameWR + "Data");
     if (!fInputItem)
     {
-        LOG(FATAL) << "R3BWhiterabbitPropagator::Init() " + fNameWR + "Data not found";
+        LOG(fatal) << "R3BWhiterabbitPropagator::Init() " + fNameWR + "Data not found";
         return kFATAL;
     }
 

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -89,11 +89,11 @@ class R3BTwimvsFootOnlineSpectra : public FairTask
     {
         if (id1 < 1)
         {
-            R3BLOG(FATAL, "id1 < 1, it should be at least 1");
+            R3BLOG(fatal, "id1 < 1, it should be at least 1");
         }
         if (id2 < 1)
         {
-            R3BLOG(FATAL, "id2 < 1, it should be at least 1");
+            R3BLOG(fatal, "id2 < 1, it should be at least 1");
         }
         fFootDetId1 = id1;
         fFootDetId2 = id2;

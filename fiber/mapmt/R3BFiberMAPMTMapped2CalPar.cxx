@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,6 +19,7 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
+#include <FairRootManager.h>
 #include <cassert>
 
 R3BFiberMAPMTMapped2CalPar::R3BFiberMAPMTMapped2CalPar(const char* a_name,
@@ -46,14 +47,14 @@ R3BFiberMAPMTMapped2CalPar::~R3BFiberMAPMTMapped2CalPar()
 
 InitStatus R3BFiberMAPMTMapped2CalPar::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     auto rm = FairRootManager::Instance();
-    R3BLOG_IF(FATAL, !rm, "FairRootManager not found");
+    R3BLOG_IF(fatal, !rm, "FairRootManager not found");
 
     fMapped = (TClonesArray*)rm->GetObject(fName + "Mapped");
     if (!fMapped)
     {
-        R3BLOG(FATAL, fName + " not found");
+        R3BLOG(fatal, fName + " not found");
         return kFATAL;
     }
 
@@ -66,7 +67,7 @@ InitStatus R3BFiberMAPMTMapped2CalPar::Init()
         f##NAME##TCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name); \
         if (!f##NAME##TCalPar)                                                         \
         {                                                                              \
-            R3BLOG(ERROR, "Could not find " << name);                                  \
+            R3BLOG(error, "Could not find " << name);                                  \
             return kFATAL;                                                             \
         }                                                                              \
         f##NAME##TCalPar->setChanged();                                                \

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,6 +21,7 @@
 #include "R3BPdcCalData.h"
 #include "R3BPdcHitData.h"
 #include "R3BTCalEngine.h"
+#include <FairRootManager.h>
 //#include "R3BPdcHitModulePar.h"
 //#include "R3BPdcHitPar.h"
 
@@ -106,7 +107,7 @@ InitStatus R3BPdcCal2Hit::Init()
         fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+            LOG(error) << "Could not get access to PdcHitPar-Container.";
             fNofHitPars = 0;
             return kFATAL;
         }
@@ -114,7 +115,7 @@ InitStatus R3BPdcCal2Hit::Init()
         fNofHitPars = fHitPar->GetNumModulePar();
         if (fNofHitPars == 0)
         {
-            LOG(ERROR) << "There are no Hit parameters in container PdcHitPar";
+            LOG(error) << "There are no Hit parameters in container PdcHitPar";
             return kFATAL;
         }
     */
@@ -135,7 +136,7 @@ InitStatus R3BPdcCal2Hit::Init()
     if (header == nullptr)
     {
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
-        R3BLOG(WARNING, "R3BEventHeader was found instead of EventHeader.");
+        R3BLOG(warn, "R3BEventHeader was found instead of EventHeader.");
     }
 
     fCalItems = (TClonesArray*)mgr->GetObject("PdcCal");
@@ -159,7 +160,7 @@ void R3BPdcCal2Hit::SetParContainers()
         fHitPar = (R3BPdcHitPar*)FairRuntimeDb::instance()->getContainer("PdcHitPar");
         if (!fHitPar)
         {
-            LOG(ERROR) << "Could not get access to PdcHitPar-Container.";
+            LOG(error) << "Could not get access to PdcHitPar-Container.";
             fNofHitPars = 0;
             return;
         }

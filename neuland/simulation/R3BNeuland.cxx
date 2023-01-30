@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -22,6 +22,7 @@
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include <FairRootManager.h>
 
 // Initialize variables from Birk' s Law
 static constexpr Double_t BirkdP = 1.032;
@@ -85,7 +86,7 @@ R3BNeuland::~R3BNeuland()
 
 void R3BNeuland::Initialize()
 {
-    LOG(INFO) << "R3BNeuland initialization ...";
+    LOG(info) << "R3BNeuland initialization ...";
 
     FairDetector::Initialize();
 
@@ -100,7 +101,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     {
         if (!fLastHitDone)
         {
-            LOG(WARNING) << "R3BNeuland: Incomplete hit discarded";
+            LOG(warn) << "R3BNeuland: Incomplete hit discarded";
             ResetValues();
         }
 
@@ -133,7 +134,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
         gMC->TrackMomentum(fMomOut);
 
         // Add Point
-        LOG(DEBUG) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
+        LOG(debug) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
                    << ") cm,  paddle " << fPaddleID << ", track " << fTrackID << ", energy loss " << fELoss << " GeV "
                    << gMC->GetStack()->GetCurrentParentTrackNumber();
 
@@ -184,7 +185,7 @@ void R3BNeuland::Register()
 
 void R3BNeuland::Print(Option_t*) const
 {
-    LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
+    LOG(info) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
 }
 
 void R3BNeuland::Reset()
@@ -223,7 +224,7 @@ void R3BNeuland::WriteParameterFile()
 
     if (!geoNodeNeuland)
     {
-        LOG(FATAL) << "volNeuland not found";
+        LOG(fatal) << "volNeuland not found";
     }
 
     fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -25,6 +25,7 @@
 
 class TClonesArray;
 class R3BMusliCalPar;
+class R3BEventHeader;
 
 class R3BMusliMapped2Cal : public FairTask
 {
@@ -56,7 +57,8 @@ class R3BMusliMapped2Cal : public FairTask
 
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-
+    
+    void SetLosMusWindow(Double_t min, Double_t max) { winL = min; winR = max; fUseMultHit = kTRUE;}
   private:
     void SetParameters();
 
@@ -70,9 +72,15 @@ class R3BMusliMapped2Cal : public FairTask
     Int_t fNumParamsEneFit;
     Int_t fNumParamsPosFit;
     Int_t fMaxMult;
+    Int_t fNumParamsMultHit;
     TArrayF* fEneCalParams;
     TArrayF* fPosCalParams;
+    TArrayF* fMultHitCalParams;
+    Double_t winL;
+    Double_t winR;
 
+    Bool_t fUseMultHit;
+    R3BEventHeader* fHeader; // Event header
     R3BMusliCalPar* fCal_Par;         /**< Parameter container. > */
     TClonesArray* fMusliMappedDataCA; /**< Array with Musli Mapped-input data. >*/
     TClonesArray* fMusliCalDataCA;    /**< Array with Musli Cal-output data. >*/

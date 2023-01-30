@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,7 +17,7 @@
 // ----------------------------------------------------------------------
 
 #ifndef R3BLogger_H
-#define R3BLogger_H
+#define R3BLogger_H 1
 
 #include <cstdlib>
 #include <fstream>
@@ -27,11 +27,11 @@
 
 #include "FairLogger.h"
 
+class R3BLogger;
+
 class R3BLogger : public FairLogger
 {
   public:
-    R3BLogger();
-
 #define R3BLOG(severity, x)                                                                                        \
     if (true)                                                                                                      \
     {                                                                                                              \
@@ -56,6 +56,7 @@ class R3BLogger : public FairLogger
         (void)0
 
   private:
+    R3BLogger();
     ~R3BLogger();
 
   public:

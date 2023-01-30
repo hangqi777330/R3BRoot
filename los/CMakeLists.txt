@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#   Copyright (C) 2019-2023 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -48,8 +48,10 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 calib/R3BLosMapped2Cal.cxx
+calib/R3BLosMapped2TCal.cxx
 params/R3BLosMapped2CalPar.cxx
 calib/R3BLosCal2Hit.cxx
+calib/R3BLosTCal2Hit.cxx
 R3BLosProvideTStart.cxx
 params/R3BLosHitPar.cxx
 params/R3BLosContFact.cxx

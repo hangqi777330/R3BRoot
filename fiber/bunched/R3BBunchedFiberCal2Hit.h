@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,6 +14,7 @@
 #ifndef R3BBUNCHEDFIBERCAL2HIT_H
 #define R3BBUNCHEDFIBERCAL2HIT_H 1
 
+#include <TClonesArray.h>
 #include "FairTask.h"
 
 #include <R3BTCalEngine.h>
@@ -125,14 +126,17 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
     void SetOrientation(Orientation opt) { fOrientation = opt; }
 
-    void SetExpId(Int_t opt) { fExpId = opt; } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
+    void SetExpId(Int_t opt)
+    {
+        fExpId = opt;
+    } // Mutator to set fExpId manually. It should be globally defined by EventHeader.
 
   private:
     void Standard();
     void S515();
 
     R3BEventHeader* header; /**< Event header. */
-    
+
     TString fName;
     Int_t fnEvents;
     Int_t maxevent;

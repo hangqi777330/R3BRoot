@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,6 +13,7 @@
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
+#include <TClonesArray.h>
 
 #include "R3BLogger.h"
 #include "R3BMwpcMappedData.h"
@@ -44,7 +45,7 @@ R3BMwpcReader::R3BMwpcReader(EXT_STR_h101_SOFMWPC* data, size_t offset)
 
 R3BMwpcReader::~R3BMwpcReader()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fArrayMwpc0)
     {
         delete fArrayMwpc0;
@@ -66,7 +67,7 @@ R3BMwpcReader::~R3BMwpcReader()
 Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
 {
     Int_t ok;
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     EXT_STR_h101_SOFMWPC_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SOFMWPC, 0);
     if (!ok)
     {
@@ -82,7 +83,7 @@ Bool_t R3BMwpcReader::Init(ext_data_struct_info* a_struct_info)
         FairRootManager::Instance()->Register("Mwpc2MappedData", "MWPC2", fArrayMwpc2, !fOnline);
     if (fMaxDet > 3)
         FairRootManager::Instance()->Register("Mwpc3MappedData", "MWPC3", fArrayMwpc3, !fOnline);
-    R3BLOG(INFO, "Max. number of MWPCs: " << fMaxDet);
+    R3BLOG(info, "Max. number of MWPCs: " << fMaxDet);
     Reset();
     memset(fData, 0, sizeof *fData);
 

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,7 @@
 #include "R3BTofiHitData.h"
 #include "R3BTofiHitModulePar.h"
 #include "R3BTofiHitPar.h"
+#include <FairRootManager.h>
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
@@ -207,14 +208,14 @@ InitStatus R3BTofiCal2HitS494::Init()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return kFATAL;
     }
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars == 0)
     {
-        LOG(ERROR) << "There are no Hit parameters in container TofiHitPar";
+        LOG(error) << "There are no Hit parameters in container TofiHitPar";
         return kFATAL;
     }
 
@@ -235,7 +236,7 @@ InitStatus R3BTofiCal2HitS494::Init()
     mgr->Register("TofiHit", "Land", fHitItems, kTRUE);
 
     if (!fTofiHisto)
-        LOG(INFO) << "No Cal2Hit Histograms will be created!";
+        LOG(info) << "No Cal2Hit Histograms will be created!";
 
     tofi_trig_map_setup();
 
@@ -248,7 +249,7 @@ void R3BTofiCal2HitS494::SetParContainers()
     fHitPar = (R3BTofiHitPar*)FairRuntimeDb::instance()->getContainer("TofiHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to TofiHitPar-Container.";
+        LOG(error) << "Could not get access to TofiHitPar-Container.";
         fNofHitPars = 0;
         return;
     }
@@ -414,7 +415,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             {
                 if (!s_was_trig_missing)
                 {
-                    LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
+                    LOG(error) << "R3BTofiCal2HitS494Par::Exec() : Missing trigger information!";
                     s_was_trig_missing = true;
                 }
                 ++n2;
@@ -454,7 +455,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
                     ++top_i;
                     ++bot_i;
@@ -462,7 +463,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    // LOG(ERROR) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
+                    // LOG(error) << "R3BTofiCal2HitS494Par::Exec() : more bars then expected! Det: " << iBar
                     //           << " allowed are 1.." << fPaddlesPerPlane;
                     ++top_i;
                     ++bot_i;
@@ -485,7 +486,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 R3BTofiHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(info) << "R3BTofiCal2HitS494::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     ++top_i;
                     ++bot_i;
@@ -494,7 +495,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(INFO) << "Walk correction not found!";
+                    LOG(info) << "Walk correction not found!";
                 auto bot_ns_walk = bot_ns - walk(bot_tot,
                                                  par->GetPar1Walk(),
                                                  par->GetPar2Walk(),
@@ -514,7 +515,7 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
                 if (std::isnan(THit))
                 {
-                    LOG(FATAL) << "ToFi THit not found";
+                    LOG(fatal) << "ToFi THit not found";
                 }
                 if (timeP0 == 0.)
                     timeP0 = THit;
@@ -610,20 +611,20 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 if (parz[0] > 0 && parz[2] > 0)
-                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
                 else
-                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
+                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 +
                                           (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width / 2 - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
@@ -631,16 +632,16 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                 {
                     if (iBar <= number_paddles / 2)
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width + (iBar - 1) * (paddle_width + air_gap_paddles)
                                    << " plane " << iPlane << " ibar " << iBar;
                     else
-                        LOG(DEBUG) << "x in this event "
+                        LOG(debug) << "x in this event "
                                    << -detector_width / 2 + paddle_width - air_gap_paddles +
                                           (iBar - 1) * (paddle_width + air_gap_paddles) + gap_center_layer
                                    << " plane " << iPlane << " ibar " << iBar;
                 }
-                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
+                LOG(debug) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
@@ -670,19 +671,19 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
-                LOG(DEBUG) << "Not in bar coincidence increase top counter";
+                LOG(debug) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
-                LOG(DEBUG) << "Not in bar coincidence increase bot counter";
+                LOG(debug) << "Not in bar coincidence increase bot counter";
             }
         }
     }
 
     // Now all hits in this event are analyzed
 
-    LOG(DEBUG) << "Hits in this event: " << event.size();
+    LOG(debug) << "Hits in this event: " << event.size();
     if (event.empty())
         events_wo_tofi_hits++;
 
@@ -706,10 +707,10 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
     std::sort(event.begin(), event.end(), [](hit const& a, hit const& b) { return a.time < b.time; });
     // Now we have all hits in this event time sorted
 
-    LOG(DEBUG) << "Charge Time xpos ypos plane bar";
+    LOG(debug) << "Charge Time xpos ypos plane bar";
     for (Int_t hit = 0; hit < event.size(); hit++)
     {
-        LOG(DEBUG) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
+        LOG(debug) << event[hit].charge << " " << event[hit].time << " " << event[hit].xpos << " " << event[hit].ypos
                    << " " << event[hit].plane << " " << event[hit].bar;
     }
 
@@ -746,15 +747,15 @@ void R3BTofiCal2HitS494::Exec(Option_t* option)
         }
     }
 
-    LOG(DEBUG) << "Used up hits in this event:";
+    LOG(debug) << "Used up hits in this event:";
     for (Int_t a = 0; a < event.size(); a++)
     {
-        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
+        LOG(debug) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
-            LOG(FATAL) << "Not all events analyzed!";
+            LOG(fatal) << "Not all events analyzed!";
     }
 
-    LOG(DEBUG) << "------------------------------------------------------\n";
+    LOG(debug) << "------------------------------------------------------\n";
     fnEvents++;
 }
 

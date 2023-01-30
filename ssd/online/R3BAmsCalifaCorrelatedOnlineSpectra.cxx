@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -24,7 +24,7 @@
 
 #include "R3BAmsCalifaCorrelatedOnlineSpectra.h"
 #include "R3BAmsHitData.h"
-#include "R3BCalifaHitData.h"
+#include "R3BCalifaClusterData.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "THttpServer.h"
@@ -85,7 +85,7 @@ R3BAmsCalifaCorrelatedOnlineSpectra::~R3BAmsCalifaCorrelatedOnlineSpectra() {}
 InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
 {
 
-    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init ";
+    LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -104,21 +104,21 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
     if (!fHitItemsAms)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
     }
 
     // get access to Hit data
-    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
+    fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaClusterData");
     if (!fHitItemsCalifa)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaHitData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaClusterData not found";
     }
 
     // get access to Hit data
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
     if (!fCalItemsLos)
     {
-        LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
+        LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
     }
 
     // CANVAS 7
@@ -303,7 +303,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
 
 void R3BAmsCalifaCorrelatedOnlineSpectra::Reset_AMS_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo";
+    LOG(info) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo";
 
     fh_Califa_coinc_petal1->Reset();
     fh_Califa_coinc_petal2->Reset();
@@ -334,7 +334,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found";
+        LOG(fatal) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found";
 
     // if(header->GetTrigger()!=1){cout << header->GetTrigger()<<endl;}
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != 1))
@@ -493,7 +493,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
                     timeLos[iPart] = timeLosM[iPart];
 
                     //    if(!(timeLosM[iPart] > 0.) && IS_NAN(timeLosM[iPart]))
-                    //        cout<<"R3BOnline WARNING!! LOS VFTX time < 0 or nan! If nan we take TAMEX time, if <0 no
+                    //        cout<<"R3BOnline warn!! LOS VFTX time < 0 or nan! If nan we take TAMEX time, if <0 no
                     //        ToF info for this event!! "<<timeLosM[iPart]<<endl;
                     // Line below only after VFTX and TAMEX clocks are synhronized!
                     //  if(IS_NAN(timeLosM[iPart])) timeLos[iPart] = timeLosT[iPart];
@@ -640,7 +640,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
         Double_t theta = 0., phi = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BCalifaHitData* hit = (R3BCalifaHitData*)fHitItemsCalifa->At(ihit);
+            R3BCalifaClusterData* hit = (R3BCalifaClusterData*)fHitItemsCalifa->At(ihit);
             if (!hit)
                 continue;
             theta = hit->GetTheta() / TMath::Pi() * 180.;

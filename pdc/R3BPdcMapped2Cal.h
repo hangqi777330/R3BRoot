@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -10,7 +10,6 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
 
 #ifndef R3BPDCMAPPED2TCAL
 #define R3BPDCMAPPED2TCAL
@@ -101,14 +100,14 @@ class R3BPdcMapped2Cal : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
   private:
-    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
-    TClonesArray* fCalTriggerItems;    /**< Array with cal trigger items - output data. */
+    TClonesArray* fMappedItems;     /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;        /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems; /**< Array with cal trigger items - output data. */
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
     UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
 
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
     Int_t fnEvents;
 
     // check for trigger should be done globablly (somewhere else)

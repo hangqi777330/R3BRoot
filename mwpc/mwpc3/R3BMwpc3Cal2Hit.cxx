@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -64,7 +64,7 @@ R3BMwpc3Cal2Hit::R3BMwpc3Cal2Hit(const char* name, Int_t iVerbose)
 /* ---- Virtual R3BMwpc3Cal2Hit: Destructor ---- */
 R3BMwpc3Cal2Hit::~R3BMwpc3Cal2Hit()
 {
-    R3BLOG(DEBUG1, "Destructor");
+    R3BLOG(debug1, "Destructor");
     if (fMwpcCalDataCA)
         delete fMwpcCalDataCA;
     if (fMwpcHitDataCA)
@@ -76,12 +76,12 @@ R3BMwpc3Cal2Hit::~R3BMwpc3Cal2Hit()
 /* ---- Public method Init   ---- */
 InitStatus R3BMwpc3Cal2Hit::Init()
 {
-    R3BLOG(INFO, "");
+    R3BLOG(info, "");
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
-        R3BLOG(FATAL, "FairRootManager not found");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
@@ -92,7 +92,7 @@ InitStatus R3BMwpc3Cal2Hit::Init()
     fMwpcCalDataCA = (TClonesArray*)rootManager->GetObject("Mwpc3CalData");
     if (!fMwpcCalDataCA)
     {
-        R3BLOG(FATAL, "Mwpc1CalData not found");
+        R3BLOG(fatal, "Mwpc1CalData not found");
         return kFATAL;
     }
 
@@ -686,7 +686,7 @@ Double_t R3BMwpc3Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 /* ----   Public method Reset  ---- */
 void R3BMwpc3Cal2Hit::Reset()
 {
-    R3BLOG(DEBUG1, "Clearing Mwpc3HitData Structure");
+    R3BLOG(debug1, "Clearing Mwpc3HitData Structure");
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }
