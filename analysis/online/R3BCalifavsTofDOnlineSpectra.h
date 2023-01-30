@@ -182,7 +182,6 @@ class R3BCalifavsTofDOnlineSpectra : public FairTask
     std::vector<Double_t> cal_Nf;
     std::vector<uint64_t> cal_time; 
 
-    // califa hit variables
     std::vector<Double_t> thetaList;
     std::vector<Double_t> phiList;
     std::vector<Double_t> energyList;

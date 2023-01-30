@@ -113,7 +113,6 @@ bool R3BCalifavsTofDOnlineSpectra::isFootDetect(TVector3 hit)
 
 InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 {
-    std::cout << "CalifavsTofDOnlineSpectra Init begin" << std::endl;
 
     R3BLOG(INFO, "");
     FairRootManager* mgr = FairRootManager::Instance();
@@ -150,7 +149,8 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
 
     // create Root File
     outfile = new TFile("protons.root","RECREATE");
-    outfile->cd();
+
+    /*outfile->cd();
     outtree = new TTree("genTbuffer","General Tree");
 
     // general vars
@@ -174,7 +174,6 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     outtree->Branch("cal_Nf",&cal_Nf);
     outtree->Branch("cal_time",&cal_time);
     
-    // califa hit vars
     outtree->Branch("theta",&thetaList);
     outtree->Branch("phi",&phiList);
     outtree->Branch("energy",&energyList);
@@ -205,7 +204,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     outtree->Branch("foot_phi",&foot_phi);
     outtree->Branch("foot_energy",&foot_energy);
 
-    //std::cout << "CalifavsTofDOnlineSpectra Init middle" << std::endl;
+    //std::cout << "CalifavsTofDOnlineSpectra Init middle" << std::endl;*/
 
     // Create histograms for detectors
 
@@ -422,7 +421,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::Init()
     run->AddObject(mainfolCalifa);*/
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_CalifavsTofD", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    //run->GetHttpServer()->RegisterCommand("Reset_CalifavsTofD", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     std::cout << "CalifavsTofDOnlineSpectra end" << std::endl;
     return kSUCCESS;
@@ -462,7 +461,6 @@ void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 
 void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 {
-    //std::cout << "CalifavsTofDOnlineSpectra Exec" << std::endl;
     //if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
         //return;
 
@@ -495,6 +493,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
     crystalHitsList.clear();
     clusterIdList.clear();
     timeList.clear();
+
     charge.clear();
     tof.clear();
     detectorId.clear();
@@ -634,6 +633,7 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
 	crystalHitsList.push_back(hit->GetNbOfCrystalHits());
 	clusterIdList.push_back(hit->GetClusterId());
 	timeList.push_back(hit->GetTime());
+	
     }
 
         /*fh2_Califa_theta_phi[0]->Fill(theta, phi); // always

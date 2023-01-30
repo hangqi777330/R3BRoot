@@ -431,7 +431,7 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 	  fNumPeaks = 2;
 	  fEnergyPeaks->Set(2);
 	  fEnergyPeaks->AddAt(1332.5,0);
-	  fEnergyPeaks->AddAt(1173.5,1);
+	  fEnergyPeaks->AddAt(1173.2,1);
 	} else if (sourceName == "AmBe")
 	{
 	  fNumPeaks = 3;
@@ -471,15 +471,18 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 	    if (fNumPeaks==2)
 	    {
 		TH1F* h3 = (TH1F*) h2->Clone("h3");
-		TH1F* h4 = (TH1F*) h2->Clone("h4");
-		h4->Add(hbkg,-1);
 		Double_t posX1 = fChannelPeaks[idx[1]];
 		Double_t posX2 = fChannelPeaks[idx[0]];
 
 		TF1* fFit = new TF1("fFit","exp([0]+[1]*x)+[2]*exp(-0.5*((x-[3])/[4])^2)+[5]*exp(-0.5*((x-[6])/[7])^2)",h3->GetXaxis()->GetXmin(),h3->GetXaxis()->GetXmax());
 		TF1* fExpo = new TF1("fExpo","expo",hbkg->GetXaxis()->GetXmin(),hbkg->GetXaxis()->GetXmax());
-		TF1* fGaus1 = new TF1("fGaus1","gaus",posX1-fSigma,posX1+fSigma);
-		TF1* fGaus2 = new TF1("fGaus2","gaus",posX2-fSigma,posX2+fSigma);
+		// axis range within limit
+                Double_t gaus1min = TMath::Max(posX1-fSigma,h3->GetXaxis()->GetXmin());
+		Double_t gaus1max = TMath::Min(posX1+fSigma,h3->GetXaxis()->GetXmax());
+		Double_t gaus2min = TMath::Max(posX2-fSigma,h3->GetXaxis()->GetXmin());
+		Double_t gaus2max = TMath::Min(posX2+fSigma,h3->GetXaxis()->GetXmax());
+		TF1* fGaus1 = new TF1("fGaus1","gaus",gaus1min,gaus1max);
+		TF1* fGaus2 = new TF1("fGaus2","gaus",gaus2min,gaus2max);
 		hbkg->Fit("fExpo","RQ");
 		h3->Fit("fGaus1","RQ");
 		h3->Fit("fGaus2","RQ+");
@@ -493,15 +496,11 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		fFit->SetParameter(7,fGaus2->GetParameter(2));
 		h3->Fit("fFit","RQ+");
 
-		//tempX[0] = fGaus1->GetParameter(1);
 		tempX[0] = fFit->GetParameter(3);
 		tempY[0] = fEnergyPeaks->GetAt(1);
-		//tempS[0] = fGaus1->GetParameter(2);
 		tempS[0] = fFit->GetParameter(4);
-		//tempX[1] = fGaus2->GetParameter(1);
 		tempX[1] = fFit->GetParameter(6);
 		tempY[1] = fEnergyPeaks->GetAt(0);
-		//tempS[1] = fGaus2->GetParameter(2);
 		tempS[1] = fFit->GetParameter(7);
 	    }
 	    
@@ -551,8 +550,8 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		// fit for function
 		auto graph = new TGraphErrors(numPeak,X[i],Y[i],eX[i],eY[i]);
 		Int_t crystalID = i+1;
-		graph->Fit("f1","WQRN");
-		graph->Fit("f1","RMQ+");
+		graph->Fit("f1","WQN");
+		graph->Fit("f1","MQ+");
 
 		Double_t chi2 = graph->Chisquare(f1,"");
 		if (chi2/numPeak < fChi2Threshold && AmBeSpectra[i])
@@ -570,7 +569,9 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		  for (Int_t t=0; t<3; t++)
 		  {
 	              Double_t expPeak = (AmBePeaks[t]-intercept)/slope;
-		      TF1 *fGaus3 = new TF1("fGaus3","gaus",expPeak-2*fSigma,expPeak+2*fSigma);
+		      Double_t gaus3min = TMath::Max(expPeak-2*fSigma,hPeak->GetXaxis()->GetXmin());
+		      Double_t gaus3max = TMath::Min(expPeak+2*fSigma,hPeak->GetXaxis()->GetXmax());
+		      TF1 *fGaus3 = new TF1("fGaus3","gaus",gaus3min,gaus3max);
 		      hPeak->Fit(fGaus3,"RQ+");
 		    
 		      Int_t posBin = (fGaus3->GetParameter(1) - hPeak->GetXaxis()->GetXmin())/hPeak->GetXaxis()->GetBinWidth(0);
@@ -588,13 +589,25 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		  }
 
 		  auto graph1 = new TGraphErrors(numPeak,X[i],Y[i],eX[i],eY[i]);
-		  graph1->Fit("f1","WQRN");
-		  graph1->Fit("f1","RMQ+");
+		  graph1->Fit("f1","WQN");
+		  graph1->Fit("f1","MQ+");
 		  chi2 = graph1->Chisquare(f1,"");
+		}
+
+		if (i > fNumCrystals/2) // reset problematic crystal
+		{
+		    if (f1->GetParameter(1)<10. or f1->GetParameter(1)>16.)
+		    {
+			f1->SetParameter(0,0.);
+			f1->SetParameter(1,0.);
+		    }
 		} else 
 		{
-		  // problem with first 2 sources fit
-                  // std::cout << "problematic crystal: " << i+1 << std::endl;
+		    if (f1->GetParameter(1)<1. or f1->GetParameter(1)>1.6)
+		    {
+			f1->SetParameter(0,0.);
+			f1->SetParameter(1,0.);
+		    }
 		}
 
 		// write histograms
@@ -644,153 +657,9 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
     fh2_chi2_crystal->Write();
     fh_numPeak->Write();
 
-    /*for (Int_t i=0; i<3; i++)
-    {
-	for (Int_t j=0; j<fNumCrystals; j++)
-	{
-	    if (fh_Map_nobkg[i*fNumCrystals+j])
-	    {
-		fh_Map_nobkg[i*fNumCrystals+j]->Write();
-	    }
-	}
-    }*/
-
     fCal_Par->setChanged();
     return;
 }
-
-/*void R3BCalifaMapped2CrystalCalPar::FitPeaks()
-{
-    Int_t numPars = 2; // Number of parameters=2 by default
-    if (fNumParam)
-    {
-        numPars = fNumParam;
-    }
-    
-    fCal_Par->SetNumCrystals(fNumCrystals);
-    fCal_Par->SetNumParametersFit(fNumParam);
-    fCal_Par->GetCryCalParams()->Set(numPars * fNumCrystals);
-
-    // maximum number of calibration points
-    // X: mapping level peaks
-    // Y: calibration point energiesi
-    Int_t maxPeaks = 20;
-    Double_t X[fNumCrystals][maxPeaks];
-    Double_t Y[fNumCrystals][maxPeaks];
-    for (Int_t i=0;i<fNumCrystals;i++)
-    {
-	for (Int_t j=0; j<maxPeaks; j++)
-	{
-	    X[i][j] = 0.;
-	    Y[i][j] = 0.;
-	}
-    }
-
-    // read in files
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t nread;
-    while((nread = getline(&line,&len,outfile)) != -1)
-    {
-	std::vector<char*> entry;
-	char* arr = strtok(line," ");
-	while (arr)
-	{
-	    entry.push_back(arr);
-	    arr = strtok(NULL," ");
-	}
-
-	std::string source = entry.at(0);
-	Int_t cryId = atoi(entry.at(1));
-	if (source=="22Na" && entry.size()==4)
-	{
-	    int start=0;
-	    while (X[cryId][start]>0.)
-	    {
-		start++;
-	    }
-	    X[cryId][start] = atof(entry.at(2));
-	    X[cryId][start+1] = atof(entry.at(3));
-	    Y[cryId][start] = 511.0;
-	    Y[cryId][start+1] = 1274.5;
-
-	}
-	if (source=="60Co" && entry.size()==4)
-	{
-	    int start=0;
-	    while (X[cryId][start]>0.)
-	    {
-		start++;
-	    }
-
-	    X[cryId][start] = atof(entry.at(2));
-	    X[cryId][start+1] = atof(entry.at(3));
-	    Y[cryId][start] = 1173.2;
-	    Y[cryId][start+1] = 1332.5;
-	}
-	if (source=="AmBe" && entry.size()==5)
-	{
-	    int start=0;
-
-	    while (X[cryId][start]>0.)
-	    {
-		start++;
-	    }
-	    X[cryId][start] = atof(entry.at(2));
-	    X[cryId][start+1] = atof(entry.at(3));
-	    X[cryId][start+2] = atof(entry.at(4));
-	    Y[cryId][start] = 3416;
-	    Y[cryId][start+1] = 3927;
-	    Y[cryId][start+2] = 4438;
-	}
-    }
-    
-    // for each crystal
-    // find the best calibration fit
-    Int_t fleft, fright;
-    for (Int_t i=0; i<fNumCrystals; i++)
-    {
-	if (i<fMap_Par->GetNumCrystals() / 2)
-	{
-	    fright = fMapHistos_right;
-	    fleft = fMapHistos_left;
-	} else
-	{
-	    fright = fMapHistos_rightp;
-	    fleft = fMapHistos_leftp;
-	}
-
-	TF1 *f1 = nullptr;
-	if (numPars == 2)
-	{
-	    f1 = new TF1("f1","[0]+[1]*x",fleft,fright);
-	}
-
-        // find actual number of peak data
-	Int_t numPeak = 0;
-	while (X[i][numPeak] > 0.)
-	{
-	    numPeak++;
-	}
-
-	if (numPeak<2)
-	{
-	    std::cout << "problem ID: " << i << std::endl;
-	}
-
-	TGraph* graph = new TGraph(numPeak,X[i],Y[i]);
-	graph->Fit("f1","Q");
-	graph->Draw("");
-
-	for (Int_t h=0; h<numPars; h++)
-	{
-	    fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h);
-	}
-    }
-
-    fCal_Par->setChanged();
-    return;
-}*/
 
 /*void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
 {
@@ -824,8 +693,6 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		LOG(DEBUG) << "CrystalId=" << i + 1 << " " << nfound << " " << fThreshold;
                 fChannelPeaks = (Double_t*)ss->GetPositionX();
 
-		//std::cout << "nfound: " << nfound << std::endl;
-
                 Int_t idx[nfound];
                 TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
 
@@ -841,7 +708,7 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
                 {
                     X[j] = fChannelPeaks[idx[nfound - j - 1]];
                     Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
-		    //std::cout << "the " << j << "th entry: channel: " << X[j] << " energy: " << Y[j] << std::endl;
+
                     LOG(DEBUG) << "CrystalId=" << i + 1 << " " << j + 1 << " " << X[j + 1];
                 }
                 X[nfound] = 0.;
@@ -900,10 +767,10 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
                 graph->Fit("f1", "Q"); // Quiet mode (minimum printing)
 		graph->Draw("");
 
+		std::cout << "crystalId: " << i+1 << std::endl;
                 for (Int_t h = 0; h < numPars; h++)
                 {
                     fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h);
-		    //std::cout<<"the "<<h<<"th parameter: "<<f1->GetParameter(h)<<std::endl;
                 }
             }
             else

@@ -1580,19 +1580,11 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 	Nf.clear();
 	time.clear();*/
 
-	//std::cout << "nHits: " << nHits << std::endl;
-
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BCalifaCrystalCalData*)fCalItemsCalifa->At(ihit);
             if (!hit)
                 continue;
-
-	    /*crystalId.push_back(hit->GetCrystalId());
-	    energy.push_back(hit->GetEnergy());
-	    Ns.push_back(hit->GetNs());
-	    Nf.push_back(hit->GetNf());
-	    time.push_back(hit->GetTime());*/
 
             Int_t cryId = hit->GetCrystalId();
 	    
@@ -1657,11 +1649,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         }
         if (maxEL > fMinProtonE && maxER > fMinProtonE)
         {
-	    //if (isFootDetect(master[0]) && isFootDetect(master[1])) {
-		//std::cout << "right: " << master[0].Theta()*57.3 << " " << master[0].Phi()*57.3 << endl;
-		//std::cout << "left: " << master[1].Theta()*57.3 << " " << master[1].Phi()*57.3 << endl;
 	    	fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
-            //}
 	}	
 
         // Comparison of hits to get energy, theta and phi correlations between them
