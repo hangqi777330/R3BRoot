@@ -424,7 +424,7 @@ InitStatus R3BCalifavsTofDOnlineSpectra::ReInit()
 void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
 {
     R3BLOG(info, "");
-    for (int i = 0; i < 2; i++)
+    /*for (int i = 0; i < 2; i++)
     {
         fh2_Califa_theta_phi[i]->Reset();
 	fh2_Califa_NsNf[i]->Reset();
@@ -440,7 +440,7 @@ void R3BCalifavsTofDOnlineSpectra::Reset_Histo()
     }
 
     fh2_Califa_NsNf[3]->Reset();
-    fh2_Q_tof->Reset();
+    fh2_Q_tof->Reset();*/
 }
 
 void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
@@ -601,9 +601,9 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* option)
         if (hit->GetEnergy() < fMinProtonE)
             continue;
 
-	thetaList.push_back(theta);
-	phiList.push_back(phi);
-	energyList.push_back(E);
+	thetaList.push_back(hit->GetTheta());
+	phiList.push_back(hit->GetPhi());
+	energyList.push_back(hit->GetEnergy());
 	NsList.push_back(hit->GetNs());
 	NfList.push_back(hit->GetNf());
 	crystalHitsList.push_back(hit->GetNbOfCrystalHits());

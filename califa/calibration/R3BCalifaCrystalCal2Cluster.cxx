@@ -232,38 +232,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
   else
 	  return;
 
-    std::list<R3BCalifaCrystalCalData*> unusedCrystalHits;
-    auto addHit = [&](R3BCalifaCrystalCalData* aCalData) {
-        if (aCalData->GetEnergy() > fThreshold)
-            unusedCrystalHits.push_back(aCalData);
-        else
-            LOG(debug) << "R3BCalifaCrystalCal2Cluster::Exec(): rejected hit in " << aCalData->GetCrystalId()
-                       << " because of low energy (E=" << aCalData->GetEnergy() << "<=" << fThreshold << "=E_threshold";
-    };
-
-    // get rid if redundant (dual range) crystals
-    {
-        std::map<uint32_t, R3BCalifaCrystalCalData*> crystalId2Pos;
-        for (auto& aCalData : TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalCalData))
-            crystalId2Pos[aCalData.GetCrystalId()] = &aCalData;
-
-        R3BLOG(debug, "crystalId2Pos.size()=" << crystalId2Pos.size());
-
-        for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
-            if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
-            {
-                auto proton = *crystalId2Pos.find(k1.first + fNbCrystalsGammaRange);
-                // k2: higher id, proton branch
-                if (proton.second->GetEnergy() < fDRThreshold)
-                    addHit(k1.second); // gamma
-                else
-                    addHit(proton.second);
-            }
-            else if (!crystalId2Pos.count(k1.first - fNbCrystalsGammaRange))
-                // not a hit where two ranges were hit
-                addHit(k1.second);
-    }
-    R3BLOG(debug, "after uniquifying, we have " << unusedCrystalHits.size() << " crystal hits.");
 
   std::list<R3BCalifaCrystalCalData*> unusedCrystalHits;
   auto addHit = [&](R3BCalifaCrystalCalData* aCalData) {
@@ -333,14 +301,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* opt)
             clusterHit = TCAHelper<R3BCalifaClusterData>::AddNew(
                 *fCalifaClusterData, time, vhighest.Theta(), vhighest.Phi(), clusterId);
         }
-
-        // loop through remaining crystals, remove matches from list.
-        auto i = unusedCrystalHits.begin();
-        while (i != unusedCrystalHits.end())
-            if (this->Match(highest, *i))
-            {
-                LOG(debug) << "R3BCalifaCrystalCal2Cluster::Exec(): adding  "
-                           << "crystal " << (*i)->GetCrystalId() << ", E=" << (*i)->GetEnergy();
 
       // loop through remaining crystals, remove matches from list.
       auto i = unusedCrystalHits.begin();
