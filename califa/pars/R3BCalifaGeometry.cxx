@@ -59,7 +59,7 @@ bool R3BCalifaGeometry::Init(Int_t version)
     {
         case 2019:
             // BARREL: demonstrator from 2019
-            geoPath += "califa_s444.geo.root";
+            geoPath += "califa_v2019.11.geo.root";
             fNumCrystals = 10000;
             break;
 

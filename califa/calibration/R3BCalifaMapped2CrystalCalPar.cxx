@@ -594,7 +594,7 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 		  chi2 = graph1->Chisquare(f1,"");
 		}
 
-		if (i > fNumCrystals/2) // reset problematic crystal
+		/*if (i > fNumCrystals/2) // reset problematic crystal
 		{
 		    if (f1->GetParameter(1)<10. or f1->GetParameter(1)>16.)
 		    {
@@ -608,7 +608,7 @@ void R3BCalifaMapped2CrystalCalPar::FitPeaks()
 			f1->SetParameter(0,0.);
 			f1->SetParameter(1,0.);
 		    }
-		}
+		}*/
 
 		// write histograms
 		TPolyMarker *pm1 = new TPolyMarker(numPeak,X[i],Y[i]);
