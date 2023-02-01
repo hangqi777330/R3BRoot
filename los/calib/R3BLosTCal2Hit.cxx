@@ -18,6 +18,7 @@
 
 #include "R3BLosTCal2Hit.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
 #include "R3BLosHitData.h"
