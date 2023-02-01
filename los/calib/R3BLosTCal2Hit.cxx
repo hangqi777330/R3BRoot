@@ -20,6 +20,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRuntimeDb.h"
+#include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
