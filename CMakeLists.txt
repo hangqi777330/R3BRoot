@@ -21,6 +21,7 @@ if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 # Check if cmake has the required version
+# was 3.15
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
 # set cmake policies
