@@ -132,11 +132,11 @@ class R3BTrackingS522 : public FairTask
 
     // Transofrming input detector hit (point) into laboratory system
     void TransformPoint(TVector3& point, TVector3* rotation, TVector3* translation);
-
+    void TransformPoint1(TVector3& point, TVector3 rotation, TVector3 translation);
     // Setup energy cuts in foot and fibers 
     void SetFootEnergyMinMax(double min, double max);
     void SetFiberEnergyMinMax(double min, double max);
-    
+
     // Setters for the alignment procedure
     void SetDoAlignment(bool flag) { DoAlignment = flag; }
     void SetReferencePoQ(Double_t val) { reference_PoQ = val; }
@@ -148,23 +148,23 @@ class R3BTrackingS522 : public FairTask
     //Storing indices of hits in TCA for potential track candidates
     struct Track
     {
-        double f1_x;
-        double f1_z;
-        double f2_y;
-        double f2_z;
-        double f15_x;
-        double f15_z;
-        double f16_y;
-        double f16_z;
-        double tx0;
-        double ty0;
-        double f32_x;
-        double f32_z;
-        double f30_x;
-        double f30_y;
-        double f30_z;
-        double last_x;
-        double last_z;
+	    double f1_x;
+	    double f1_z;
+	    double f2_y;
+	    double f2_z;
+	    double f15_x;
+	    double f15_z;
+	    double f16_y;
+	    double f16_z;
+	    double tx0;
+	    double ty0;
+	    double f32_x;
+	    double f32_z;
+	    double f30_x;
+	    double f30_y;
+	    double f30_z;
+	    double last_x;
+	    double last_z;
     };
     std::vector<Track> tracks_in; //track candidates in FOOT
     std::vector<Track> tracks_out;//track candidates in FOOT
@@ -174,31 +174,46 @@ class R3BTrackingS522 : public FairTask
     vector<UInt_t> f2_hits;
     vector<UInt_t> f15_hits;
     vector<UInt_t> f16_hits;
-    TVector3 m0_point, m1_point, f1_point, f2_point, f15_point,f16_point, f30_point, f32_point, last_point;
-    
+    TVector3 m0_point, m1_point, f1_point, f2_point, f15_point,f16_point, f30_point, f32_point, flast_point;
+
     bool IsGoodFiberHit(R3BFiberMAPMTHitData* fhit);
     bool IsGoodFootHit(R3BFootHitData* fhit);
     bool SortFootData();
     bool MakeIncomingTracks();
     bool MakeOutgoingTracks();
+    // Data containesr needed only for the Alignment() function
+    struct det_points
+    {
+	    TVector3 f1;
+	    TVector3 f2;
+	    TVector3 f30;
+	    TVector3 f32;
+	    TVector3 flast;
+    };
+    std::vector<det_points> det_points_vec;
+
+    // TVector3 mwpc_point, f10_point, f11_point, f12_point, tofd_point;
+    TVector3 f1_ang_offset, f2_ang_offset, f30_ang_offset, f32_ang_offset, flast_ang_offset;
+    TVector3 f1_pos_offset, f2_pos_offset, f30_pos_offset, f32_pos_offset, flast_pos_offset;
+
 
   private:
     // Input hit data from the TClonesArray
     // do not change the order, add new det in the end
     enum DetectorInstances
     {
-        DET_FI_FIRST,
-        DET_FI30 = DET_FI_FIRST,
-        DET_FI31,
-        DET_FI32,
-        DET_FI33,
-        DET_FI_LAST = DET_FI33,
-        DET_TOFD,
-        FOOT_HITDATA,
-        MWPC0_HITDATA,
-        MWPC1_HITDATA,
-        FRS_DATA,
-        DET_MAX
+	    DET_FI_FIRST,
+	    DET_FI30 = DET_FI_FIRST,
+	    DET_FI31,
+	    DET_FI32,
+	    DET_FI33,
+	    DET_FI_LAST = DET_FI33,
+	    DET_TOFD,
+	    FOOT_HITDATA,
+	    MWPC0_HITDATA,
+	    MWPC1_HITDATA,
+	    FRS_DATA,
+	    DET_MAX
     };
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
@@ -206,7 +221,7 @@ class R3BTrackingS522 : public FairTask
     // Names of essential branches in the input tree
     // do not change the order! add new data in the end
     const char* fDetectorNames[DET_MAX + 1] = { "Fi30Hit", "Fi31Hit", "Fi32Hit", "Fi33Hit",
-        "TofdHit", "FootHitData", "Mwpc0HitData", "Mwpc1HitData", "FrsData", NULL };
+	    "TofdHit", "FootHitData", "Mwpc0HitData", "Mwpc1HitData", "FrsData", NULL };
 
     R3BEventHeader* fHeader;
     std::vector<TClonesArray*> fDataItems; // input data

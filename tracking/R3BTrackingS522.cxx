@@ -299,6 +299,17 @@ cout << "\nGood event!\n";
 
     is_good_event = true;
 
+    if (DoAlignment)
+    {
+        det_points align_data;
+        align_data.f1.SetXYZ(f1_point.X(), 0, f1_point.Z());
+        align_data.f2.SetXYZ(0, f2_point.Y(), f2_point.Z());
+        align_data.f30.SetXYZ(f30_point.X(), 0, f30_point.Z());
+        align_data.f32.SetXYZ(0, f32_point.Y(), f32_point.Z());
+        align_data.flast.SetXYZ(flast_point.X(), 0, flast_point.Z());
+	det_points_vec.push_back(align_data);
+    }
+    
     double delta_TY0, delta_TX0;
     for (auto & tin : tracks_in){
         for (auto & tout : tracks_out){
@@ -611,10 +622,10 @@ bool R3BTrackingS522::MakeOutgoingTracks()
                 if((f32->GetTime_ns() - f31->GetTime_ns())>20 ||
                         (f32->GetTime_ns() - f31->GetTime_ns())<(-10) ) continue;
 
-                last_point.SetXYZ(f31->GetX(), 0, 0); //cm
-                TransformPoint(last_point, &f31_angles, &f31_position);
-                tr.last_x = last_point.X();
-                tr.last_z = last_point.Z();
+                flast_point.SetXYZ(f31->GetX(), 0, 0); //cm
+                TransformPoint(flast_point, &f31_angles, &f31_position);
+                tr.last_x = flast_point.X();
+                tr.last_z = flast_point.Z();
                 angle_out = TMath::ATan((tr.last_x - tr.f32_x)/(tr.last_z - tr.f32_z)) * TMath::RadToDeg();
                 if(angle_out>(-10.) || angle_out<(-18.)) continue;
                 // We need to extrapolate Z position in f30 because it was used for Y measurement
@@ -660,6 +671,24 @@ void R3BTrackingS522::TransformPoint(TVector3& point, TVector3* rot, TVector3* t
     return;
 }
 
+void R3BTrackingS522::TransformPoint1(TVector3& point, TVector3 rot, TVector3 trans)
+{
+    r.SetToIdentity();
+    // First Euler rotation around Y axis
+    r.RotateY(rot.Y());
+    // get local X axis after first rotation
+    v3_localX.SetMagThetaPhi(1, r.ThetaX(), r.PhiX());
+    // Second Euler rotation around local X axis
+    r.Rotate(rot.X(), v3_localX);
+    // get local Z axis after second rotation
+    v3_localZ.SetMagThetaPhi(1, r.ThetaZ(), r.PhiZ());
+    // final rotation around local Z axis
+    r.Rotate(rot.Z(), v3_localZ);
+    point.Transform(r);
+    point += (trans);
+    return;
+}
+
 R3BTrack* R3BTrackingS522::AddTrackData(TVector3 mw, TVector3 poq, Double_t charge, Double_t aoz)
 {
     // Filling output track info
@@ -683,67 +712,202 @@ void R3BTrackingS522::SetFiberEnergyMinMax(double min, double max)
 }
 void R3BTrackingS522::Alignment()
 {
-    /*
-       double R3BTrackingS522::AlignmentErrorS522(const double* par)
-       {
-       gMDFTrackerS522->mwpc_ang_offset.SetXYZ(0, par[0], par[1]);
-       gMDFTrackerS522->mwpc_pos_offset.SetXYZ(par[2], par[3], par[4]);
+	int run_flag = 0;
+	std::cout << "\n\n----------------------------------------------------";
+/*	std::cout << "\n Ready for detector alignment using the following data set:";
+	std::cout << "\n\tNumber of reference tracks: " << det_points_vec.size();
+	std::cout << "\n\tFRS Brho: min = " << FrsBrhoMin << ", max = " << FrsBrhoMax;
+	std::cout << "\n\tFRS PoQ: min = " << FrsBrhoMin / 3.3356 << ", max = " << FrsBrhoMax / 3.3356;
+	std::cout << "\n\tP/Z reference: " << reference_PoQ << "GeV/c";
+*/	std::cout << "\n\n Do you want to continue? (0 = no, 1 = yes):  ";
+	std::cin >> run_flag;
+	if (run_flag == 0)
+		return;
 
-       gMDFTrackerS522->f10_ang_offset.SetXYZ(0, par[5], par[6]);
-       gMDFTrackerS522->f10_pos_offset.SetXYZ(par[7], par[8], par[9]);
+	// Now define minimizer
+	ROOT::Math::Minimizer* minimizer = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+	const UInt_t NVarsFunctor = 25; // number of the alignment offsets: (2 angles + 3 offsets) x 4 detectors
+	const double* xs;
+	double step[NVarsFunctor];
+	double offset[NVarsFunctor];
+	Double_t min_offset[NVarsFunctor];
+	Double_t max_offset[NVarsFunctor];
+	TH1F* hist[NVarsFunctor];
+	char hname[100];
 
-       gMDFTrackerS522->f11_ang_offset.SetXYZ(0, par[10], par[11]);
-       gMDFTrackerS522->f11_pos_offset.SetXYZ(par[12], par[13], par[14]);
+	// For every detector: 3 Euler angles and 3 shifts
+	for (auto d = 0; d < 4; ++d)
+	{
+		for (auto a = 0; a < 2; ++a) // angle shifts in rad
+		{
+			min_offset[d * 5 + a] = -0.04;
+			max_offset[d * 5 + a] = 0.04;
+			step[d * 5 + a] = 0.001;
+		}
+		for (auto o = 0; o < 3; ++o) // position shifts in cm
+		{
+			min_offset[d * 5 + 2 + o] = -4.;
+			max_offset[d * 5 + 2 + o] = 4.;
+			step[d * 5 + 2 + o] = 0.01;
+		}
+	}
+	for (UInt_t i = 0; i < NVarsFunctor; i++)
+	{
+		sprintf(hname, "par%d", i);
+		hist[i] = new TH1F(hname, hname, 100, min_offset[i], max_offset[i]);
+	}
+	std::cout << "\n\n-- Perfroming minimization for the detector alignment. Please wait... \n";
 
-       gMDFTrackerS522->f12_ang_offset.SetXYZ(0, par[15], par[16]);
-       gMDFTrackerS522->f12_pos_offset.SetXYZ(par[17], par[18], par[19]);
+	// Setting up Minimizer function parameters
+	Double_t precision = 1e-10; // 0 - default precision will be automaticalle determined
+	Double_t tolerance = 0.02;
+	minimizer->SetMaxFunctionCalls(1000000000); // for Minuit/Minuit2
+	minimizer->SetMaxIterations(100);           // for GSL
+	minimizer->SetTolerance(tolerance);
+	minimizer->SetPrecision(precision);
+	minimizer->SetPrintLevel(2);
+	minimizer->SetStrategy(0); // to run faster
+	ROOT::Math::Functor f(&R3BTrackingS522::AlignmentErrorS522, NVarsFunctor);
+	minimizer->SetFunction(f);
+	minimizer->SetPrintLevel(0);
 
-       Double_t mdf_input[8]; // data container for the MDF function
+	// Getting experimental data and doing minimization
+	UInt_t i;
+	Int_t bs = 0;
+	bool good_minimum = false;
+	while (bs < 100) // running several minimizations
+	{
+		minimizer->Clear();
+		for (i = 0; i < NVarsFunctor; i++) // sampling +=50% from limits
+		{
+			offset[i] = gRandom->Uniform(min_offset[i] * 0.5, max_offset[i] * 0.5);
+			minimizer->SetVariable(i, Form("par%d", i), offset[i], step[i]);
+			minimizer->SetVariableLimits(i, min_offset[i], max_offset[i]);
+		}
+		minimizer->Minimize();
+		xs = minimizer->X();
+		// if(minimizer->Status() !=0) continue; //valid minimum
+		// Check if all paramters are "far" from limits
+		for (i = 0; i < NVarsFunctor; i++)
+		{
+			if (fabs((xs[i] - min_offset[i]) / min_offset[i]) < 0.1 ||
+					fabs((max_offset[i] - xs[i]) / max_offset[i]) < 0.1)
+				break;
+		}
+		if (i != NVarsFunctor)
+		{
+			// std::cout << "\n\n -- Parameter is too close to the limit!! ";
+			continue;
+		}
+		else
+		{
+			std::cout << "\n\n-- Good parameters are found!!";
+			good_minimum = true;
+		}
+		std::cout << "\n-- Minimization No. " << bs << "\n-- Minimum: f(";
+		for (i = 0; i < NVarsFunctor; i++)
+		{
+			std::cout << xs[i];
+			hist[i]->Fill(xs[i]);
+			if (i != NVarsFunctor - 1)
+				std::cout << ",";
+		}
+		std::cout << ") = " << minimizer->MinValue();
+		std::cout << "\n-- Minimizer status: " << minimizer->Status() << std::endl;
+		bs++;
+	}
+	// Outputing final info and histograms
+	if (minimizer->MinValue() < tolerance && f(xs) < tolerance)
+		std::cout << "-- Minimizer "
+			<< "   converged to the right minimum" << std::endl;
+	else
+	{
+		std::cout << "-- Minimizer "
+			<< "   failed to converge !!!" << std::endl;
+	}
+	TCanvas* c1 = new TCanvas("c1", "c1", 1000, 1000);
+	c1->Divide(5, 4);
+	for (UInt_t v = 0; v < NVarsFunctor; v++)
+	{
+		c1->cd(v + 1);
+		hist[v]->Draw();
+	}
+	return;
+}
 
-       double v2 = 0;
-       double v = 0;
-       int counter = 0;
-       for (auto& d : (gMDFTrackerS522->det_points_vec))
-       {
-       gMDFTrackerS522->mwpc_point = d.mwpc;
-       gMDFTrackerS522->f10_point = d.f10;
-       gMDFTrackerS522->f11_point = d.f11;
-       gMDFTrackerS522->f12_point = d.f12;
 
-    // This will transform "det_point" vectors into lab frame
-    gMDFTrackerS522->TransformPoint(gMDFTrackerS522->mwpc_point,
-    gMDFTrackerS522->GetEulerAnglesMWPC() + gMDFTrackerS522->mwpc_ang_offset,
-    gMDFTrackerS522->GetPositionMWPC() + gMDFTrackerS522->mwpc_pos_offset);
+double R3BTrackingS522::AlignmentErrorS522(const double* par)
+{
+	gMDFTrackerS522->f1_ang_offset.SetXYZ(par[0], par[1], par[2]);
+	gMDFTrackerS522->f1_pos_offset.SetXYZ(par[3], 0 , par[4]);
 
-    gMDFTrackerS522->TransformPoint(gMDFTrackerS522->f10_point,
-    gMDFTrackerS522->GetEulerAnglesF10() + gMDFTrackerS522->f10_ang_offset,
-    gMDFTrackerS522->GetPositionF10() + gMDFTrackerS522->f10_pos_offset);
+	gMDFTrackerS522->f2_ang_offset.SetXYZ(par[5], par[6], par[7]);
+	gMDFTrackerS522->f2_pos_offset.SetXYZ(0, par[8], par[9]);
 
-    gMDFTrackerS522->TransformPoint(gMDFTrackerS522->f11_point,
-    gMDFTrackerS522->GetEulerAnglesF11() + gMDFTrackerS522->f11_ang_offset,
-    gMDFTrackerS522->GetPositionF11() + gMDFTrackerS522->f11_pos_offset);
+	gMDFTrackerS522->f30_ang_offset.SetXYZ(par[10], par[11], par[12]);
+	gMDFTrackerS522->f30_pos_offset.SetXYZ(par[13], 0, par[14]);
 
-    gMDFTrackerS522->TransformPoint(gMDFTrackerS522->f12_point,
-    gMDFTrackerS522->GetEulerAnglesF12() + gMDFTrackerS522->f12_ang_offset,
-    gMDFTrackerS522->GetPositionF12() + gMDFTrackerS522->f12_pos_offset);
+	gMDFTrackerS522->f32_ang_offset.SetXYZ(par[15], par[16], par[17]);
+	gMDFTrackerS522->f32_pos_offset.SetXYZ(0, par[18], par[19]);
 
-    mdf_input[0] = gMDFTrackerS522->mwpc_point.X();
-    mdf_input[1] = gMDFTrackerS522->mwpc_point.Y();
-    mdf_input[2] = gMDFTrackerS522->mwpc_point.Z();
-    mdf_input[3] = gMDFTrackerS522->f10_point.X();
-    mdf_input[4] = gMDFTrackerS522->f10_point.Z();
-    mdf_input[5] = gMDFTrackerS522->f11_point.X();
-    mdf_input[6] = gMDFTrackerS522->f11_point.Z();
-    mdf_input[7] = (gMDFTrackerS522->f12_point.Y() - mdf_input[1]) / (gMDFTrackerS522->f12_point.Z() - mdf_input[2]);
+	gMDFTrackerS522->flast_ang_offset.SetXYZ(par[20], par[21], par[22]);
+	gMDFTrackerS522->flast_pos_offset.SetXYZ(par[23], 0, par[24]);
 
-    v2 += pow((gMDFTrackerS522->Get_MDF_PoQ()->MDF(mdf_input) - gMDFTrackerS522->GetReferencePoQ()), 2);
-    counter++;
-    }
-    v2 /= counter;
-    v = sqrt(v2);
-    // std::cout << "\nReturning error: " << v;
-    return v;
-    */
+
+	Double_t mdf_input[8]; // data container for the MDF function
+
+	double v2 = 0;
+	double v = 0;
+	int counter = 0;
+	for (auto& d : (gMDFTrackerS522->det_points_vec))
+	{
+		gMDFTrackerS522->f1_point = d.f1;
+		gMDFTrackerS522->f2_point = d.f2;
+		gMDFTrackerS522->f30_point = d.f30;
+		gMDFTrackerS522->f32_point = d.f32;
+		gMDFTrackerS522->flast_point = d.flast;	
+
+		// This will transform "det_point" vectors into lab frame
+		gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->f1_point,
+				gMDFTrackerS522->GetEulerAnglesFoot1() + gMDFTrackerS522->f1_ang_offset,
+				gMDFTrackerS522->GetPositionFoot1() + gMDFTrackerS522->f1_pos_offset);
+
+		gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->f2_point,
+				gMDFTrackerS522->GetEulerAnglesFoot2() + gMDFTrackerS522->f2_ang_offset,
+				gMDFTrackerS522->GetPositionFoot2() + gMDFTrackerS522->f2_pos_offset);
+
+		gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->f30_point,
+				gMDFTrackerS522->GetEulerAnglesFiber30() + gMDFTrackerS522->f30_ang_offset,
+				gMDFTrackerS522->GetPositionFiber30() + gMDFTrackerS522->f30_pos_offset);
+
+			gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->f32_point,
+				gMDFTrackerS522->GetEulerAnglesFiber32() + gMDFTrackerS522->f32_ang_offset,
+				gMDFTrackerS522->GetPositionFiber32() + gMDFTrackerS522->f32_pos_offset);
+
+		gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->flast_point,
+				gMDFTrackerS522->GetEulerAnglesFiber31() + gMDFTrackerS522->flast_ang_offset,
+				gMDFTrackerS522->GetPositionFiber31() + gMDFTrackerS522->flast_pos_offset);
+
+
+
+		mdf_input[0] = gMDFTrackerS522->f2_point.Y();
+		mdf_input[1] = gMDFTrackerS522->f2_point.Z();
+		mdf_input[2] = gMDFTrackerS522->f1_point.X();
+		mdf_input[3] = gMDFTrackerS522->f1_point.Z();
+		mdf_input[4] = gMDFTrackerS522->f32_point.X();
+		mdf_input[5] = gMDFTrackerS522->f32_point.Z();	
+		mdf_input[6] = (gMDFTrackerS522->flast_point.X() - mdf_input[4]) / (gMDFTrackerS522->flast_point.Z() - mdf_input[5]);
+	mdf_input[7] = (gMDFTrackerS522->f30_point.Y() - mdf_input[0]) / (gMDFTrackerS522->f30_point.Z() - mdf_input[1]);
+
+
+		v2 += pow((gMDFTrackerS522->Get_MDF_PoQ()->MDF(mdf_input) - gMDFTrackerS522->GetReferencePoQ()), 2);
+		counter++;
+	}
+	v2 /= counter;
+	v = sqrt(v2);
+	// std::cout << "\nReturning error: " << v;
+	return v;
+
 }
 
 ClassImp(R3BTrackingS522);
