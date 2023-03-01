@@ -249,28 +249,31 @@ void R3BTrackingS522::Exec(Option_t* option)
     mul_f33  = fDataItems[DET_FI33]->GetEntriesFast();
     mul_tofd = fDataItems[DET_TOFD]->GetEntriesFast();
     
-    //cout << "\n\nMul m0: \t" << mul_m0;
-    //cout << "\nMul m1: \t" << mul_m1;
-    //cout << "\nMul foot: \t" << mul_foot;
-    //cout << "\nMul f30: \t" << mul_f30;
-    //cout << "\nMul f31: \t" << mul_f31;
-    //cout << "\nMul f32: \t" << mul_f32;
-    //cout << "\nMul f33: \t" << mul_f33;
-    //cout << "\nMul tofd: \t" << mul_tofd;
+    /*std::cout << "\n\nMul m0: \t" << mul_m0;
+    std::cout << "\nMul m1: \t" << mul_m1;
+    std::cout << "\nMul foot: \t" << mul_foot;
+    std::cout << "\nMul f30: \t" << mul_f30;
+    std::cout << "\nMul f31: \t" << mul_f31;
+    std::cout << "\nMul f32: \t" << mul_f32;
+    std::cout << "\nMul f33: \t" << mul_f33;
+    std::cout << "\nMul tofd: \t" << mul_tofd << std::endl;*/
 
 
     if(mul_m0!=1 || mul_m1!=1 || mul_foot<1) return;//for now take only mul=1 in mwpcs
     if(mul_f32<1 || mul_f30<1 || (mul_f31==0 && mul_f33==0) || mul_tofd<1) return;
     if(mul_f32>10 || mul_f30>10 || mul_f31>10 || mul_f33 >10 || mul_tofd>10) return;
 
-    //cout << "\nGood event!\n";
+    cout << "\nGood event! multiplicity foot/fiber \n";
        
     //FRS data
     auto frs_DataItems = fDataItems.at(FRS_DATA);
+    cout << "\n Frs Entries: \t" << frs_DataItems->GetEntriesFast();
     if(frs_DataItems->GetEntriesFast() < 1) return; 
     auto frs_data = (R3BFrsData*)frs_DataItems->At(0);
-    //if(frs_data->GetBrho()<16 || frs_data->GetBrho()>19) return;
-cout << "\nGood event!\n";
+    cout << "\n Frs Brho: \t" << frs_data->GetBrho();
+    if(frs_data->GetBrho()<16 || frs_data->GetBrho()>19) return;
+     
+    cout << "\nGood event! Brho check \n";
         //------ Get TOFD data 
         R3BTofdHitData* tofd_hit{};
     bool is_good_tofd = false;
@@ -296,6 +299,8 @@ cout << "\nGood event!\n";
 	    return;//at least one good track candidate in Fibers
     }
     if(mul_f1>10 || mul_f2>10 || mul_f15>10 || mul_f16 >10) return;
+    
+    cout << "\nGood event! tracks identified \n";
 
     is_good_event = true;
 
