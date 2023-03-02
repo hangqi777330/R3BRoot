@@ -267,10 +267,8 @@ void R3BTrackingS522::Exec(Option_t* option)
        
     //FRS data
     auto frs_DataItems = fDataItems.at(FRS_DATA);
-    cout << "\n Frs Entries: \t" << frs_DataItems->GetEntriesFast();
     if(frs_DataItems->GetEntriesFast() < 1) return; 
     auto frs_data = (R3BFrsData*)frs_DataItems->At(0);
-    cout << "\n Frs Brho: \t" << frs_data->GetBrho();
     if(frs_data->GetBrho()<16 || frs_data->GetBrho()>19) return;
      
     cout << "\nGood event! Brho check \n";
@@ -425,6 +423,7 @@ bool R3BTrackingS522::SortFootData()
 {
     f1_hits.clear(); f2_hits.clear(); f15_hits.clear(); f16_hits.clear();
     mul_foot = fDataItems[FOOT_HITDATA]->GetEntriesFast();
+    std::cout << "mul_foot: " << mul_foot << std::endl;
     if(mul_foot==0) return false;
     for (auto f=0; f<mul_foot; ++f)
     {
@@ -446,6 +445,7 @@ bool R3BTrackingS522::SortFootData()
                 break;
         }
     }
+    std::cout << "f1: " << f1_hits.size() << " f2: " << f2_hits.size() << " f15: " << f15_hits.size() << " f16: " << f16_hits.size() << std::endl;
     if(f1_hits.empty() || f2_hits.empty() || f15_hits.empty() || f16_hits.empty())     
         return false; 
     mul_f1  = f1_hits.size(); mul_f2  = f2_hits.size();
@@ -459,7 +459,11 @@ bool R3BTrackingS522::MakeIncomingTracks()
         return false;
     tracks_in.clear();
     N_in_tracks=0;
-    if(!SortFootData()) return false;//at least 1 hit in every FOOT
+    if(!SortFootData()) 
+    {
+	    std::cout << "wrong Foot data sorting" << std::endl;
+	    return false;//at least 1 hit in every FOOT
+    }
     TVector3 vertex_mwpc, vertex_foot;//projection to the center of the target (0,0,0)
     double tx_in, ty_in, dx_vertex, dy_vertex;
     Track tr;
@@ -512,6 +516,7 @@ bool R3BTrackingS522::MakeIncomingTracks()
                     dx_vertex = vertex_foot.X() - vertex_mwpc.X();
                     dy_vertex = vertex_foot.Y() - vertex_mwpc.Y();
                     
+		    std::cout << "dx_vertex: " << dx_vertex << " dy_vertex: " << dy_vertex << std::endl;
                     //s522
                     if(dx_vertex<1 || dx_vertex>2 || dy_vertex<(-2.5) || dy_vertex>(-1.5)) continue;
                     //s509
