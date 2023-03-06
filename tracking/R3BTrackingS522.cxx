@@ -423,7 +423,6 @@ bool R3BTrackingS522::SortFootData()
 {
     f1_hits.clear(); f2_hits.clear(); f15_hits.clear(); f16_hits.clear();
     mul_foot = fDataItems[FOOT_HITDATA]->GetEntriesFast();
-    std::cout << "mul_foot: " << mul_foot << std::endl;
     if(mul_foot==0) return false;
     for (auto f=0; f<mul_foot; ++f)
     {
