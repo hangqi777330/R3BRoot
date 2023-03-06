@@ -175,7 +175,7 @@ class R3BTrackingS522 : public FairTask
     vector<UInt_t> f15_hits;
     vector<UInt_t> f16_hits;
     TVector3 m0_point, m1_point, f1_point, f2_point, f15_point,f16_point, f30_point, f32_point, flast_point;
-
+    TVector3 m0_point_i, m1_point_i, f1_point_i, f2_point_i, f15_point_i,f16_point_i, f30_point_i, f32_point_i, flast_point_i;
     bool IsGoodFiberHit(R3BFiberMAPMTHitData* fhit);
     bool IsGoodFootHit(R3BFootHitData* fhit);
     bool SortFootData();
@@ -232,6 +232,9 @@ class R3BTrackingS522 : public FairTask
     TRotation r;
     TVector3 v3_localX;
     TVector3 v3_localZ;
+    TRotation r1;
+    TVector3 v3_localX1;
+    TVector3 v3_localZ1;
 
     TVector3 los_position;
     TVector3 los_angles;
@@ -293,7 +296,7 @@ class R3BTrackingS522 : public FairTask
     // Cut on fiber hit energy set by SetFiberEnergyMinMax():
     Double_t FiberEnergyMin;
     Double_t FiberEnergyMax;
-    
+
     TTree tree_out;
     UInt_t N_glob_tracks;
     UInt_t N_in_tracks;
@@ -327,7 +330,7 @@ class R3BTrackingS522 : public FairTask
     Float_t  m0_X;
     Float_t  m0_Y;
     Float_t  m0_Z;
-    
+
     Float_t  m1_X;
     Float_t  m1_Y;
     Float_t  m1_Z;
@@ -337,7 +340,7 @@ class R3BTrackingS522 : public FairTask
 
     Float_t vertex_mwpc_X[N_glob_tracks_max];
     Float_t vertex_mwpc_Y[N_glob_tracks_max];
-    
+
     Float_t f1_X[N_glob_tracks_max];
     Float_t f1_Y[N_glob_tracks_max];
     Float_t f1_Z[N_glob_tracks_max];
