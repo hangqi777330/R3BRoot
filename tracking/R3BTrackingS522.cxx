@@ -357,11 +357,22 @@ void R3BTrackingS522::Exec(Option_t* option)
 
             tofd_Q[N_glob_tracks] = tofd_hit->GetEloss();
 
-            N_glob_tracks++;
+	    ToF[N_glob_tracks] = FlightPath[N_glob_tracks] / frs_data->GetBeta() / SPEED_OF_LIGHT + tof_offset;
+	    Beta[N_glob_tracks] = FlightPath[N_glob_tracks] / ToF[N_glob_tracks] / SPEED_OF_LIGHT;
+	    Gamma[N_glob_tracks] = 1. / sqrt(1 - pow(Beta[N_glob_tracks],2));
+	    mdf_AoZ[N_glob_tracks] = PoQ[N_glob_tracks] / Beta[N_glob_tracks] / Gamma[N_glob_tracks] / AMU;
+
+	    TVector3 vec_PoQ(TX0[N_glob_tracks], TY0[N_glob_tracks], 1);
+	    vec_PoQ.SetMag(PoQ[N_glob_tracks]);
+
+	    AddTrackData(m0_point, vec_PoQ, tofd_Q[N_glob_tracks], mdf_AoZ[N_glob_tracks]);
+
+	    N_glob_tracks++;
 
             if(N_glob_tracks == N_glob_tracks_max) return;
         }
     }
+
     return;
 }
 
@@ -444,7 +455,6 @@ bool R3BTrackingS522::SortFootData()
                 break;
         }
     }
-    std::cout << "f1: " << f1_hits.size() << " f2: " << f2_hits.size() << " f15: " << f15_hits.size() << " f16: " << f16_hits.size() << std::endl;
     if(f1_hits.empty() || f2_hits.empty() || f15_hits.empty() || f16_hits.empty())     
         return false; 
     mul_f1  = f1_hits.size(); mul_f2  = f2_hits.size();
@@ -460,7 +470,6 @@ bool R3BTrackingS522::MakeIncomingTracks()
     N_in_tracks=0;
     if(!SortFootData()) 
     {
-	    std::cout << "wrong Foot data sorting" << std::endl;
 	    return false;//at least 1 hit in every FOOT
     }
     TVector3 vertex_mwpc, vertex_foot;//projection to the center of the target (0,0,0)
