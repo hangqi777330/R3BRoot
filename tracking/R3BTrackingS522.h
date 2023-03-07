@@ -132,7 +132,7 @@ class R3BTrackingS522 : public FairTask
 
     // Transofrming input detector hit (point) into laboratory system
     void TransformPoint(TVector3& point, TVector3* rotation, TVector3* translation);
-    void TransformPoint1(TVector3& point, TVector3 rotation, TVector3 translation);
+    void TransformPoint1(TVector3& point1, TVector3 rotation1, TVector3 translation1);
     // Setup energy cuts in foot and fibers 
     void SetFootEnergyMinMax(double min, double max);
     void SetFiberEnergyMinMax(double min, double max);

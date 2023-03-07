@@ -269,9 +269,9 @@ void R3BTrackingS522::Exec(Option_t* option)
     auto frs_DataItems = fDataItems.at(FRS_DATA);
     if(frs_DataItems->GetEntriesFast() < 1) return; 
     auto frs_data = (R3BFrsData*)frs_DataItems->At(0);
-    if(frs_data->GetBrho()<17 || frs_data->GetBrho()>18) return;
-    if(frs_data->GetAq()<2.675 || frs_data->GetAq()>2.694) return;
-    if(frs_data->GetZ()<5.5 || frs_data->GetZ()>6.5) return;
+    if(frs_data->GetBrho()<17.5 || frs_data->GetBrho()>17.7) return;
+    //if(frs_data->GetAq()<2.675 || frs_data->GetAq()>2.694) return;
+    if(frs_data->GetZ()<5.2 || frs_data->GetZ()>6.7) return;
     //cout << "\nGood event!\n";
     //------ Get TOFD data 
     R3BTofdHitData* tofd_hit{};
@@ -301,25 +301,14 @@ void R3BTrackingS522::Exec(Option_t* option)
 
     is_good_event = true;
 
-    if (DoAlignment)
+    if (DoAlignment && mul_f1==1 && mul_f2==1 && mul_f32==1 && mul_f30==1 && mul_f31==1)
     {
 	    det_points align_data;
-	   // cout<<"f1_X-->"<<f1_point.X()<<endl;
-	   // cout<<"f1_Z-->"<<f1_point.Z()<<endl;
-	   // cout<<"f2_Y-->"<<f2_point.Y()<<endl;
-	   // cout<<"f2_Z-->"<<f2_point.Z()<<endl;
-	   // cout<<"f32_x-->"<<f32_point.X()<<endl;
-	   // cout<<"f32_z-->"<<f32_point.Z()<<endl;
-	    //cout<<"f2_Z-->"<<f2_point.Y()<<endl;
-	    //cout<<"f2_Z-->"<<f2_point.Z()<<endl;
-	    
-	   
-	   
-	    align_data.f1.SetXYZ(f1_point_i.X(), 0, f1_point_i.Z());
+	    align_data.f1.SetXYZ(f1_point_i.X(),0, f1_point_i.Z());
 	    align_data.f2.SetXYZ(0, f2_point_i.Y(), f2_point_i.Z());
 	    align_data.f30.SetXYZ(0, f30_point_i.Y(), f30_point_i.Z());
 	    align_data.f32.SetXYZ(f32_point_i.X(),0, f32_point_i.Z());
-	    align_data.flast.SetXYZ(flast_point_i.X(), 0, flast_point_i.Z());
+	    align_data.flast.SetXYZ(flast_point_i.X(),0, flast_point_i.Z());
 	    det_points_vec.push_back(align_data);
     }
 
@@ -518,57 +507,56 @@ bool R3BTrackingS522::MakeIncomingTracks()
         f2_point_i=f2_point;
 	TransformPoint(f2_point,  &f2_angles,  &f2_position);
 
-        for (auto & f1 : f1_hits){
-            auto f1_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f1));
-            f1_point.SetXYZ((-1.) * f1_hit->GetPosLab().X() * 0.1, 0, 0); //cm
-            f1_point_i=f1_point;
-	    TransformPoint(f1_point,  &f1_angles,  &f1_position);
+	for (auto & f1 : f1_hits){
+		auto f1_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f1));
+		f1_point.SetXYZ((-1.) * f1_hit->GetPosLab().X() * 0.1, 0, 0); //cm
+		f1_point_i=f1_point;
+		TransformPoint(f1_point,  &f1_angles,  &f1_position);       
+		for (auto & f16 : f16_hits){
+			auto f16_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f16));
+			f16_point.SetXYZ(0, f16_hit->GetPosLab().Y() * 0.1, 0); //cm
+			TransformPoint(f16_point, &f16_angles, &f16_position);
 
-            for (auto & f16 : f16_hits){
-                auto f16_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f16));
-                f16_point.SetXYZ(0, f16_hit->GetPosLab().Y() * 0.1, 0); //cm
-                TransformPoint(f16_point, &f16_angles, &f16_position);
+			for (auto & f15 : f15_hits){
+				auto f15_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f15));
+				f15_point.SetXYZ((-1.) * f15_hit->GetPosLab().X() * 0.1, 0, 0); //cm
+				TransformPoint(f15_point, &f15_angles, &f15_position);
 
-                for (auto & f15 : f15_hits){
-                    auto f15_hit = static_cast<R3BFootHitData*>(fDataItems[FOOT_HITDATA]->At(f15));
-                    f15_point.SetXYZ((-1.) * f15_hit->GetPosLab().X() * 0.1, 0, 0); //cm
-                    TransformPoint(f15_point, &f15_angles, &f15_position);
+				//project foot track to the center of the target
+				tr.tx0 = (f15_point.X() - f1_point.X())/(f15_point.Z() - f1_point.Z());
+				tr.ty0 = (f16_point.Y() - f2_point.Y())/(f16_point.Z() - f2_point.Z());
+				vertex_foot.SetX(f1_point.X() - tr.tx0 * f1_point.Z());
+				vertex_foot.SetY(f2_point.Y() - tr.ty0 * f2_point.Z());
+				vertex_foot.SetZ(0);
+				//Condition on the vertex matching
+				dx_vertex = vertex_foot.X() - vertex_mwpc.X();
+				dy_vertex = vertex_foot.Y() - vertex_mwpc.Y();
 
-                    //project foot track to the center of the target
-                    tr.tx0 = (f15_point.X() - f1_point.X())/(f15_point.Z() - f1_point.Z());
-                    tr.ty0 = (f16_point.Y() - f2_point.Y())/(f16_point.Z() - f2_point.Z());
-                    vertex_foot.SetX(f1_point.X() - tr.tx0 * f1_point.Z());
-                    vertex_foot.SetY(f2_point.Y() - tr.ty0 * f2_point.Z());
-                    vertex_foot.SetZ(0);
-                    //Condition on the vertex matching
-                    dx_vertex = vertex_foot.X() - vertex_mwpc.X();
-                    dy_vertex = vertex_foot.Y() - vertex_mwpc.Y();
-                    
-                    //s522
-                    if(dx_vertex<1 || dx_vertex>2 || dy_vertex<(-2.5) || dy_vertex>(-1.5)) continue;
-                    //s509
-                    //if(dx_vertex<1 || dx_vertex>2 || dy_vertex<(-1.9) || dy_vertex>(-1.)) continue;
-                    
-                    tr.f1_x   = f1_point.X();
-                    tr.f1_z   = f1_point.Z();
-                    tr.f2_y   = f2_point.Y();
-                    tr.f2_z   = f2_point.Z();
-                    tr.f15_x  = f15_point.X();
-                    tr.f15_z  = f15_point.Z();
-                    tr.f16_y  = f16_point.Y();
-                    tr.f16_z  = f16_point.Z();
-                    tracks_in.push_back(tr);
+				//s522
+				if(dx_vertex<1 || dx_vertex>2 || dy_vertex<(-2.5) || dy_vertex>(-1.5)) continue;
+				//s509
+				//if(dx_vertex<1 || dx_vertex>2 || dy_vertex<(-1.9) || dy_vertex>(-1.)) continue;
 
-                    //Fill output tree
-                    vertex_mwpc_X[N_in_tracks] = vertex_mwpc.X();
-                    vertex_mwpc_Y[N_in_tracks] = vertex_mwpc.Y();
-                    vertex_foot_X[N_in_tracks] = vertex_foot.X();
-                    vertex_foot_Y[N_in_tracks] = vertex_foot.Y();
-                    N_in_tracks++;
-                    if(N_in_tracks==N_glob_tracks_max/2) return true;
-                }
-            }
-        }
+				tr.f1_x   = f1_point.X();
+				tr.f1_z   = f1_point.Z();
+				tr.f2_y   = f2_point.Y();
+				tr.f2_z   = f2_point.Z();
+				tr.f15_x  = f15_point.X();
+				tr.f15_z  = f15_point.Z();
+				tr.f16_y  = f16_point.Y();
+				tr.f16_z  = f16_point.Z();
+				tracks_in.push_back(tr);
+
+				//Fill output tree
+				vertex_mwpc_X[N_in_tracks] = vertex_mwpc.X();
+				vertex_mwpc_Y[N_in_tracks] = vertex_mwpc.Y();
+				vertex_foot_X[N_in_tracks] = vertex_foot.X();
+				vertex_foot_Y[N_in_tracks] = vertex_foot.Y();
+				N_in_tracks++;
+				if(N_in_tracks==N_glob_tracks_max/2) return true;
+			}
+		}
+	}
     }
     if(tracks_in.empty()) return false;
     else return true;
@@ -576,110 +564,110 @@ bool R3BTrackingS522::MakeIncomingTracks()
 
 bool R3BTrackingS522::MakeOutgoingTracks()
 {
-    if(fDataItems[DET_FI32]->GetEntriesFast() == 0 || fDataItems[DET_FI30]->GetEntriesFast() == 0 || 
-            (fDataItems[DET_FI33]->GetEntriesFast() == 0 && fDataItems[DET_FI31]->GetEntriesFast()==0) ) 
-        return false;
-    tracks_out.clear();
-    Track tr;
-    N_out_tracks=0;
-    double angle_out, f30_slope, f30_offset, track_slope, track_offset;
-    TVector3 f30_edge[2];//to extract z and x in f30
-    for (auto i=0; i<fDataItems[DET_FI32]->GetEntriesFast(); ++i)
-    {
-        auto f32 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI32]->At(i));
-        if(!IsGoodFiberHit(f32)) continue;
-        f32_point.SetXYZ(f32->GetX(), 0, 0); //cm
-        f32_point_i=f32_point;
-	TransformPoint(f32_point, &f32_angles, &f32_position);
-        tr.f32_x = f32_point.X();
-        tr.f32_z = f32_point.Z();
+	if(fDataItems[DET_FI32]->GetEntriesFast() == 0 || fDataItems[DET_FI30]->GetEntriesFast() == 0 || 
+			(fDataItems[DET_FI33]->GetEntriesFast() == 0 && fDataItems[DET_FI31]->GetEntriesFast()==0) ) 
+		return false;
+	tracks_out.clear();
+	Track tr;
+	N_out_tracks=0;
+	double angle_out, f30_slope, f30_offset, track_slope, track_offset;
+	TVector3 f30_edge[2];//to extract z and x in f30
+	for (auto i=0; i<fDataItems[DET_FI32]->GetEntriesFast(); ++i)
+	{
+		auto f32 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI32]->At(i));
+		if(!IsGoodFiberHit(f32)) continue;
+		f32_point.SetXYZ(f32->GetX(), 0, 0); //cm
+		f32_point_i=f32_point;
+		TransformPoint(f32_point, &f32_angles, &f32_position);
+		tr.f32_x = f32_point.X();
+		tr.f32_z = f32_point.Z();
 
-        for (auto j=0; j<fDataItems[DET_FI30]->GetEntriesFast(); ++j)
-        {
-            auto f30 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI30]->At(j));
-            if(!IsGoodFiberHit(f30)) continue;
-	    f30_point.SetXYZ(0,f30->GetY(), 0); //cm
-	    f30_point_i=f30_point;
-	    TransformPoint(f30_point, &f30_angles, &f30_position);
-	    tr.f30_y = f30_point.Y();
+		for (auto j=0; j<fDataItems[DET_FI30]->GetEntriesFast(); ++j)
+		{
+			auto f30 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI30]->At(j));
+			if(!IsGoodFiberHit(f30)) continue;
+			f30_point.SetXYZ(0,f30->GetY(), 0); //cm
+			f30_point_i=f30_point;
+			TransformPoint(f30_point, &f30_angles, &f30_position);
+			tr.f30_y = f30_point.Y();
 
-	    if(fabs(f32->GetTime_ns() - f30->GetTime_ns())>30) continue;
+			if(fabs(f32->GetTime_ns() - f30->GetTime_ns())>30) continue;
 
-	    //make combination with every hit in fibers 33 and 31
+			//make combination with every hit in fibers 33 and 31
 
-	    //for (auto k = 0; k<fDataItems[DET_FI33]->GetEntriesFast(); ++k)
-	    //{
-	    //    auto f33 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI33]->At(k));
-	    //    if(!IsGoodFiberHit(f33)) continue; //Messel side
+			/*	    for (auto k = 0; k<fDataItems[DET_FI33]->GetEntriesFast(); ++k)
+				    {
+				    auto f33 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI33]->At(k));
+				    if(!IsGoodFiberHit(f33)) continue; //Messel side
 
-	    //    if(fabs(f32->GetTime_ns() - f33->GetTime_ns())>40) continue;
+				    if(fabs(f32->GetTime_ns() - f33->GetTime_ns())>40) continue;
 
-	    //    last_point.SetXYZ(f33->GetX(), 0, 0); //cm
-	    //    TransformPoint(last_point, &f33_angles, &f33_position);
-	    //    tr.last_x = last_point.X();
-	    //    tr.last_z = last_point.Z();
-	    //    angle_out = TMath::ATan((tr.last_x - tr.f32_x)/(tr.last_z - tr.f32_z)) * TMath::RadToDeg();
-	    //    if(angle_out>(-10.) || angle_out<(-18.)) continue;
-	    //    // We need to extrapolate Z position in f30 because it was used for Y measurement
-	    //    // Define two (X,Z) points on the f30 plane:
-	    //    //Now track every combination of upstream and downstream tracks 
-	    //    f30_edge[0].SetXYZ(-1, 0, 0);
-	    //    f30_edge[1].SetXYZ(1, 0, 0);
-	    //    TransformPoint(f30_edge[0], &f30_angles, &f30_position);
-	    //    TransformPoint(f30_edge[1], &f30_angles, &f30_position);
-	    //    // Parameterize f30 plane
-	    //    f30_slope = (f30_edge[1].X() - f30_edge[0].X()) / (f30_edge[1].Z() - f30_edge[0].Z());
-	    //    f30_offset = f30_edge[0].X() - f30_slope * f30_edge[0].Z();
-	    //    track_slope  = (tr.last_x - tr.f32_x) / (tr.last_z - tr.f32_z);
-	    //    track_offset = (tr.last_x - track_slope * tr.last_z);
-	    //    // Extrapolate final X and Z position in f30
-	    //    tr.f30_z = (track_offset - f30_offset) / (f30_slope - track_slope);// extrapolated
-	    //    tr.f30_x = (track_slope * tr.f30_z + track_offset);// extrapolated
-	    //    N_out_tracks++;
-	    //    tracks_out.push_back(tr);
-	    //    if(N_out_tracks==N_glob_tracks/2) return true;
-	    //}
+				    flast_point.SetXYZ(f33->GetX(), 0, 0); //cm
+				    TransformPoint(flast_point, &f33_angles, &f33_position);
+				    tr.last_x = flast_point.X();
+				    tr.last_z = flast_point.Z();
+				    angle_out = TMath::ATan((tr.last_x - tr.f32_x)/(tr.last_z - tr.f32_z)) * TMath::RadToDeg();
+				    if(angle_out>(-10.) || angle_out<(-18.)) continue;
+			// We need to extrapolate Z position in f30 because it was used for Y measurement
+			// Define two (X,Z) points on the f30 plane:
+			//Now track every combination of upstream and downstream tracks 
+			f30_edge[0].SetXYZ(-1, 0, 0);
+			f30_edge[1].SetXYZ(1, 0, 0);
+			TransformPoint(f30_edge[0], &f30_angles, &f30_position);
+			TransformPoint(f30_edge[1], &f30_angles, &f30_position);
+			// Parameterize f30 plane
+			f30_slope = (f30_edge[1].X() - f30_edge[0].X()) / (f30_edge[1].Z() - f30_edge[0].Z());
+			f30_offset = f30_edge[0].X() - f30_slope * f30_edge[0].Z();
+			track_slope  = (tr.last_x - tr.f32_x) / (tr.last_z - tr.f32_z);
+			track_offset = (tr.last_x - track_slope * tr.last_z);
+			// Extrapolate final X and Z position in f30
+			tr.f30_z = (track_offset - f30_offset) / (f30_slope - track_slope);// extrapolated
+			tr.f30_x = (track_slope * tr.f30_z + track_offset);// extrapolated
+			N_out_tracks++;
+			tracks_out.push_back(tr);
+			if(N_out_tracks==N_glob_tracks/2) return true;
+			}
+			*/
 
+			//make combination with every hit in fibers 33 and 31
+			for (auto k = 0; k<fDataItems[DET_FI31]->GetEntriesFast(); ++k)
+			{
+				auto f31 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI31]->At(k));
+				if(!IsGoodFiberHit(f31)) continue; //Messel side
 
-	    //make combination with every hit in fibers 33 and 31
-	    for (auto k = 0; k<fDataItems[DET_FI31]->GetEntriesFast(); ++k)
-	    {
-		    auto f31 = static_cast<R3BFiberMAPMTHitData*>(fDataItems[DET_FI31]->At(k));
-		    if(!IsGoodFiberHit(f31)) continue; //Messel side
+				if((f32->GetTime_ns() - f31->GetTime_ns())>20 ||
+						(f32->GetTime_ns() - f31->GetTime_ns())<(-10) ) continue;
 
-		    if((f32->GetTime_ns() - f31->GetTime_ns())>20 ||
-				    (f32->GetTime_ns() - f31->GetTime_ns())<(-10) ) continue;
-
-		    flast_point.SetXYZ(f31->GetX(), 0, 0); //cm
-		    flast_point_i=flast_point;
-		    TransformPoint(flast_point, &f31_angles, &f31_position);
-		    tr.last_x = flast_point.X();
-		    tr.last_z = flast_point.Z();
-		    angle_out = TMath::ATan((tr.last_x - tr.f32_x)/(tr.last_z - tr.f32_z)) * TMath::RadToDeg();
-		    if(angle_out>(-10.) || angle_out<(-18.)) continue;
-		    // We need to extrapolate Z position in f30 because it was used for Y measurement
-		    // Define two (X,Z) points on the f30 plane:
-		    //Now track every combination of upstream and downstream tracks 
-		    f30_edge[0].SetXYZ(-1, 0, 0);
-		    f30_edge[1].SetXYZ(1, 0, 0);
-		    TransformPoint(f30_edge[0], &f30_angles, &f30_position);
-		    TransformPoint(f30_edge[1], &f30_angles, &f30_position);
-		    // Parameterize f30 plane
-		    f30_slope = (f30_edge[1].X() - f30_edge[0].X()) / (f30_edge[1].Z() - f30_edge[0].Z());
-		    f30_offset = f30_edge[0].X() - f30_slope * f30_edge[0].Z();
-		    track_slope  = (tr.last_x - tr.f32_x) / (tr.last_z - tr.f32_z);
-		    track_offset = (tr.last_x - track_slope * tr.last_z);
-		    // Extrapolate final X and Z position in f30
-		    tr.f30_z = (track_offset - f30_offset) / (f30_slope - track_slope);// extrapolated
-		    tr.f30_x = (track_slope * tr.f30_z + track_offset);// extrapolated
-		    N_out_tracks++;
-		    tracks_out.push_back(tr);
-		    if(N_out_tracks==N_glob_tracks/2) return true;
-	    }
+				flast_point.SetXYZ(f31->GetX(), 0, 0); //cm
+				flast_point_i=flast_point;
+				TransformPoint(flast_point, &f31_angles, &f31_position);
+				tr.last_x = flast_point.X();
+				tr.last_z = flast_point.Z();
+				angle_out = TMath::ATan((tr.last_x - tr.f32_x)/(tr.last_z - tr.f32_z)) * TMath::RadToDeg();
+				if(angle_out>(-10.) || angle_out<(-18.)) continue;
+				// We need to extrapolate Z position in f30 because it was used for Y measurement
+				// Define two (X,Z) points on the f30 plane:
+				//Now track every combination of upstream and downstream tracks 
+				f30_edge[0].SetXYZ(-1, 0, 0);
+				f30_edge[1].SetXYZ(1, 0, 0);
+				TransformPoint(f30_edge[0], &f30_angles, &f30_position);
+				TransformPoint(f30_edge[1], &f30_angles, &f30_position);
+				// Parameterize f30 plane
+				f30_slope = (f30_edge[1].X() - f30_edge[0].X()) / (f30_edge[1].Z() - f30_edge[0].Z());
+				f30_offset = f30_edge[0].X() - f30_slope * f30_edge[0].Z();
+				track_slope  = (tr.last_x - tr.f32_x) / (tr.last_z - tr.f32_z);
+				track_offset = (tr.last_x - track_slope * tr.last_z);
+				// Extrapolate final X and Z position in f30
+				tr.f30_z = (track_offset - f30_offset) / (f30_slope - track_slope);// extrapolated
+				tr.f30_x = (track_slope * tr.f30_z + track_offset);// extrapolated
+				N_out_tracks++;
+				tracks_out.push_back(tr);
+				if(N_out_tracks==N_glob_tracks/2) return true;
+			}
+		}
 	}
-    }
-    if(tracks_out.empty()) return false;
-    return true;
+	if(tracks_out.empty()) return false;
+	return true;
 }
 
 void R3BTrackingS522::TransformPoint(TVector3& point, TVector3* rot, TVector3* trans)
@@ -700,24 +688,24 @@ void R3BTrackingS522::TransformPoint(TVector3& point, TVector3* rot, TVector3* t
 	return;
 }
 
-void R3BTrackingS522::TransformPoint1(TVector3& point, TVector3 rot, TVector3 trans)
+void R3BTrackingS522::TransformPoint1(TVector3& point1, TVector3 rot1, TVector3 trans1)
 {
 
-	//cout<<"pointx "<<point.X()<<endl;
-	//cout<<"pointy "<<point.Y()<<endl;
-	//cout<<"pointz "<<point.Z()<<endl;
+/*	cout<<"pointx "<<point1.X()<<endl;
+	cout<<"pointy "<<point1.Y()<<endl;
+	cout<<"pointz "<<point1.Z()<<endl;
 
-	//cout<<"rotx "<<rot.X()<<endl;
-	//cout<<"roty "<<rot.Y()<<endl;
-	//cout<<"rotz "<<rot.Z()<<endl;
+	cout<<"rotx "<<rot1.X()<<endl;
+	cout<<"roty "<<rot1.Y()<<endl;
+	cout<<"rotz "<<rot1.Z()<<endl;
 
-	//cout<<"transx "<<trans.X()<<endl;
-	//cout<<"transy "<<trans.Y()<<endl;
-	//cout<<"transz "<<trans.Z()<<endl;
-
+	cout<<"transx "<<trans1.X()<<endl;
+	cout<<"transy "<<trans1.Y()<<endl;
+	cout<<"transz "<<trans1.Z()<<endl;
+*/
 	r1.SetToIdentity();
 	// First Euler rotation around Y axis
-	r1.RotateY(rot.Y());
+	r1.RotateY(rot1.Y());
 	// get local X axis after first rotation
 	v3_localX1.SetMagThetaPhi(1, r1.ThetaX(), r1.PhiX());
 	//cout<<"R1tx "<<r1.ThetaX()<<endl;
@@ -726,19 +714,19 @@ void R3BTrackingS522::TransformPoint1(TVector3& point, TVector3 rot, TVector3 tr
 
 
 	// Second Euler rotation around local X axis
-	r1.Rotate(rot.X(), v3_localX1);
+	r1.Rotate(rot1.X(), v3_localX1);
 	// get local Z axis after second rotation	
 	v3_localZ1.SetMagThetaPhi(1, r1.ThetaZ(), r1.PhiZ());
 	//cout<<"R1tZ "<<r1.ThetaZ()<<endl;
 	//cout<<"R1pZ "<<r1.PhiZ()<<endl;
 
 	// final rotation around local Z axis
-	r1.Rotate(rot.Z(), v3_localZ1);
-	point.Transform(r1);
-	point += (trans);
-	//cout<<"pointx_a  "<<point.X()<<endl;
-	//cout<<"pointy_a  "<<point.Y()<<endl;
-	//cout<<"pointz_a  "<<point.Z()<<endl;
+	r1.Rotate(rot1.Z(), v3_localZ1);
+	point1.Transform(r1);
+	point1 += (trans1);
+	//cout<<"pointx_a  "<<point1.X()<<endl;
+	//cout<<"pointy_a  "<<point1.Y()<<endl;
+	//cout<<"pointz_a  "<<point1.Z()<<endl;
 
 
 	return;
@@ -816,7 +804,7 @@ void R3BTrackingS522::Alignment()
 
 	// Setting up Minimizer function parameters
 	Double_t precision = 1e-10; // 0 - default precision will be automaticalle determined
-	Double_t tolerance = 0.1;
+	Double_t tolerance = 0.2;
 	minimizer->SetMaxFunctionCalls(1000000000); // for Minuit/Minuit2
 	minimizer->SetMaxIterations(200);           // for GSL
 	minimizer->SetTolerance(tolerance);
@@ -836,12 +824,13 @@ void R3BTrackingS522::Alignment()
 		for (i = 0; i < NVarsFunctor; i++) // sampling +=50% from limits
 		{
 			offset[i] = gRandom->Uniform(min_offset[i] * 0.5, max_offset[i] * 0.5);
+		//	cout<<"Off--> "<<offset[i]<<endl;
 			minimizer->SetVariable(i, Form("par%d", i), offset[i], step[i]);
 			minimizer->SetVariableLimits(i, min_offset[i], max_offset[i]);	
 		}
 		minimizer->Minimize();
 		xs = minimizer->X();
-		cout<<"Min status--> "<<minimizer->Status()<<endl;
+		//cout<<"Min status--> "<<minimizer->Status()<<endl;
 		// if(minimizer->Status() !=0) continue; //valid minimum
 		// Check if all paramters are "far" from limits
 		for (i = 0; i < NVarsFunctor; i++)
@@ -926,8 +915,18 @@ double R3BTrackingS522::AlignmentErrorS522(const double* par)
 		gMDFTrackerS522->f32_point_i = d.f32;
 		gMDFTrackerS522->f30_point_i = d.f30;
 		gMDFTrackerS522->flast_point_i = d.flast;	
-
+		//cout<<"BT-> "<<gMDFTrackerS522->f1_point_i.X()<<endl;
 		// This will transform "det_point" vectors into lab frame
+/*
+		cout<<"f1x_posoff_x-> "<<gMDFTrackerS522->f1_point_i.X()<<endl;
+		cout<<"f1y_posoff_z-> "<<gMDFTrackerS522->f1_point_i.Y()<<endl;
+		cout<<"f1z_posoff_y-> "<<gMDFTrackerS522->f1_point_i.Z()<<endl;
+		cout<<"f2x_posoff_z-> "<<gMDFTrackerS522->f2_point_i.X()<<endl;
+		cout<<"f2y_ang_x-> "<<gMDFTrackerS522->f2_point_i.Y()<<endl;
+		cout<<"f2z_ang_y-> "<<gMDFTrackerS522->f2_point_i.Z()<<endl;
+
+*/
+
 		gMDFTrackerS522->TransformPoint1(gMDFTrackerS522->f1_point_i,
 				gMDFTrackerS522->GetEulerAnglesFoot1() + gMDFTrackerS522->f1_ang_offset,
 				gMDFTrackerS522->GetPositionFoot1() + gMDFTrackerS522->f1_pos_offset);
@@ -948,21 +947,30 @@ double R3BTrackingS522::AlignmentErrorS522(const double* par)
 				gMDFTrackerS522->GetEulerAnglesFiber31() + gMDFTrackerS522->flast_ang_offset,
 				gMDFTrackerS522->GetPositionFiber31() + gMDFTrackerS522->flast_pos_offset);
 
-		mdf_input[0] = gMDFTrackerS522->f2_point.Y();
-		mdf_input[1] = gMDFTrackerS522->f2_point.Z();
-		mdf_input[2] = gMDFTrackerS522->f1_point.X();
-		mdf_input[3] = gMDFTrackerS522->f1_point.Z();
-		mdf_input[4] = gMDFTrackerS522->f32_point.X();
-		mdf_input[5] = gMDFTrackerS522->f32_point.Z();
-		mdf_input[6] = (gMDFTrackerS522->flast_point.X() - mdf_input[4]) / (gMDFTrackerS522->flast_point.Z() - mdf_input[5]);
-		mdf_input[7] = (gMDFTrackerS522->f30_point.Y() - mdf_input[0]) / (gMDFTrackerS522->f30_point.Z() - mdf_input[1]);
+/*		cout<<"f1_posoff_x-> "<<gMDFTrackerS522->f1_pos_offset.X()<<endl;
+		cout<<"f1_posoff_z-> "<<gMDFTrackerS522->f1_pos_offset.Z()<<endl;
+		cout<<"f2_posoff_y-> "<<gMDFTrackerS522->f2_pos_offset.Y()<<endl;
+		cout<<"f2_posoff_z-> "<<gMDFTrackerS522->f2_pos_offset.Z()<<endl;
+		cout<<"f1_ang_x-> "<<gMDFTrackerS522->f1_ang_offset.X()<<endl;
+		cout<<"f1_ang_x-> "<<gMDFTrackerS522->f1_ang_offset.Y()<<endl;
+*/
+
+		mdf_input[0] = gMDFTrackerS522->f2_point_i.Y();
+		mdf_input[1] = gMDFTrackerS522->f2_point_i.Z();
+		mdf_input[2] = gMDFTrackerS522->f1_point_i.X();
+		mdf_input[3] = gMDFTrackerS522->f1_point_i.Z();
+		mdf_input[4] = gMDFTrackerS522->f32_point_i.X();
+		mdf_input[5] = gMDFTrackerS522->f32_point_i.Z();
+		mdf_input[6] = (gMDFTrackerS522->flast_point_i.X() - mdf_input[4]) / (gMDFTrackerS522->flast_point_i.Z() - mdf_input[5]);
+		mdf_input[7] = (gMDFTrackerS522->f30_point_i.Y() - mdf_input[0]) / (gMDFTrackerS522->f30_point_i.Z() - mdf_input[1]);
 		v2 += pow((gMDFTrackerS522->Get_MDF_PoQ()->MDF(mdf_input) - gMDFTrackerS522->GetReferencePoQ()), 2);
 		//cout<<"MDF_PoQ "<<gMDFTrackerS522->Get_MDF_PoQ()->MDF(mdf_input)<<"  "<<" Ref_PoQ "<<gMDFTrackerS522->GetReferencePoQ()<<endl;
 		counter++;
 	}
 	v2 /= counter;
 	v = sqrt(v2);
-	//std::cout << "\nReturning error: " << v;
+//	std::cout << "\nReturning error: " << v;
+//for(int i=0; i<25; i++){cout<<"Par-> "<<par[i]<<endl;}
 	return v;
 
 }
